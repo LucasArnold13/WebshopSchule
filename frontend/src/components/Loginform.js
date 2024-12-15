@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthProvider';
+
 
 function LoginForm() {
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); 
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false); 
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
@@ -18,33 +24,35 @@ function LoginForm() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', 
         body: JSON.stringify({
-          username: username,
+          email: email,
           password: password,
         }),
       });
 
       const data = await response.json(); 
-      console.log(response)
+      console.log(data)
 
       if (response.ok) {
         console.log('Login erfolgreich:', data);
-        // Erfolgs-Handling hier, z.B. Weiterleitung oder Token speichern
+        login(data.user);
+        navigate('/customer/orders');
       } else {
-        setError(data.message || 'Login fehlgeschlagen'); // Fehlernachricht anzeigen
+        setError(data.message || 'Login fehlgeschlagen'); 
       }
     } catch (err) {
       setError('Ein Fehler ist aufgetreten');
       console.error('Fehler:', err);
     } finally {
-      setLoading(false); // Ladezustand deaktivieren
-    }
+      setLoading(false); 
+    } 
   };
 
   return (
     <Box
-      component="form" // Form-Tag für bessere Struktur
-      onSubmit={handleSubmit} // Beim Abschicken
+      component="form" 
+      onSubmit={handleSubmit} 
       sx={{
         backgroundColor: '#333',
         color: '#fff',
@@ -63,12 +71,14 @@ function LoginForm() {
       </Typography>
       <TextField
         fullWidth
-        label="Username"
+        label="Email"
         variant="filled"
-        value={username} // Username aus dem Zustand
-        onChange={(e) => setUsername(e.target.value)} // Zustand aktualisieren
-        InputProps={{
-          style: { backgroundColor: '#fff' },
+        value={email} 
+        onChange={(e) => setEmail(e.target.value)} 
+        slotProps={{
+          input: { 
+            style: { backgroundColor: '#fff', color: '#000' }, 
+          },
         }}
       />
       <TextField

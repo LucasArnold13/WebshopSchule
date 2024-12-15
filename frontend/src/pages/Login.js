@@ -1,10 +1,17 @@
 import React from "react";
 import Loginform from "../components/Loginform";
+import { Box } from "@mui/material";
 
 
 function Login() {
   return (
-  <Loginform/>
+    <Box sx={{         
+      display: 'flex',
+      justifyContent: 'center'
+    }}>
+    <Loginform/>
+    </Box>
+
   );
 }
 

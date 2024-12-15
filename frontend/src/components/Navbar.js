@@ -17,7 +17,7 @@ function Navbar() {
     <AppBar
       position="fixed"
       elevation={0}
-      sx={{ backgroundColor: 'transparent' }}
+      sx={{ backgroundColor: 'transparent',  backdropFilter: 'blur(8px)' }}
     >
       <Toolbar
         sx={{
@@ -30,9 +30,6 @@ function Navbar() {
         <div style={{ display: 'flex', gap: '10px' }}>
           <NavLink to="/" style={navLinkStyle}>
             Logo
-          </NavLink>
-          <NavLink to="/login" style={navLinkStyle}>
-            Login(zum Testen)
           </NavLink>
           <NavLink to="/1" style={navLinkStyle}>
             Handys
@@ -48,10 +45,11 @@ function Navbar() {
           </NavLink>
         </div>
 
-        {/* Rechte Seite der Navbar */}
+     
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <SearchOutlinedIcon />
-          <UserMenu />
+           {/* Rechte Seite der Navbar */}
+        <UserMenu/>
           <ShoppingBagOutlinedIcon />
         </div>
       </Toolbar>
