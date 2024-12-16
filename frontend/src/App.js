@@ -1,14 +1,21 @@
-import './App.css';
+import { AuthProvider } from './context/AuthProvider';
+import { Routes, Route } from 'react-router-dom';
+
 import Login from "./pages/Login";
 import Layout from "./components/Layouts/Layout"
 import Register from './pages/Register';
 import Customerlayout from './components/Layouts/Customerlayout';
-import Profile from './pages/customer/profile';
-import Address from './pages/customer/address';
-import { Routes, Route } from 'react-router-dom';
-import Orders from './pages/customer/orders';
-import { AuthProvider } from './context/AuthProvider';
-import Order from './pages/customer/Order';
+import Profile from './pages/Customer/profile';
+import Address from './pages/Customer/address';
+import Orders from './pages/Customer/orders';
+import BackendLayout from './components/Layouts/Backendlayout';
+
+import Order from './pages/Customer/Order';
+import Dashboard from './pages/Backend/Dashboard';
+import Customers from './pages/Backend/Customer';
+import Backendorders from './pages/Backend/Orders';
+import Backendorder from './pages/Backend/Backenorder';
+import Products from './pages/Backend/Products';
 
 function App() {
   return (
@@ -36,8 +43,13 @@ function App() {
 
 
           {/* Backend */}
-          <Route path='/backend/' >
-            <Route path='dashboard'/>
+          <Route path='/backend/' element={<BackendLayout/>} >
+            <Route path='dashboard' element={<Dashboard/>}/>
+            <Route path='customers' element={<Customers/>}/>
+            <Route path='orders' element={<Backendorders/>}/>
+            <Route path='order/:id' element={<Backendorder/>}/>
+            <Route path='products' element={<Products/>}/>
+
           </Route>
       </Routes>
     </AuthProvider>

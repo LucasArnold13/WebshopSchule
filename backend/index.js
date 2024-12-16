@@ -3,7 +3,7 @@ const session = require('express-session');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 
-const { Customer, Order, Orderitems } = require('./models'); 
+const { Customer, Order, Orderitems, Status } = require('./models'); 
 const app = express();
 const port = 3000;
 
@@ -138,7 +138,6 @@ app.delete('/api/logout', (req, res) => {
 
 
 app.get('/api/customer/:id/orders', async (req, res) => {
-  console.log("test");
   try {
     const customerId = req.params.id; 
     const customerOrders = await Order.findAll({
@@ -158,3 +157,29 @@ app.get('/api/customer/:id/orders', async (req, res) => {
   }
 });
 
+app.get('/api/backend/orders', async (req, res) => {
+  try {
+    const customerOrders = await Order.findAll({
+      include: [
+        {
+          model: Orderitems, 
+          as: 'orderitems', 
+        },
+        {
+          model: Status, 
+          as: 'status', 
+        },
+        {
+          model: Customer, 
+          as: 'customer', 
+          attributes: { exclude: ['password'] }, // für die Sicherheit
+        },
+      ],
+    });
+
+    return res.json(customerOrders); 
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});

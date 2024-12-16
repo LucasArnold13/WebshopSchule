@@ -11,7 +11,7 @@ function Orders() {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/customer/10/orders', {
+                const response = await fetch('http://localhost:3000/api/customer/21/orders', {
                     method: 'GET',
                     credentials: 'include',
                 });
