@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthProvider';
 
 function Registerform() {
   const [firstname, setFirstname] = useState('');
@@ -11,7 +10,6 @@ function Registerform() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -36,7 +34,6 @@ function Registerform() {
       console.log(response)
 
       if (response.ok) {
-        login()
         navigate("/customer/orders")
       } else {
         setError(data.message || 'Login fehlgeschlagen'); 

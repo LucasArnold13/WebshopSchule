@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthProvider';
 
 
 function LoginForm() {
@@ -9,7 +8,6 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); 
-  const { login } = useAuth();
   const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
 
@@ -19,7 +17,7 @@ function LoginForm() {
 
     try {
       setLoading(true); 
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch('http://localhost:3000/api/frontend/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,12 +31,11 @@ function LoginForm() {
 
       const data = await response.json(); 
       console.log(data)
-
+      sessionStorage.setItem("customersession", JSON.stringify(data));
       if (response.ok) {
         console.log('Login erfolgreich:', data);
-        login(data.user);
-        navigate('/customer/orders');
-      } else {
+       // navigate('/customer/orders');
+      } else { 
         setError(data.message || 'Login fehlgeschlagen'); 
       }
     } catch (err) {

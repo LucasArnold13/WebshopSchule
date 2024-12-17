@@ -1,7 +1,7 @@
 import React, {useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Ordercard from "../../components/Ordercard";
+import Ordercard from "../../Components/Ordercard";
 
 function Orders() {
 

@@ -1,18 +1,35 @@
 import { DataGrid } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Typography } from '@mui/material';
 
+const theme = createTheme({
+    components: {
+      MuiDataGrid: {
+        styleOverrides: {
+          columnHeaders: {
+            backgroundColor: "rgba(45, 89, 235, 0.9)  !important", // Hintergrund global anpassen
+            color: "black", // Textfarbe
+          },
+          root: {
+            '--DataGrid-containerBackground': 'rgba(45, 89, 235, 0.9)',
+          },
+        },
+      },
+    },
+  });
 
 
 function Orders() {
     const navigate = useNavigate();
     const [rows, setRows] = useState([]);
     const columns = [
-        { field: 'col1', headerName: 'ID', width: 150, headerAlign: "center",   cellClassName: 'super-app-theme--header',},
-        { field: 'col2', headerName: 'Kunde', width: 150,  headerAlign: "center" },
-        { field: 'col3', headerName: 'Status', width: 150,  headerAlign: "center" },
-        { field: 'col4', headerName: 'Erstellt am', width: 150,  headerAlign: "center" },
-        { field: 'col5', headerName: 'Preis', width: 150,  headerAlign: "center" },
+        { field: 'col1', headerName: 'ID', headerAlign: "center",  flex: 1,   },
+        { field: 'col2', headerName: 'Kunde',  headerAlign: "center", flex: 1,    },
+        { field: 'col3', headerName: 'Status',  headerAlign: "center", flex: 1    },
+        { field: 'col4', headerName: 'Erstellt am',  headerAlign: "center", flex: 1    },
+        { field: 'col5', headerName: 'Preis',  headerAlign: "center", flex: 1    },
     ];
 
 
@@ -64,20 +81,34 @@ function Orders() {
 
     return (
         <>
-            <p>Bestellungen</p>
-            <div style={{ height: 300, width: '100%' }}>
+            <Typography variant='h4' sx={{padding : "10,10,10,10"}}>Bestellungen</Typography>
+            <ThemeProvider theme={theme}>
+            <div style={{ height: "100vh", width: '100%'}}>
                 <DataGrid
                     disableRowSelectionOnClick 
                     rows={rows}
                     columns={columns}
                     onCellClick={handleCellClick}
                     sx={{
-                        cursor: 'pointer',
-'& .super-app-theme--header': {
-     backgroundColor: '#7BF3A4',
- },
-                    }} />
+                        "& .MuiDataGrid-cell:focus": {
+                            outline: "none", 
+                          },
+                          "& .MuiDataGrid-columnHeader:focus": {
+                            outline: "none",
+                          },
+                        "& .MuiDataGrid-columnHeaders": {
+                        },
+                        '& .MuiDataGrid-cell': {
+                            backgroundColor:  "rgba(255, 255, 255, 0.9) !important", 
+                            cursor: 'pointer',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+
+                          },
+                        }} />
             </div>
+            </ThemeProvider>
         </>
 
     );

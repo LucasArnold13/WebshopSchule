@@ -13,18 +13,17 @@ import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthProvider';
 
 export default function UserMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate(); 
-  const { isLoggedIn, logout } = useAuth();
+
 
   const MenuItemStyle = () => ({ color: '#FFFFFF', fontSize: 30 });
 
   React.useEffect(() => {
-  }, [isLoggedIn]);
+  });
 
   const handleNavigation = () => {
     navigate('/login'); 
@@ -115,7 +114,7 @@ export default function UserMenu() {
                Adressen
               </Typography>
             </MenuItem>
-            <MenuItem onClick={() => logout()}>
+            <MenuItem onClick={() => console.log("logout wieder hinzufügen")}>
               <Logout sx={MenuItemStyle}/>
               <Typography color="white" sx={{ marginLeft: 1, textAlign: 'center' }}>
                Logout

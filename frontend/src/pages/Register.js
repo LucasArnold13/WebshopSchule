@@ -1,5 +1,5 @@
 import React from "react";
-import Registerform from "../components/Registerform";
+import Registerform from "../Components/Registerform";
 import { Box } from "@mui/material";
 
 

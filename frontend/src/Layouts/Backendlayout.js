@@ -7,11 +7,14 @@ function BackendLayout() {
         textDecoration: "none",
         padding: "10px 15px",
         borderRadius: "8px",
-       backgroundColor: isActive ? "rgba(178, 58, 238, 0.3)" : "transparent",
+        width : "100%",
+        boxSizing: "border-box",
+        color: 'black',
+       backgroundColor: isActive ? "rgba(45, 89, 235, 0.3)" : "transparent",
         display: "block",
         transition: "background-color 0.3s ease", // Optional: weicher Übergang
         "&:hover": {
-            backgroundColor: "rgba(178, 58, 238, 0.8) !important", // Müll
+            backgroundColor: "rgba(45, 89, 235, 0.8) !important", // Müll
         },
     });
 
@@ -25,6 +28,7 @@ function BackendLayout() {
                 flexDirection: "column", 
             }}>
                 <Box sx={{
+                    height : "300px",
                     backgroundColor: "white",
                     borderRadius: "12px",
                     alignItems: 'center',
@@ -55,6 +59,12 @@ function BackendLayout() {
                         style={navLinkStyle}
                     >
                         Produkte
+                    </NavLink>
+                    <NavLink
+                        to="/backend/users"
+                        style={navLinkStyle}
+                    >
+                        Users
                     </NavLink>
                 </Box>
 

@@ -1,11 +1,9 @@
 import { Navigate, Outlet, NavLink } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 import React, { useEffect } from 'react';
-import { useAuth } from '../../context/AuthProvider';
 
 
 function Customerlayout() {
-    const { isLoggedIn, user } = useAuth();
 
     const navLinkStyle = ({ isActive }) => ({
         textDecoration: "none",
@@ -17,7 +15,7 @@ function Customerlayout() {
     });
     useEffect(() => {
 
-    }, [isLoggedIn]);
+    });
 
         return (
             <Box sx={{
