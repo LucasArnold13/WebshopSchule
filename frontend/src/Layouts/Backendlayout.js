@@ -7,10 +7,10 @@ function BackendLayout() {
         textDecoration: "none",
         padding: "10px 15px",
         borderRadius: "8px",
-        width : "100%",
+        width: "100%",
         boxSizing: "border-box",
         color: 'black',
-       backgroundColor: isActive ? "rgba(45, 89, 235, 0.3)" : "transparent",
+        backgroundColor: isActive ? "rgba(45, 89, 235, 0.3)" : "transparent",
         display: "block",
         transition: "background-color 0.3s ease", // Optional: weicher Übergang
         "&:hover": {
@@ -19,16 +19,16 @@ function BackendLayout() {
     });
 
     return (
-        <Box sx={{ display: 'flex', backgroundColor : "#f0f0f0" }}>
+        <>
             <Box sx={{
                 flex: 2,
-             //  backgroundColor: "green",
-                paddingTop :"50px",
+                //  backgroundColor: "green",
+                paddingTop: "50px",
                 height: "100vh", // Volle Bildschirmhöhe
-                flexDirection: "column", 
+                flexDirection: "column",
             }}>
                 <Box sx={{
-                    height : "300px",
+                    height: "300px",
                     backgroundColor: "white",
                     borderRadius: "12px",
                     alignItems: 'center',
@@ -69,7 +69,7 @@ function BackendLayout() {
                 </Box>
 
             </Box>
-            <Box sx={{ flex: 12,  display: "flex", flexDirection: "column" }} >
+            <Box sx={{ flex: 12, display: "flex", flexDirection: "column" }} >
                 <Box sx={{
                     display: "flex",
                     justifyContent: "flex-end",
@@ -86,7 +86,7 @@ function BackendLayout() {
                     <Outlet />
                 </Box>
             </Box>
-        </Box>
+        </>
     );
 
 }

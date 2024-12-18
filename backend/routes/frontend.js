@@ -4,9 +4,9 @@ const { Customer, Order, Orderitems, Status } = require('../models');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 
-const customerSession = session({
-    name: "customer.sid", // Eindeutiger Name für Kunden-Session
-    secret: "customer-session-secret",
+const frontendSession = session({
+    name: "FSID", // Eindeutiger Name für Kunden-Session
+    secret: "geheimes_passwort",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 }, // 1 Stunde
@@ -14,7 +14,7 @@ const customerSession = session({
 
   
 
-router.post('/login',customerSession, async (req, res) => {
+router.post('/login',frontendSession, async (req, res) => {
     const { email, password } = req.body;
     const existingCustomer = await Customer.findOne({ where: { email } });
 

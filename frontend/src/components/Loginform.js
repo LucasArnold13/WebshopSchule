@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../Context/AuthProvider';
 
 
 function LoginForm() {
-
+  const {handleLogin, isLoggedIn} = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); 
@@ -15,35 +16,25 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault(); 
 
-    try {
-      setLoading(true); 
-      const response = await fetch('http://localhost:3000/api/frontend/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', 
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
+   let isLoggedIn = await handleLogin('http://localhost:3000/api/frontend/login',
+    {
+      email: email,
+      password: password,
+    });
 
-      const data = await response.json(); 
-      console.log(data)
-      sessionStorage.setItem("customersession", JSON.stringify(data));
-      if (response.ok) {
-        console.log('Login erfolgreich:', data);
-       // navigate('/customer/orders');
-      } else { 
-        setError(data.message || 'Login fehlgeschlagen'); 
-      }
-    } catch (err) {
-      setError('Ein Fehler ist aufgetreten');
-      console.error('Fehler:', err);
-    } finally {
-      setLoading(false); 
-    } 
+    console.log(isLoggedIn);
+    
+    if(isLoggedIn)
+    {
+      localStorage.setItem("isLoggedIn", "true");
+      console.log("eingeloggt");
+      navigate('/customer/orders');
+    }
+    else 
+    {
+     setError("deine Mutter");
+    }
+   
   };
 
   return (

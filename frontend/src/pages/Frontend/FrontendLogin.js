@@ -1,9 +1,9 @@
 import React from "react";
-import Loginform from "../Components/Loginform";
+import Loginform from "../../Components/Loginform";
 import { Box } from "@mui/material";
 
 
-function Login() {
+function FrontendLogin() {
   return (
     <Box sx={{         
       display: 'flex',
@@ -15,4 +15,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default FrontendLogin;

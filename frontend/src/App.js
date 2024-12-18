@@ -1,39 +1,48 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import Login from "./pages/Login";
+import FrontendLogin from "./Pages/Frontend/FrontendLogin";
 import Layout from "./Layouts/Layout"
-import Register from './pages/Register';
+import Register from './Pages/Frontend/Register';
 import Customerlayout from './Layouts/Customerlayout';
-import Profile from './pages/Customer/profile';
-import Address from './pages/Customer/address';
-import Orders from './pages/Customer/orders';
+import Profile from './Pages/Frontend/Customer/profile';
+import Address from './Pages/Frontend/Customer/address';
+import Orders from './Pages/Frontend/Customer/orders';
 import BackendLayout from './Layouts/Backendlayout';
+import BackendBackground from './Background/BackendBackground';
+import NotFoundBackend from './Pages/Backend/NotFoundBackend';
+import NotFoundFrontend from './Pages/Frontend/NotFoundFrontend'
 
-import Order from './pages/Customer/Order';
-import Dashboard from './pages/Backend/Dashboard';
-import Customers from './pages/Backend/Customer';
-import Backendorders from './pages/Backend/Orders';
-import Backendorder from './pages/Backend/Backenorder';
-import Products from './pages/Backend/Products';
-import Users from './pages/Backend/Users';
-import  ProtectedCustomerRoutes  from './Context/ProtectedCustomerRoutes';
+import Order from './Pages/Frontend/Customer/Order';
+import Dashboard from './Pages/Backend/Dashboard';
+import Customers from './Pages/Backend/Customer';
+import Backendorders from './Pages/Backend/Orders';
+import Backendorder from './Pages/Backend/Backenorder';
+import Products from './Pages/Backend/Products';
+import Users from './Pages/Backend/Users';
+import ProtectedFrontendRoutes from './Context/ProtectedFrontendRoutes';
+import ProtectedBackendRoutes from './Context/ProtectedBackendRoutes';
+import { AuthProvider } from './Context/AuthProvider';
+import BackendLogin from './Pages/Backend/BackendLogin';
 
 function App() {
+
+
   return (
+    <AuthProvider>
       <Routes>
 
         {/* Frontend */}
         <Route path="/" element={<Layout />}>
-          <Route path="login" element={<Login />} />
+          <Route path="login" element={<FrontendLogin />} />
           <Route path="register" element={<Register />} />
 
-          <Route element={ProtectedCustomerRoutes} >
-          <Route path='customer/' element={<Customerlayout />}>
-            <Route path="order/:id" element={<Order />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="addresses" element={<Address />} />
-          </Route>
+          <Route element={<ProtectedFrontendRoutes />} >
+            <Route path='customer/' element={<Customerlayout />}>
+              <Route path="order/:id" element={<Order />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="addresses" element={<Address />} />
+            </Route>
           </Route>
 
 
@@ -42,21 +51,31 @@ function App() {
           <Route path="3" />
           <Route path="4" />
           <Route path="user" />
+          <Route path="*" element={<NotFoundFrontend />} />
         </Route>
 
 
         {/* Backend */}
-        <Route path='/backend/' element={<BackendLayout />} >
-          <Route index element={<Navigate to="/backend/dashboard" replace />} />
-          <Route path='dashboard' element={<Dashboard />} />
-          <Route path='customers' element={<Customers />} />
-          <Route path='orders' element={<Backendorders />} />
-          <Route path='order/:id' element={<Backendorder />} />
-          <Route path='products' element={<Products />} />
-          <Route path='users' element={<Users />} />
-        </Route>
-      </Routes>
+        <Route path='/backend/' element={<BackendBackground />} >
+          <Route path='login' element={<BackendLogin/>} />
 
+          <Route element={<ProtectedBackendRoutes />} >
+          <Route element={<BackendLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='customers' element={<Customers />} />
+            <Route path='orders' element={<Backendorders />} />
+            <Route path='order/:id' element={<Backendorder />} />
+            <Route path='products' element={<Products />} />
+            <Route path='users' element={<Users />} />
+            <Route path="*" element={<NotFoundBackend />} />
+          </Route>
+          </Route>
+
+        </Route>
+
+      </Routes>
+    </AuthProvider>
 
   );
 }

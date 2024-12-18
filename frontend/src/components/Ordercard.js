@@ -4,19 +4,16 @@ import Statebox from './Statebox';
 
 function Ordercard({ date, state, price, quantity }) {
     return (
-        <Card sx={{ backgroundColor: "rgba(0, 0, 0, 0.3)", width : "800px", margin: '15px 0px 15px 10px'}}>
-            <CardContent sx={{ color: 'white', display : "flex" }}>
-                <Box sx={{display : "flex", flex : 1}}>
+        <Card sx={{ backgroundColor: "rgba(0, 0, 0, 0.3)", width: "800px",  }}>
+            <CardContent sx={{ color: 'white', display: "flex" }}>
+                <Box sx={{ display: "flex", flex: 1 }}>
                     <Typography variant="h6">Bestellung vom {date}</Typography>
 
-                    <Statebox state={state}/>
+                    <Statebox state={state} />
                 </Box>
-
-
                 <Box>
-
-                <Typography variant="body1">{price}€</Typography>
-                <Typography variant="body1">{quantity} Artikel </Typography>
+                    <Typography variant="body1">{price}€</Typography>
+                    <Typography variant="body1">{quantity} Artikel </Typography>
                 </Box>
             </CardContent>
         </Card>

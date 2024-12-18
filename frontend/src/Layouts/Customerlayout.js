@@ -1,10 +1,10 @@
 import { Navigate, Outlet, NavLink } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 import React, { useEffect } from 'react';
-
+import { useAuth } from "../Context/AuthProvider";
 
 function Customerlayout() {
-
+    const { user } = useAuth();
     const navLinkStyle = ({ isActive }) => ({
         textDecoration: "none",
         color: isActive ? "white" : "rgba(255, 255, 255, 0.7)",
@@ -34,7 +34,7 @@ function Customerlayout() {
                 }}>
                     <Box>
                         <Typography variant="h4" sx={{ marginBottom: '20px' }}>
-                            {/*   {user.firstname} {user.lastname} */}
+                            {/*   {user.firstname} {user.lastname} */} vc {user}
                         </Typography>
 
 
