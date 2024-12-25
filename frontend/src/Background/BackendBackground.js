@@ -4,7 +4,7 @@ import {Outlet } from "react-router-dom";
 function BackendBackground()
 {
     return (
-        <Box sx={{   height: '100vh', backgroundColor : "#f0f0f0", display: 'flex'}}>
+        <Box sx={{ backgroundColor : "#f0f0f0", display: 'flex'}}>
               <Outlet />
         </Box>
     )

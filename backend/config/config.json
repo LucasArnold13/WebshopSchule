@@ -1,8 +1,7 @@
 {
   "development": {
-    "username": "postgres",
+    "username": "lucas",
     "database": "webshop_schule_dev",
-    "password": "nht#la01",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },

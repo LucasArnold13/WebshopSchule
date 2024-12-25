@@ -1,9 +1,39 @@
 import { useState } from 'react';
+import { useAuth } from '../../Context/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography } from '@mui/material';
 
 function BackendLogin() {
-    const [name, setName] = useState("");
-    const [password, setPassword] = useState("");
+  const {handleLogin} = useAuth();
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(''); 
+  const [loading, setLoading] = useState(false); 
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("backend login");
+    let isLoggedIn = await handleLogin('http://localhost:3000/api/backend/login',
+      {
+        name: name,
+        password: password,
+      });
+
+    console.log(isLoggedIn);
+
+    if (isLoggedIn) {
+      localStorage.setItem("isLoggedIn", "true");
+      console.log("eingeloggt");
+      navigate('/backend');
+    }
+    else {
+      setError("falsch");
+      console.log("falsch");
+    }
+
+  };
+
 
   return (
     <Box
@@ -17,6 +47,8 @@ function BackendLogin() {
       }}
     >
       <Box
+        component="form"
+        onSubmit={handleSubmit}
         sx={{
           backgroundColor: 'white',
           padding: '2rem',
@@ -34,7 +66,7 @@ function BackendLogin() {
         <TextField
           label="Name"
           variant="outlined"
-          onChange={(e) => setName(e.target.value)} 
+          onChange={(e) => setName(e.target.value)}
           fullWidth
           sx={{ marginBottom: '1rem' }}
         />
@@ -42,14 +74,14 @@ function BackendLogin() {
           label="Password"
           type="password"
           variant="outlined"
-          onChange={(e) => setPassword(e.target.value)} 
+          onChange={(e) => setPassword(e.target.value)}
           fullWidth
           sx={{ marginBottom: '1.5rem' }}
         />
         <Button
           variant="contained"
+          type="submit" 
           color="primary"
-          onClick={() => console.log(name, password)}
           fullWidth
           sx={{
             padding: '0.75rem',

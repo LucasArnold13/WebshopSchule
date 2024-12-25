@@ -41,7 +41,7 @@ router.post('/login',frontendSession, async (req, res) => {
     }
 });
 
-router.post('/register',customerSession,  async (req, res) => {
+router.post('/register',frontendSession,  async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
 
     if (!firstname || !lastname || !email || !password) {
@@ -84,7 +84,7 @@ router.post('/register',customerSession,  async (req, res) => {
     }
 });
 
-router.get('/auth',customerSession,  (req, res) => {
+router.get('/auth',frontendSession,  (req, res) => {
     console.log(req.session);
     if (req.session.user) {
         console.log(req.session.user + " richtig");
@@ -95,7 +95,7 @@ router.get('/auth',customerSession,  (req, res) => {
     }
 });
 
-router.delete('/logout',customerSession, (req, res) => {
+router.delete('/logout',frontendSession, (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Fehler beim Zerstören der Session:', err);

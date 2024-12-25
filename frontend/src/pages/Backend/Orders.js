@@ -47,10 +47,11 @@ function Orders() {
 
     const handleCellClick = (params) => {
 
-        navigate(`/backend/order/${params.row.col1}`);
+        navigate(`/backend/orders/${params.row.col1}`);
       };
 
     useEffect(() => {
+      console.log("test");
         const fetchOrders = async () => {
             try {
                 const response = await fetch('http://localhost:3000/api/backend/orders', {

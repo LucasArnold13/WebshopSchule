@@ -3,27 +3,21 @@ import { Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-function Products()
+function Categories()
 {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const columns = [
-    { field: 'col1', headerName: 'SKU', headerAlign: "center", flex: 1, },
+    { field: 'col1', headerName: 'id', headerAlign: "center", flex: 1, },
     { field: 'col2', headerName: 'Name', headerAlign: "center", flex: 1, },
-    { field: 'col3', headerName: 'Anzahl', headerAlign: "center", flex: 1 },
-    { field: 'col4', headerName: 'Preis', headerAlign: "center", flex: 1 },
-    { field: 'col5', headerName: 'ist aktiv', headerAlign: "center", flex: 1 },
   ];
 
 
   const transformData = (apiData) => {
     return apiData.map((item, index) => ({
       id: index + 1,
-      col1: item.sku,
+      col1: item.id,
       col2: item.name,
-      col3: item.quantity,
-      col4: item.price,
-      col5: item.is_active ? 'Ja' : 'Nein',
     }));
   };
   const handleCellClick = (params) => {
@@ -32,7 +26,7 @@ function Products()
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCategories = async () => {
       try {
         const response = await fetch('http://localhost:3000/api/backend/products', {
           method: 'GET',
@@ -52,15 +46,15 @@ function Products()
       }
     };
 
-    fetchProducts();
+    fetchCategories();
   }, []);
 
     return (
       <>
-      <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Produkte</Typography>
+      <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Kategorien</Typography>
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
     </>
     );
 }
 
-export default Products;
+export default Categories;

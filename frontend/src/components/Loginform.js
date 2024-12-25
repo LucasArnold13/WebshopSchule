@@ -32,7 +32,7 @@ function LoginForm() {
     }
     else 
     {
-     setError("deine Mutter");
+     setError("falsch");
     }
    
   };
@@ -100,7 +100,7 @@ function LoginForm() {
         type="submit"
         variant="contained"
         fullWidth
-        disabled={loading} // Deaktivieren während der Anfrage
+        disabled={loading} 
         sx={{
           backgroundColor: '#007BFF',
           color: '#fff',

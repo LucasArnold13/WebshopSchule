@@ -12,7 +12,7 @@ function ProtectedFrontendRoutes() {
         method: "GET",
         credentials: "include", 
       });
-
+      
       if (response.ok) {
         const data = await response.json();
         setIsAuthenticated(true); 
