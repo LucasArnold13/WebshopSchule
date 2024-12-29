@@ -28,7 +28,7 @@ function Products()
   };
   const handleCellClick = (params) => {
 
-    navigate(`/backend/products/${params.row.col1}`);
+    navigate(`/backend/products/${params.row.id}`);
   };
 
   useEffect(() => {

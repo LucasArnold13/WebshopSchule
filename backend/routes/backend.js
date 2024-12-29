@@ -3,6 +3,7 @@ const router = express.Router();
 const session = require('express-session');
 const { Customer, Order, Orderitems, Status, User, Product, Role, Category } = require('../models');
 const bcrypt = require("bcrypt");
+const { where } = require("sequelize");
 
 const backendSession = session({
   name: "BSID",
@@ -83,15 +84,21 @@ router.get('/orders', async (req, res) => {
 
 
 
-router.get('/order/:id', async (req, res) => {
+router.get('/orders/:id', async (req, res) => {
   try {
     const orderId = req.params.id;
-    const customerOrders = await Order.findAll({
+    const customerOrders = await Order.findOne({
       where: { id: orderId },
       include: [
         {
           model: Orderitems,
           as: 'orderitems',
+          include: [
+            {
+              model: Product, // Beispiel für das verknüpfte Model
+              as: 'product',
+            },
+          ],
         },
         {
           model: Status,
@@ -157,9 +164,7 @@ router.get('/customers/:id', async (req, res) => {
 router.put('/customers/:id', async (req, res) => {
   try {
 
-    const  customer  = req.body;
-    console.log(customer);
-    console.log(req.params.id);
+    const customer = req.body;
     const updatedtCustomer = await Customer.update(customer,
       { where: { id: req.params.id } }
     );
@@ -194,6 +199,34 @@ router.get('/products', async (req, res) => {
   }
 });
 
+router.get('/products/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findOne({
+      where: { id: productId }
+    });
+
+    return res.json(product);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+//ändern zu suchfunktion!
+router.get('/products/active', async (req, res) => {
+  try {
+    const products = await Product.findAll({
+      where: { is_active: true }
+    });
+
+    return res.json(products);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 //#endregion
 
 
@@ -216,6 +249,80 @@ router.get('/users', async (req, res) => {
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
+
+
+router.get('/users/:id', async (req, res) => {
+  try {
+    const userID = req.params.id;
+    const users = await User.findOne({
+      where: { id: userID },
+      attributes: { exclude: ['password'] }, // für die Sicherheit
+
+    });
+
+    return res.json(users);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+
+router.put('/users/:id', async (req, res) => {
+  try {
+
+    const user = req.body;
+    const updatetUser = await User.update(user,
+      { where: { id: req.params.id } }
+    );
+    if (updatetUser == 0) {
+      return res.status(400).json({ message: 'User konnte nicht aktualisiert werden.' });
+    }
+    else {
+      return res.status(200).json({ message: 'User wurde erfolgreich aktualisiert.' });
+    }
+
+
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+router.post('/users', async (req, res) => {
+  try {
+    const user = req.body;
+
+    const newUser = await User.create(user);
+
+    if (newUser) {
+      return res.status(200).json({ message: 'User wurde erfolgreich angelegt' });
+    }
+    else {
+      return res.status(400).json({ message: 'Fehler bei Erstellung des Users' });
+    }
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+
+//#endregion
+
+
+//#region Roles
+router.get('/roles', async (req, res) => {
+  try {
+    const roles = await Role.findAll({
+    });
+
+    return res.json(roles);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
 //#endregion
 
 
@@ -226,6 +333,20 @@ router.get('/categories', async (req, res) => {
     });
 
     return res.json(categories);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+router.get('/categories/:id', async (req, res) => {
+  try {
+    const categoryID = req.params.id;
+    const category = await Category.findOne({
+      where: { id: categoryID }
+    });
+
+    return res.json(category);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });

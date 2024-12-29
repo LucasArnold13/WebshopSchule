@@ -27,6 +27,7 @@ import ProtectedBackendRoutes from './Context/ProtectedBackendRoutes';
 import { AuthProvider } from './Context/AuthProvider';
 import BackendLogin from './Pages/Backend/BackendLogin';
 import Categories from './Pages/Backend/Categories';
+import Category from './Pages/Backend/Category';
 
 function App() {
 
@@ -76,7 +77,7 @@ function App() {
             <Route path='users' element={<Users />} />
             <Route path='users/:id' element={<User />} />
             <Route path='categories' element={<Categories />} />
-            <Route path='categories/:id' element={<Categories />} />
+            <Route path='categories/:id' element={<Category />} />
             <Route path="*" element={<NotFoundBackend />} />
           </Route>
           </Route>

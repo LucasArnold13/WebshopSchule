@@ -22,7 +22,7 @@ function Categories()
   };
   const handleCellClick = (params) => {
 
-    navigate(`/backend/products/${params.row.col1}`);
+    navigate(`/backend/categories/${params.row.col1}`);
   };
 
   useEffect(() => {

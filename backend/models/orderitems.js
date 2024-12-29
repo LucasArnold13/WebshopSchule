@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Orderitems.belongsTo(models.Product, {
         foreignKey: 'product_id', 
-        as: 'products',    
+        as: 'product',    
       });
       Orderitems.belongsTo(models.Order, {
         foreignKey: 'order_id', 

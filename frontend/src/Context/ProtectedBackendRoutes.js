@@ -18,6 +18,7 @@ function ProtectedBackendRoutes()
           const data = await response.json();
           setIsAuthenticated(true); 
         } else {
+          console.error("Fehler bei der API-Anfrage:", response.statusText);
           setIsAuthenticated(false);
         }
       } catch (error) {
@@ -30,9 +31,9 @@ function ProtectedBackendRoutes()
   
     useEffect(() => {
       checkSession(); 
-    }, []);
+      console.log("so oft wird die Komponente neu gerendert");
+    }, [location]);
   
-  console.log("so oft wird die Komponente neu gerendert")
     if (isLoading) {
       return <></>;
     }
