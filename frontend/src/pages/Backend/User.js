@@ -7,6 +7,8 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { fetchUser, updateUser } from "../../api/users";
+import { fetchRoles } from "../../api/roles";
 
 function User() {
   const [user, setUser] = useState(null); // Initialisiere als null
@@ -15,77 +17,39 @@ function User() {
   const { id } = useParams();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchAndSetUser = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/backend/users/" + id,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setUser(data);
-        } else {
-          console.error("Fehler bei der API-Anfrage:", response.statusText);
-        }
+        const data = await fetchUser(id);
+        setUser(data);
       } catch (error) {
         console.error("Fehler beim Abrufen der Benutzerdaten:", error);
       }
     };
 
-    const fetchRoles = async () => {
+    const fetchAndSetRoles = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/backend/roles",
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setRoles(data);
-        } else {
-          console.error("Fehler bei der API-Anfrage:", response.statusText);
-        }
+        const data = await fetchRoles();
+        setRoles(data);
       } catch (error) {
         console.error("Fehler beim Abrufen der Rollen:", error);
       }
     };
 
-    // Beide API-Aufrufe starten und Ladezustand beenden
-    Promise.all([fetchUser(), fetchRoles()]).finally(() => {
+
+    Promise.all([fetchAndSetUser(), fetchAndSetRoles()]).finally(() => {
       setLoading(false);
     });
   }, [id]);
 
   const handleSave = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/backend/users/" + id,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        }
-      );
-      if (response.ok) {
-        console.log("Benutzerdaten erfolgreich gespeichert");
-      } else {
-        console.error("Fehler bei der API-Anfrage:", response.statusText);
-      }
+      await updateUser(id, user);
     } catch (error) {
       console.error("Fehler beim Speichern der Benutzerdaten:", error);
     }
 
   };
 
-  // Zeige Ladezustand an, bis die Daten verfügbar sind
   if (loading) {
     return <CircularProgress />;
   }

@@ -1,8 +1,7 @@
-import { DataGrid } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Typography } from '@mui/material';
+import { Typography, Button, Box } from '@mui/material';
+import { fetchCustomers } from '../../api/customers';
 import Table from '../../Components/Table';
 
 function Customers() {
@@ -32,32 +31,29 @@ function Customers() {
 
 
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const fetchAndSetCustomers = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/backend/customers', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        const data = await response.json();
-        console.log(data);
+        const data = await fetchCustomers();
         setRows(transformData(data));
-        if (response.ok) {
-
-        } else {
-          console.error("Fehler bei der API-Anfrage:", response.statusText);
-        }
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
     };
 
-    fetchCustomers();
+    fetchAndSetCustomers();
   }, []);
 
   return (
     <>
-      <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Kunden</Typography>
+      <Box sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 2,
+      }}>
+        <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Kunden</Typography>
+        <Button variant="contained" onClick={() => navigate('/backend/customers/new')}>Kunden hinzufügen</Button>
+      </Box>
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
     </>
 

@@ -40,7 +40,7 @@ export default function UserMenu() {
 
   return (
     <React.Fragment>
-      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', textalign: 'center' }}>
         <IconButton
           onClick={handleClick}
           size="large"
@@ -98,19 +98,19 @@ export default function UserMenu() {
             <Divider />
             <MenuItem onClick={() => navigate('/customer/profile')}>
             <AccountBoxOutlinedIcon sx={MenuItemStyle}/>
-              <Typography color="white" sx={{ marginLeft: 1, textAlign: 'center' }}>
+              <Typography color="white" sx={{ marginLeft: 1, textalign: 'center' }}>
                Profil
               </Typography>
             </MenuItem>
             <MenuItem onClick={() => navigate('/customer/orders')}>
             <ShoppingBagIcon sx={MenuItemStyle}/>
-            <Typography color="white" sx={{ marginLeft: 1, textAlign: 'center' }}>
+            <Typography color="white" sx={{ marginLeft: 1, textalign: 'center' }}>
                Bestellungen
               </Typography>
             </MenuItem>
             <MenuItem onClick={() => navigate('/customer/addresses')}>
             <LocationOnIcon sx={MenuItemStyle}/>
-            <Typography color="white" sx={{ marginLeft: 1, textAlign: 'center' }}>
+            <Typography color="white" sx={{ marginLeft: 1, textalign: 'center' }}>
                Adressen
               </Typography>
             </MenuItem>
@@ -131,7 +131,7 @@ export default function UserMenu() {
                 width: '100%',
               }}
             >
-              <Typography color="white" sx={{ marginBottom: 2, textAlign: 'center' }}>
+              <Typography color="white" sx={{ marginBottom: 2, textalign: 'center' }}>
                 Du bist noch nicht angemeldet
               </Typography>
               <Button

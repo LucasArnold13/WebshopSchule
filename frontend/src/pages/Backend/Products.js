@@ -1,10 +1,10 @@
 import Table from "../../Components/Table";
-import { Typography } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { fetchProducts } from "../../api/products";
 
-function Products()
-{
+function Products() {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const columns = [
@@ -32,35 +32,32 @@ function Products()
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchAndSetProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/backend/products', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        const data = await response.json();
-        console.log(data);
-        setRows(transformData(data));
-        if (response.ok) {
-
-        } else {
-          console.error("Fehler bei der API-Anfrage:", response.statusText);
-        }
+        const products = await fetchProducts();
+        setRows(transformData(products));
       } catch (error) {
-        console.error('Fehler beim Abrufen der Daten:', error);
+        console.error("Fehler beim Abrufen der Produkte:", error);
       }
     };
 
-    fetchProducts();
+    fetchAndSetProducts();
   }, []);
 
-    return (
-      <>
-      <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Produkte</Typography>
+  return (
+    <>
+      <Box sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 2,
+      }}>
+        <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Produkte</Typography>
+        <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Produkt hinzufügen</Button>
+      </Box>
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
     </>
-    );
+  );
 }
 
 export default Products;

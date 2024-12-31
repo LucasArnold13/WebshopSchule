@@ -92,7 +92,7 @@ function LoginForm() {
   Passwort vergessen?
 </Link>
       {error && (
-        <Typography variant="body2" sx={{ color: 'red', textAlign: 'center' }}>
+        <Typography variant="body2" sx={{ color: 'red', textalign: 'center' }}>
           {error}
         </Typography>
       )}
@@ -111,7 +111,7 @@ function LoginForm() {
       >
         {loading ? 'Laden...' : 'Login'}
       </Button>
-      <Typography variant="body2" sx={{ textAlign: 'center' }}>
+      <Typography variant="body2" sx={{ textalign: 'center' }}>
         Noch keinen Account?{' '}
         <Link href="/register" underline="hover" sx={{ color: '#007BFF' }}>
           Erstelle jetzt einen hier

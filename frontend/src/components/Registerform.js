@@ -110,7 +110,7 @@ function Registerform() {
 
       {/* Error Message */}
       {error && (
-        <Typography variant="body2" sx={{ color: 'red', textAlign: 'center' }}>
+        <Typography variant="body2" sx={{ color: 'red', textalign: 'center' }}>
           {error}
         </Typography>
       )}

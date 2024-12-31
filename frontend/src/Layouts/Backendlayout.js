@@ -5,16 +5,25 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 
 function BackendLayout() {
 
+    const navLinks = [
+        { to: "/backend/dashboard", label: "Dashboard" },
+        { to: "/backend/customers", label: "Kunden" },
+        { to: "/backend/orders", label: "Bestellungen" },
+        { to: "/backend/products", label: "Produkte" },
+        { to: "/backend/categories", label: "Kategorien" },
+        { to: "/backend/users", label: "Benutzer" }
+    ];
+
     const navLinkStyle = ({ isActive }) => ({
         textDecoration: "none",
         borderRadius: "8px",
         width: "100%",
-        fontSize: '1.5rem', // Schriftgröße anpassen
+        fontSize: '1.5rem',
         display: 'flex',
         justifyContent: 'center',
         boxSizing: "border-box",
         padding: "10px",
-        textaling: "center",
+        textAlign: "center",
         color: 'black',
         backgroundColor: isActive ? "rgba(45, 89, 235, 0.3)" : "transparent",
         transition: "background-color 0.3s ease",
@@ -26,55 +35,21 @@ function BackendLayout() {
                 flex: 2,
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: "white",
-                paddingTop : "50px",
+                paddingTop: "50px",
                 boxShadow: "10px 0 10px -5px rgba(0, 0, 0, 0.3)",
-                borderRight: "1px black",
-                minHeight: "100vh",
+                borderRight: "1px solid black",
             }}>
-                <NavLink
-                    to="/backend/dashboard"
-                    style={navLinkStyle}
-
-                >
-                    Dashboard
-
-                </NavLink>
-                <NavLink
-                    to="/backend/customers"
-                    style={navLinkStyle}
-                    textAlign="center"
-                >
-                    Kunden
-                </NavLink>
-                <NavLink
-                    to="/backend/orders"
-                    style={navLinkStyle}
-                >
-                    Bestellungen
-                </NavLink>
-                <NavLink
-                    to="/backend/products"
-                    style={navLinkStyle}
-                >
-                    Produkte
-                </NavLink>
-                <NavLink
-                    to="/backend/categories"
-                    style={navLinkStyle}
-                >
-                    Kategorien
-                </NavLink>
-                <NavLink
-                    to="/backend/users"
-                    style={navLinkStyle}
-                >
-                    Benutzer
-                </NavLink>
+                {navLinks.map((link) => (
+                    <Box key={link.to} sx={{ '&:hover': { backgroundColor: "rgba(45, 89, 235, 0.1)" } }}>
+                        <NavLink to={link.to} style={({ isActive }) => navLinkStyle({ isActive })}>
+                            {link.label}
+                        </NavLink>
+                    </Box>
+                ))}
             </Box>
             <Box sx={{ flex: 12 }}>
                 <Box sx={{
-                    height: "50px", 
+                    height: "5vh",
                     display: "flex",
                     justifyContent: "flex-end",
                     alignItems: "center",
@@ -85,55 +60,15 @@ function BackendLayout() {
                     <NotificationsIcon />
                     <AccountCircleIcon />
                 </Box>
-                <Box >
+                <Box sx={{ height: "95vh", display: "flex", flexDirection: "column", padding: "15px", boxSizing: "border-box" }}>
                     <Outlet />
                 </Box>
             </Box>
         </>
-
     );
-
 }
 
 
-/*
-   <Box sx={{
-                flex: 2,
-                paddingTop: "50px",
-                flexDirection: "column",
-            }}>
-                <Box sx={{
-                    height: "100%",
-                    width: "100%",
-                    backgroundColor: "white",
-                    borderRadius: "12px",
-                    flexDirection: "column", // Elemente vertikal stapeln
-                    display: "flex",
-                    margin: "10px",
-                    Fontsize : "48px",
-                }}>
-                  
-                </Box>
 
-            </Box>
-            <Box sx={{ flex: 12, display: "flex", flexDirection: "column" }} >
-                <Box sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    width: "100%",
-                    padding: 2,
-                    boxSizing: "border-box"
-                }}>
-                    <NotificationsIcon/> 
-                    <AccountCircleIcon/> 
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                    <Outlet />
-                </Box>
-            </Box>
-        </>
-
-*/
 
 export default BackendLayout; 

@@ -7,14 +7,22 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 
 function Dashboard() {
     return (
-        <Box sx={{ width: "100%", height: "95vh", display : "flex", flexDirection : "column"}}>
-            <Box sx={{ width: "100%", height: "300px", display: "flex", gap: 2, flex : 1, padding: 2, boxSizing: "border-box" }}>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Box sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 2,
+            }}>
+                <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Dashboard</Typography>
+            </Box>
+            <Box sx={{ width: "100%", height: "300px", display: "flex", gap: 2, flex: 1, padding: 2, boxSizing: "border-box" }}>
                 <Card sx={{ flex: 1, height: "200px" }}>
                     <CardHeader title="Bestellungen in diesem Monat" />
                     <CardContent>
                         {/* Titel */}
                         <Typography variant="subtitle1" color="textSecondary" sx={{ marginBottom: 1 }}>
-                           1.12.2021 - 31.12.2021
+                            1.12.2021 - 31.12.2021
                         </Typography>
 
                         {/* Zahl und Vergleich */}
@@ -133,7 +141,7 @@ function Dashboard() {
                 </Card>
             </Box>
 
-            <Box sx={{ display: "flex", gap: 2, padding: 2, boxSizing: "border-box", flex : 1 }}>
+            <Box sx={{ display: "flex", gap: 2, padding: 2, boxSizing: "border-box", flex: 1 }}>
                 <Card sx={{ flex: 1 }}>
 
                     <CardHeader title="tägliche Einahmen" subheader="Kalenderwoche 50" />

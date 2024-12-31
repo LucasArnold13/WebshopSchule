@@ -242,10 +242,9 @@ router.get('/users', async (req, res) => {
         },
       ],
     });
-
-    return res.json(users);
+    return res.status(200).json(users);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error('Fehler beim Abrufen der User:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -260,7 +259,7 @@ router.get('/users/:id', async (req, res) => {
 
     });
 
-    return res.json(users);
+    return res.status(200).json(users);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
@@ -299,6 +298,7 @@ router.post('/users', async (req, res) => {
       return res.status(200).json({ message: 'User wurde erfolgreich angelegt' });
     }
     else {
+      console.log(newUser);
       return res.status(400).json({ message: 'Fehler bei Erstellung des Users' });
     }
   } catch (error) {
@@ -317,7 +317,7 @@ router.get('/roles', async (req, res) => {
     const roles = await Role.findAll({
     });
 
-    return res.json(roles);
+    return res.status(200).json(roles);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
@@ -332,7 +332,7 @@ router.get('/categories', async (req, res) => {
     const categories = await Category.findAll({
     });
 
-    return res.json(categories);
+    return res.status(200).json(categories);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
@@ -343,10 +343,16 @@ router.get('/categories/:id', async (req, res) => {
   try {
     const categoryID = req.params.id;
     const category = await Category.findOne({
-      where: { id: categoryID }
+      where: { id: categoryID },
+      include: [
+        {
+          model: Product,
+          as: 'products',
+        },
+      ],
     });
 
-    return res.json(category);
+    return res.status(200).json(category);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });

@@ -1,10 +1,10 @@
 import Table from "../../Components/Table";
-import { Typography } from "@mui/material";
+import { Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { fetchCategories } from "../../api/categories";
 
-function Categories()
-{
+function Categories() {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const columns = [
@@ -26,35 +26,34 @@ function Categories()
   };
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchAndSetCategories = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/backend/products', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        const data = await response.json();
-        console.log(data);
+        const data = await fetchCategories();
         setRows(transformData(data));
-        if (response.ok) {
-
-        } else {
-          console.error("Fehler bei der API-Anfrage:", response.statusText);
-        }
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
     };
 
-    fetchCategories();
+    fetchAndSetCategories();
   }, []);
 
-    return (
-      <>
-      <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Kategorien</Typography>
+  return (
+    <>
+      <Box sx={{
+        display: "flex",
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        marginBottom: 2,
+      }}>
+        <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Kategorien</Typography>
+        <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Kategorie hinzufügen</Button>
+      </Box>
+
+
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
     </>
-    );
+  );
 }
 
 export default Categories;
