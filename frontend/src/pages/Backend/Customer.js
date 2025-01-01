@@ -1,14 +1,14 @@
 
-import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert } from "@mui/material";
+import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchCustomer, updateCustomer } from "../../api/customers";
 import CustomerContent from "../../Components/CustomerContent";
 function Customer() {
     const [customer, setCustomer] = useState({});
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-
     const { id } = useParams();
+
+    
     useEffect(() => {
         const fetchAndSetCustomer = async () => {
             try {
@@ -22,18 +22,14 @@ function Customer() {
         fetchAndSetCustomer();
     }, [id]);
 
-    const updateCustomer = async (customer) => {
-        try {
-         //   await updateCustomer(customer);
-        } catch (error) {
-            console.error('Fehler beim Speichern der Daten:', error);
-        }
-    };
-
 
 
     return (
-      <CustomerContent initialCustomer={customer} onSave={updateCustomer}/>
+        <>
+            <Typography variant="h4" sx={{ paddingBottom : 3 }}>Kunde {customer.id}</Typography>
+            <CustomerContent initialCustomer={customer} onSave={updateCustomer}/>
+        </>
+
     );
 }
 

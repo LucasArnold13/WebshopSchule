@@ -22,3 +22,11 @@ export const updateCustomer = async (id, data) => {
         data
     });
 };
+
+export const createCustomer = async (data) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/backend/customers`,
+        method: 'POST',
+        data
+    });
+};

@@ -1,5 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
+import { AuthProvider } from './Context/AuthProvider';
+import ProtectedFrontendRoutes from './Context/ProtectedFrontendRoutes';
+import ProtectedBackendRoutes from './Context/ProtectedBackendRoutes';
 import FrontendLogin from "./Pages/Frontend/FrontendLogin";
 import Layout from "./Layouts/Layout"
 import Register from './Pages/Frontend/Register';
@@ -11,20 +14,17 @@ import BackendLayout from './Layouts/Backendlayout';
 import BackendBackground from './Background/BackendBackground';
 import NotFoundBackend from './Pages/Backend/NotFoundBackend';
 import NotFoundFrontend from './Pages/Frontend/NotFoundFrontend'
-
 import Order from './Pages/Frontend/Customer/Order';
 import Dashboard from './Pages/Backend/Dashboard';
 import Customers from './Pages/Backend/Customers';
 import Customer from './Pages/Backend/Customer';
+import AddCustomer from './Pages/Backend/AddCustomer';
 import Backendorders from './Pages/Backend/Orders';
 import Backendorder from './Pages/Backend/Backenorder';
 import Products from './Pages/Backend/Products';
 import Product from './Pages/Backend/Product';
 import Users from './Pages/Backend/Users';
 import User from './Pages/Backend/User';
-import ProtectedFrontendRoutes from './Context/ProtectedFrontendRoutes';
-import ProtectedBackendRoutes from './Context/ProtectedBackendRoutes';
-import { AuthProvider } from './Context/AuthProvider';
 import BackendLogin from './Pages/Backend/BackendLogin';
 import Categories from './Pages/Backend/Categories';
 import Category from './Pages/Backend/Category';
@@ -69,16 +69,27 @@ function App() {
           <Route element={<BackendLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path='dashboard' element={<Dashboard />} />
+
             <Route path='customers' element={<Customers />} />
             <Route path='customers/:id' element={<Customer />} />
+            <Route path='customers/new' element={<AddCustomer />} />
+
             <Route path='orders' element={<Backendorders />} />
             <Route path='orders/:id' element={<Backendorder />} />
+            <Route path='orders/new' element={<Backendorder />} />
+
             <Route path='products' element={<Products />} />
             <Route path='products/:id' element={<Product />} />
+            <Route path='products/new' element={<Product />} />
+
             <Route path='users' element={<Users />} />
             <Route path='users/:id' element={<User />} />
+            <Route path='users/new' element={<User />} />
+
             <Route path='categories' element={<Categories />} />
             <Route path='categories/:id' element={<Category />} />
+            <Route path='categories/new' element={<Category />} />
+            
             <Route path="*" element={<NotFoundBackend />} />
           </Route>
           </Route>

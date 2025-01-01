@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
+import React, { useState } from 'react';
+import { TextField, Button, Checkbox, FormControlLabel, Snackbar, Alert } from '@mui/material';
 import CustomSnackbar from "./Feedback/CustomSnackbar";
+import { useEffect } from 'react';
 
 function CustomerContent({ initialCustomer, onSave }) {
   // Lokaler State für den Kunden
-  const [customer, setCustomer] = useState(initialCustomer || {});
+  const [customer, setCustomer] = useState(initialCustomer || {
+    firstname: "",
+    lastname: "",
+    email: "",
+    is_disabled: false,
+  });
   const [snackbarState, setSnackbarState] = useState({
     open: false,
     message: "",
@@ -12,11 +18,11 @@ function CustomerContent({ initialCustomer, onSave }) {
   });
 
   useEffect(() => {
-    console.log("Initial customer:", initialCustomer);
-    setCustomer(initialCustomer || {});
+    setCustomer(initialCustomer);
+    console.log(customer);
   }, [initialCustomer]);
 
-  const handleClose = (event, reason) => {
+  const closeSnackbar = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -37,50 +43,49 @@ function CustomerContent({ initialCustomer, onSave }) {
 
   return (
     <>
-      <CustomSnackbar open={snackbarState.open} message={snackbarState.message} severity={snackbarState.severity} handleClose={handleClose} />
+      <CustomSnackbar open={snackbarState.open} message={snackbarState.message} severity={snackbarState.severity} handleClose={closeSnackbar} />
 
       <TextField
         id="firstname"
         label="Vorname"
         variant="outlined"
-        value={customer.firstname || ''}
-        onChange={(e) => {
-          const updatedCustomer = { ...customer, firstname: e.target.value };
-          console.log("Updated customer:", updatedCustomer);
-          setCustomer(updatedCustomer);
-        }}
+        value={customer?.firstname}
+        onChange={(e) => setCustomer({
+          ...customer,
+          firstname: e.target.value,
+        })}
       />
       <TextField
         id="lastname"
         label="Nachname"
         variant="outlined"
-        value={customer.lastname || ''}
-        onChange={(e) => {
-          const updatedCustomer = { ...customer, lastname: e.target.value };
-          console.log("Updated customer:", updatedCustomer);
-          setCustomer(updatedCustomer);
-        }}
+        value={customer?.lastname}
+        onChange={(e) => setCustomer({
+          ...customer,
+          lastname: e.target.value,
+        })}
       />
       <TextField
         id="email"
         label="E-Mail"
+        email
         variant="outlined"
-        value={customer.email || ''}
-        onChange={(e) => {
-          const updatedCustomer = { ...customer, email: e.target.value };
-          console.log("Updated customer:", updatedCustomer);
-          setCustomer(updatedCustomer);
-        }}
+        value={customer?.email}
+        onChange={(e) => setCustomer({
+          ...customer,
+          email: e.target.value,
+        })}
       />
       <FormControlLabel
         control={
           <Checkbox
-            checked={customer.is_disabled || false}
-            onChange={(e) => {
-              const updatedCustomer = { ...customer, is_disabled: e.target.checked };
-              console.log("Updated customer:", updatedCustomer);
-              setCustomer(updatedCustomer);
-            }}
+            checked={customer?.is_disabled}
+            onChange={(e) =>
+              setCustomer({
+                ...customer,
+                is_disabled: e.target.checked,
+              })
+            }
           />
         }
         label="Ist deaktiviert"

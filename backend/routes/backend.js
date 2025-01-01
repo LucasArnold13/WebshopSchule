@@ -15,7 +15,6 @@ const backendSession = session({
 
 
 router.post('/login', backendSession, async (req, res) => {
-  console.log("test");
   const { name, password } = req.body;
   const existingUser = await User.findOne({ where: { name } });
 
@@ -77,7 +76,7 @@ router.get('/orders', async (req, res) => {
 
     return res.json(customerOrders);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -114,7 +113,7 @@ router.get('/orders/:id', async (req, res) => {
 
     return res.json(customerOrders);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -131,7 +130,7 @@ router.get('/customers', async (req, res) => {
 
     return res.status(200).json(customers);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -156,7 +155,7 @@ router.get('/customers/:id', async (req, res) => {
 
     return res.status(200).json(customer);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -178,7 +177,26 @@ router.put('/customers/:id', async (req, res) => {
 
 
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+router.post('/customers', async (req, res) => {
+  try {
+    const customer = req.body;
+
+    const newCustomer = await Customer.create(customer);
+
+    if (newCustomer) {
+      return res.status(200).json({ message: 'Kunde wurde erfolgreich angelegt' });
+    }
+    else {
+      console.log(newUser);
+      return res.status(400).json({ message: 'Fehler bei Erstellung des Kunden' });
+    }
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -244,7 +262,7 @@ router.get('/users', async (req, res) => {
     });
     return res.status(200).json(users);
   } catch (error) {
-    console.error('Fehler beim Abrufen der User:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -261,7 +279,7 @@ router.get('/users/:id', async (req, res) => {
 
     return res.status(200).json(users);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -283,7 +301,7 @@ router.put('/users/:id', async (req, res) => {
 
 
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -302,7 +320,7 @@ router.post('/users', async (req, res) => {
       return res.status(400).json({ message: 'Fehler bei Erstellung des Users' });
     }
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -319,7 +337,7 @@ router.get('/roles', async (req, res) => {
 
     return res.status(200).json(roles);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -334,7 +352,7 @@ router.get('/categories', async (req, res) => {
 
     return res.status(200).json(categories);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -354,7 +372,7 @@ router.get('/categories/:id', async (req, res) => {
 
     return res.status(200).json(category);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
