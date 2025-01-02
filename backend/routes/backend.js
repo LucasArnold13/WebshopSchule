@@ -205,6 +205,8 @@ router.post('/customers', async (req, res) => {
 
 
 //#region products
+
+// returns all products
 router.get('/products', async (req, res) => {
   try {
     const products = await Product.findAll({
@@ -269,7 +271,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// returns an unique user
+// returns an specific user
 router.get('/users/:id', async (req, res) => {
   try {
     const userID = req.params.id;
@@ -350,6 +352,8 @@ router.post('/users', async (req, res) => {
 
 
 //#region Roles
+
+// returns all roles
 router.get('/roles', async (req, res) => {
   try {
     const roles = await Role.findAll({
@@ -365,6 +369,8 @@ router.get('/roles', async (req, res) => {
 
 
 //#region categories
+
+// returns all categories
 router.get('/categories', async (req, res) => {
   try {
     const categories = await Category.findAll();
@@ -376,9 +382,15 @@ router.get('/categories', async (req, res) => {
   }
 });
 
+// returns a specific category
 router.get('/categories/:id', async (req, res) => {
   try {
     const categoryID = req.params.id;
+
+    if (isNaN(categoryID)) {
+      return res.status(400).json({ message: 'Ungültige Kategorie-ID.' });
+    }
+
     const category = await Category.findOne({
       where: { id: categoryID },
       include: [

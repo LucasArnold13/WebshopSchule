@@ -55,7 +55,10 @@ function Products() {
         <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Produkte</Typography>
         <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Produkt hinzufügen</Button>
       </Box>
-      <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      <Box sx={{ flex: 1, overflow: "auto", }}>
+      <Table  rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      </Box>
+
     </>
   );
 }

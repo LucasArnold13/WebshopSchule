@@ -7,7 +7,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     const products = [];
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 100; i++) {
       products.push({
         description: faker.commerce.productDescription(), // Zufällige Produktbeschreibung
         quantity: faker.number.int({ min: 1, max: 100 }), // Zufällige Menge zwischen 1 und 100

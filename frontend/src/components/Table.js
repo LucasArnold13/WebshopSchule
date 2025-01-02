@@ -1,5 +1,6 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
+import { Box } from '@mui/system';
 
 
 function Table({rows, columns, handleCellClick})
@@ -23,11 +24,10 @@ function Table({rows, columns, handleCellClick})
       return (
         <>
             <ThemeProvider theme={theme}>
-            <div style={{ height: "100%", width: '100%'}}>
+            <Box >
                 <DataGrid
                     disableRowSelectionOnClick 
                     rows={rows}
-                    height={1700}
                     columns={columns}
                     onCellClick={handleCellClick}
                     sx={{
@@ -48,7 +48,7 @@ function Table({rows, columns, handleCellClick})
 
                           },
                         }} />
-            </div>
+            </Box>
             </ThemeProvider>
         </>
 

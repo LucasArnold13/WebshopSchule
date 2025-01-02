@@ -262,12 +262,12 @@ describe('PUT /users/:id', () => {
   it('should return a response with status 400 when the id is not a number', async () => {
 
     const response = await request(app)
-    .put(backend + 'users/' + "ffsdsd")
-    .send({
-      id: 1,
-      name: "test",
-    })
-    .set('Content-Type', 'application/json');
+      .put(backend + 'users/' + "ffsdsd")
+      .send({
+        id: 1,
+        name: "test",
+      })
+      .set('Content-Type', 'application/json');
 
     expect(response.status).toBe(400);
 
@@ -279,19 +279,19 @@ describe('POST /users', () => {
 
   it('should return a response with status 200 when the user was created successfully', async () => {
 
-    let user = 
+    let user =
     {
-      name :"test",
-      email : "test",
-      password : "test",
-      role_id : 1,
-      is_active : true
+      name: "test",
+      email: "test",
+      password: "test",
+      role_id: 1,
+      is_active: true
     }
 
     const response = await request(app)
-    .post(backend + 'users/')
-    .send(user)
-    .set('Content-Type', 'application/json');
+      .post(backend + 'users/')
+      .send(user)
+      .set('Content-Type', 'application/json');
 
     expect(response.status).toBe(200);
 
@@ -300,8 +300,8 @@ describe('POST /users', () => {
   it('should create a user in the DB based on the data', async () => {
     const user = {
       name: "test",
-      email: "test@example.com", 
-      password: "test", 
+      email: "test@example.com",
+      password: "test",
       role_id: 1,
       is_active: true,
     };
@@ -310,11 +310,11 @@ describe('POST /users', () => {
       .post(backend + 'users/')
       .send(user)
       .set('Content-Type', 'application/json');
-  
+
     const createdUser = await sequelize.models.User.findOne({
       where: { email: user.email },
     });
-  
+
     expect(createdUser).toMatchObject(user);
 
   });
@@ -324,7 +324,7 @@ describe('POST /users', () => {
 
 
   });
-  
+
 });
 
 //#endregion
@@ -356,8 +356,9 @@ describe('GET /roles', () => {
 //#endregion
 
 //#region categories
+
 describe('GET /categories', () => {
-  
+
   it('should return a response with status 200', async () => {
     const response = await request(app).get(backend + 'categories');
     expect(response.status).toBe(200);
@@ -415,7 +416,7 @@ describe('GET /categories/:id', () => {
       description: 'test',
     };
     await sequelize.models.Category.create(category);
-    
+
     const response = await request(app).get(backend + 'categories/1');
     expect(response.body).toMatchObject(category);
   });
@@ -426,6 +427,83 @@ describe('GET /categories/:id', () => {
     expect(response.status).toBe(404);
   });
 
+  it('should return a reponse with status 400 when the id is not a number', async () => {
+
+    const response = await request(app).get(backend + 'categories/sadac');
+    expect(response.status).toBe(400);
+  });
+
+
 });
+
+
+//#endregion
+
+//#region  products
+describe('GET /products', () => {
+  it('should return a response with status 200', async () => {
+    const response = await request(app).get(backend + 'products');
+    expect(response.status).toBe(200);
+  });
+
+  it('should return an array with data', async () => {
+    const response = await request(app).get(backend + 'products');
+
+    await sequelize.models.Category.bulkCreate([
+      { id: 1, name: 'test', description: 'test' },
+      { id: 2, name: 'test', description: 'test' },
+    ]);
+
+    await sequelize.models.Product.bulkCreate([
+      { id: 1, name: 'Product 1', description: 'Description 1', quantity: 10, image_url: 'http://example.com/image1.jpg', category_id: 1, price: 100.00, sku: 'SKU1', is_active: true },
+      { id: 2, name: 'Product 2', description: 'Description 2', quantity: 20, image_url: 'http://example.com/image2.jpg', category_id: 2, price: 200.00, sku: 'SKU2', is_active: true },
+    ]);
+
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0);
+    expect(response.body.length).toBe(2);
+  });
+
+  it('should return an array with product objects', async () => {
+    await sequelize.models.Category.bulkCreate([
+      { id: 1, name: 'test', description: 'test' },
+      { id: 2, name: 'test', description: 'test' },
+    ]);
+
+    await sequelize.models.Product.bulkCreate([
+      { id: 1, name: 'Product 1', description: 'Description 1', quantity: 10, image_url: 'http://example.com/image1.jpg', category_id: 1, price: 100.00, sku: 'SKU1', is_active: true },
+      { id: 2, name: 'Product 2', description: 'Description 2', quantity: 20, image_url: 'http://example.com/image2.jpg', category_id: 2, price: 200.00, sku: 'SKU2', is_active: true },
+    ]);
+    const response = await request(app).get(backend + 'products');
+    response.body.forEach(item => {
+      expect(item).toHaveProperty('id');
+      expect(item).toHaveProperty('name');
+      expect(item).toHaveProperty('description');
+      expect(item).toHaveProperty('quantity');
+      expect(item).toHaveProperty('image_url');
+      expect(item).toHaveProperty('category_id');
+      expect(item).toHaveProperty('price');
+      expect(item).toHaveProperty('sku');
+      expect(item).toHaveProperty('is_active');
+    });
+
+  });
+
+  it('should return an empty array when there are no products', async () => {
+    const response = await request(app).get(backend + 'products');
+
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBe(0);
+  });
+
+});
+//#endregion
+
+//#region customers
+
+
+//#endregion
+
+//#region orders
 
 //#endregion

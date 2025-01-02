@@ -13,7 +13,7 @@ export const fetchUser = async (id) => {
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     // Verzögerung von z.B. 2 Sekunden
-    await delay(2000);
+    //await delay(2000);
     return await apiCall({
         url: `${API_BASE_URL}api/backend/users/${id}`,
         method: 'GET',
