@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+exports.router = router;
 const { Customer, Order, Orderitems, Status } = require('../models');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
@@ -11,6 +12,7 @@ const frontendSession = session({
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 }, // 1 Stunde
   });
+exports.frontendSession = frontendSession;
 
   
 

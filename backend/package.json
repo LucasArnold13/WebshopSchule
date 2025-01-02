@@ -1,9 +1,9 @@
 {
   "name": "webshop",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "Index.js",
   "scripts": {
-    "test": "NODE_ENV=test jest --runInBand"
+    "test": "powershell -Command \"$env:NODE_ENV='test'; jest --runInBand\""
   },
   "keywords": [],
   "author": "",

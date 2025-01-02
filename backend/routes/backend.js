@@ -249,6 +249,8 @@ router.get('/products/active', async (req, res) => {
 
 
 //#region users
+
+// returns all users
 router.get('/users', async (req, res) => {
   try {
     const users = await User.findAll({
@@ -267,36 +269,53 @@ router.get('/users', async (req, res) => {
   }
 });
 
-
+// returns an unique user
 router.get('/users/:id', async (req, res) => {
   try {
     const userID = req.params.id;
-    const users = await User.findOne({
-      where: { id: userID },
-      attributes: { exclude: ['password'] }, // für die Sicherheit
 
+    if (isNaN(userID)) {
+      return res.status(400).json({ message: 'Ungültige Benutzer-ID.' });
+    }
+
+    const user = await User.findOne({
+      where: { id: userID },
+      attributes: { exclude: ['password'] },
     });
 
-    return res.status(200).json(users);
+    if (!user) {
+      return res.status(404).json({
+        message: `Benutzer konnte nicht gefunden werden`,
+      });
+    }
+
+    return res.status(200).json(user);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
 
-
+// updates a user
 router.put('/users/:id', async (req, res) => {
   try {
 
     const user = req.body;
+    const userID = req.params.id;
+
+    if (isNaN(userID)) {
+      return res.status(400).json({ message: 'Ungültige Benutzer-ID.' });
+    }
+
     const updatetUser = await User.update(user,
-      { where: { id: req.params.id } }
+      { where: { id: userID } }
     );
+
     if (updatetUser == 0) {
-      return res.status(400).json({ message: 'User konnte nicht aktualisiert werden.' });
+      return res.status(404).json({ message: 'Benutzer mit der ID wurde nicht gefunden ' });
     }
     else {
-      return res.status(200).json({ message: 'User wurde erfolgreich aktualisiert.' });
+      return res.status(200).json({ message: 'Benutzer wurde erfolgreich aktualisiert.' });
     }
 
 
@@ -306,6 +325,7 @@ router.put('/users/:id', async (req, res) => {
   }
 });
 
+// creates a user
 router.post('/users', async (req, res) => {
   try {
     const user = req.body;
@@ -347,8 +367,7 @@ router.get('/roles', async (req, res) => {
 //#region categories
 router.get('/categories', async (req, res) => {
   try {
-    const categories = await Category.findAll({
-    });
+    const categories = await Category.findAll();
 
     return res.status(200).json(categories);
   } catch (error) {
@@ -369,6 +388,12 @@ router.get('/categories/:id', async (req, res) => {
         },
       ],
     });
+
+    if (!category) {
+      return res.status(404).json({
+        message: `Kategorie konnte nicht gefunden werden`,
+      });
+    }
 
     return res.status(200).json(category);
   } catch (error) {
