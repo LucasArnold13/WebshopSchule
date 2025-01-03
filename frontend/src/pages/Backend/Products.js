@@ -34,8 +34,8 @@ function Products() {
   useEffect(() => {
     const fetchAndSetProducts = async () => {
       try {
-        const products = await fetchProducts();
-        setRows(transformData(products));
+        const response = await fetchProducts();
+        setRows(transformData(response.data));
       } catch (error) {
         console.error("Fehler beim Abrufen der Produkte:", error);
       }
@@ -55,7 +55,7 @@ function Products() {
         <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Produkte</Typography>
         <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Produkt hinzufügen</Button>
       </Box>
-      <Box sx={{ flex: 1, overflow: "auto", }}>
+      <Box sx={{overflow: "auto", }}>
       <Table  rows={rows} columns={columns} handleCellClick={handleCellClick} />
       </Box>
 

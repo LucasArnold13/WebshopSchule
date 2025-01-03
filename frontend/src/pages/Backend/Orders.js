@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Typography, Box, Button } from '@mui/material';
+import { fetchOrders } from '../../api/orders';
 import Table from "../../Components/Table";
 
 
@@ -37,28 +38,16 @@ function Orders() {
   };
 
   useEffect(() => {
-    console.log("test");
-    const fetchOrders = async () => {
+    const fetchAndSetOrders = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/backend/orders', {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        const data = await response.json();
-        console.log(data);
-        setRows(transformData(data));
-        if (response.ok) {
-
-        } else {
-          console.error("Fehler bei der API-Anfrage:", response.statusText);
-        }
+        const response = fetchOrders();
+        setRows(transformData(response.data))        
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
     };
 
-    fetchOrders();
+    fetchAndSetOrders();
   }, []);
 
 
@@ -77,7 +66,9 @@ function Orders() {
         <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Bestellungen</Typography>
         <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Bestellungen hinzufügen</Button>
       </Box>
+      <Box sx={{overflow: "auto", }}>
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      </Box>
     </>
 
   );

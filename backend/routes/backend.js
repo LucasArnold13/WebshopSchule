@@ -167,7 +167,6 @@ router.put('/customers/:id', async (req, res) => {
     const updatedtCustomer = await Customer.update(customer,
       { where: { id: req.params.id } }
     );
-    console.log(updatedtCustomer);
     if (updatedtCustomer == 0) {
       return res.status(400).json({ message: 'Kunde konnte nicht aktualisiert werden.' });
     }
@@ -333,9 +332,9 @@ router.post('/users', async (req, res) => {
     const user = req.body;
 
     const newUser = await User.create(user);
-
+    console.log(newUser);
     if (newUser) {
-      return res.status(200).json({ message: 'User wurde erfolgreich angelegt' });
+      return res.status(201).json({ message: 'User wurde erfolgreich angelegt', user: newUser });
     }
     else {
       console.log(newUser);

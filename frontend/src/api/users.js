@@ -20,24 +20,18 @@ export const fetchUser = async (id) => {
     });
     }
 
-export const updateUser = async (id, data) => {
+export const updateUser = async (user) => {
     return await apiCall({
-        url: `${API_BASE_URL}api/backend/users/${id}`,
+        url: `${API_BASE_URL}api/backend/users/${user.id}`,
         method: 'PUT',
-        body: data, 
+        body: user, 
     });
     }
 
-export const createUser = async (data, responseOkay, responseNotOkay ) => {
+export const createUser = async (user) => {
     return await apiCall({
         url: `${API_BASE_URL}api/backend/users`,
         method: 'POST',
-        body: data, 
-        responseOkay: (message) => {
-            responseOkay(message);
-        },
-        responseNotOkay: (message) => {
-            responseNotOkay(message);
-        },
+        body: user, 
     });
     }

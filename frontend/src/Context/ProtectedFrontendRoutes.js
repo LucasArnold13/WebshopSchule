@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
 
 function ProtectedFrontendRoutes() {
-  const [isAuthenticated, setIsAuthenticated] = useState(null); 
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
@@ -10,28 +10,28 @@ function ProtectedFrontendRoutes() {
     try {
       const response = await fetch("http://localhost:3000/api/frontend/auth", {
         method: "GET",
-        credentials: "include", 
+        credentials: "include",
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        setIsAuthenticated(true); 
+        setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
       }
     } catch (error) {
       console.error("Fehler beim Überprüfen der Session:", error);
-      setIsAuthenticated(false); 
+      setIsAuthenticated(false);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    checkSession(); 
+    checkSession();
   }, []);
 
-console.log("so oft wird die Komponente neu gerendert")
+  console.log("so oft wird die Komponente neu gerendert")
   if (isLoading) {
     return <></>;
   }

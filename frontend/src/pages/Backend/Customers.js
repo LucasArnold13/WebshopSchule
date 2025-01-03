@@ -33,8 +33,8 @@ function Customers() {
   useEffect(() => {
     const fetchAndSetCustomers = async () => {
       try {
-        const data = await fetchCustomers();
-        setRows(transformData(data));
+        const response = await fetchCustomers();
+        setRows(transformData(response.data));
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
@@ -54,7 +54,9 @@ function Customers() {
         <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Kunden</Typography>
         <Button variant="contained" onClick={() => navigate('/backend/customers/new')}>Kunden hinzufügen</Button>
       </Box>
-      <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      <Box sx={{ overflow: "auto", }}>
+        <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      </Box>
     </>
 
   );

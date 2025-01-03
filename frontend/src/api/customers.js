@@ -15,18 +15,18 @@ export const fetchCustomer = async (id) => {
     });
 };
 
-export const updateCustomer = async (id, data) => {
+export const updateCustomer = async (customer) => {
     return await apiCall({
-        url: `${API_BASE_URL}api/backend/customers/${id}`,
+        url: `${API_BASE_URL}api/backend/customers/${customer.id}`,
         method: 'PUT',
-        data
+        body : customer
     });
 };
 
-export const createCustomer = async (data) => {
+export const createCustomer = async (customer) => {
     return await apiCall({
         url: `${API_BASE_URL}api/backend/customers`,
         method: 'POST',
-        data
+        body : customer
     });
 };

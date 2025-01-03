@@ -1,15 +1,15 @@
-import { BASE_API_IMAGES_URL, apiCall } from ".";
+import { API_BASE_URL, apiCall } from ".";
 
 export const fetchOrders = async () => {
     return await apiCall({
-        url: `${BASE_API_IMAGES_URL}api/backend/orders`,
+        url: `${API_BASE_URL}api/backend/orders`,
         method: 'GET',
     });
 };
 
 export const fetchOrder = async (id) => {
     return await apiCall({
-        url: `${BASE_API_IMAGES_URL}api/backend/orders/${id}`,
+        url: `${API_BASE_URL}api/backend/orders/${id}`,
         method: 'GET',
     });
 };

@@ -28,8 +28,8 @@ function Categories() {
   useEffect(() => {
     const fetchAndSetCategories = async () => {
       try {
-        const data = await fetchCategories();
-        setRows(transformData(data));
+        const response = await fetchCategories();
+        setRows(transformData(response.data));
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
@@ -50,8 +50,9 @@ function Categories() {
         <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Kategorie hinzufügen</Button>
       </Box>
 
-
+      <Box sx={{overflow: "auto", }}>
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      </Box>
     </>
   );
 }

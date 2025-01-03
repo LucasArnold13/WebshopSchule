@@ -20,21 +20,14 @@ export const apiCall = async ({
             },
             credentials,
         };
-
         if (body) {
+    
             options.body = JSON.stringify(body);
         }
-
         const response = await fetch(url, options);
         const data = await response.json();
-
-        if (response.ok) {
-            responseOkay(data.message); 
-        } else {
-            responseNotOkay(data.message);
-        }
-
-        return data;
+        
+        return {status : response.status, data};
     } catch (error) {
         catchError(error); 
     }

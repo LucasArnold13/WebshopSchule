@@ -1,56 +1,26 @@
 
 import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert } from "@mui/material";
 import { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { data, NavLink, useParams } from "react-router-dom";
+import { fetchOrder } from "../../api/orders";
 
 function Customer() {
     const [order, setOrder] = useState({});
-    const [products, setProducts] = useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const { id } = useParams();
 
 
     useEffect(() => {
-        const fetchCustomer = async () => {
+        const fetchAndSetOrder = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/backend/orders/' + id, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-
-                const data = await response.json();
-                console.log(data);
-                if (response.ok) {
-                    setOrder(data);
-                } else {
-                    console.error("Fehler bei der API-Anfrage:", response.statusText);
-                }
+                const data = await fetchOrder(id);
+                setOrder(data);
             } catch (error) {
                 console.error('Fehler beim Abrufen der Daten:', error);
             }
         };
 
-        const fetchActiveProducts = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/api/backend/products/active', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-
-                const data = await response.json();
-                console.log(data);
-                if (response.ok) {
-                    setProducts(data);
-                } else {
-                    console.error("Fehler bei der API-Anfrage:", response.statusText);
-                }
-            } catch (error) {
-                console.error('Fehler beim Abrufen der Daten:', error);
-            }
-        };
-
-        fetchCustomer();
-        fetchActiveProducts();
+        fetchAndSetOrder();
     }, [id]);
 
     const handleClick = async () => {

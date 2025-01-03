@@ -1,12 +1,14 @@
-import { TextField, Typography, Checkbox, FormControlLabel, Button, Snackbar, Alert, Box } from "@mui/material";
+import { TextField, Typography, Checkbox, FormControlLabel, Button, Snackbar, Alert, Box, Select, MenuItem } from "@mui/material";
 import Textarea from '@mui/joy/Textarea';
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProduct } from "../../api/products";
+import { fetchCategories, fetchCategory } from "../../api/categories";
 
 function Product() {
   const [product, setProduct] = useState({});
+  const [categories, setCategories] = useState([]);
   const { id } = useParams();
 
 
@@ -20,6 +22,15 @@ function Product() {
       }
     };
 
+    const fetchAndSetCategories = async () => {
+      try {
+        const data = await fetchCategories();
+        setCategories(data);
+      } catch (error) {
+        
+      }
+    }
+    fetchAndSetCategories();
     fetchAndSetProduct();
   }, []);
 
@@ -36,6 +47,20 @@ function Product() {
             <TextField value={product?.name} label="Name" onChange={(e) => setProduct({ ...product, name: e.target.value })} />
             <TextField value={product?.sku} label="SKU" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
             <TextField value={product?.price} label="Preis" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
+            <Select
+        label="Kategorie"
+        value={product?.category_id || ""}
+        sx={{ width: "20%", marginTop: "1rem" }}
+        onChange={(e) =>
+          setProduct((prev) => ({ ...prev, role_id: e.target.value }))
+        }
+      >
+        {categories?.map((category) => (
+          <MenuItem key={category.id} value={category.id}>
+            {category.name}
+          </MenuItem>
+        ))}
+      </Select>
           </Box>
         </Box>
         <Textarea value={product?.description} placeholder="Beschreibung" onChange={(e) => setProduct({ ...product, description: e.target.value })} style={{ width: '100%', padding: '8px', fontSize: '16px' }} />

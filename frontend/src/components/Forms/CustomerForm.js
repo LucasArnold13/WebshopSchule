@@ -1,41 +1,15 @@
 import React, { useState } from 'react';
 import { TextField, Button, Checkbox, FormControlLabel, Snackbar, Alert } from '@mui/material';
-import CustomSnackbar from "./Feedback/CustomSnackbar";
 import { useEffect } from 'react';
+import { useSnackbar } from '../../Context/SnackbarContext';
 
-function CustomerContent({ initialCustomer, onSave }) {
-  // Lokaler State für den Kunden
-  const [customer, setCustomer] = useState(initialCustomer || {
-    firstname: "",
-    lastname: "",
-    email: "",
-    is_disabled: false,
-  });
-  const [snackbarState, setSnackbarState] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+function CustomerForm({ customer,setCustomer, onSave }) {
 
-  useEffect(() => {
-    setCustomer(initialCustomer);
-    console.log(customer);
-  }, [initialCustomer]);
-
-  const closeSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarState({ ...snackbarState, open: false });
-  };
+  const { showSnackbar } = useSnackbar();
 
   const handleClick = () => {
     if (!customer.firstname || !customer.lastname || !customer.email) {
-      setSnackbarState({
-        open: true,
-        message: "Bitte fülle alle Felder aus.",
-        severity: "warning",
-      });
+      showSnackbar("Alle Felder müssen gesetzt sein", "info");
       return;
     }
     onSave(customer);
@@ -43,12 +17,11 @@ function CustomerContent({ initialCustomer, onSave }) {
 
   return (
     <>
-      <CustomSnackbar open={snackbarState.open} message={snackbarState.message} severity={snackbarState.severity} handleClose={closeSnackbar} />
-
       <TextField
         id="firstname"
         label="Vorname"
         variant="outlined"
+        
         value={customer?.firstname}
         onChange={(e) => setCustomer({
           ...customer,
@@ -68,7 +41,7 @@ function CustomerContent({ initialCustomer, onSave }) {
       <TextField
         id="email"
         label="E-Mail"
-        email
+        type="email"
         variant="outlined"
         value={customer?.email}
         onChange={(e) => setCustomer({
@@ -98,4 +71,4 @@ function CustomerContent({ initialCustomer, onSave }) {
   );
 }
 
-export default CustomerContent;
+export default CustomerForm;

@@ -11,18 +11,23 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchUser, updateUser } from "../../api/users";
 import { fetchRoles } from "../../api/roles";
-
+import { useSnackbar } from "../../Context/SnackbarContext";
+import UserForm from "../../Components/Forms/UserForm";
+import { format } from 'date-fns';
+ 
 function User() {
-  const [user, setUser] = useState(null); 
+  const { showSnackbar } = useSnackbar();
+  const [user, setUser] = useState(null);
   const [roles, setRoles] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
     const fetchAndSetUser = async () => {
       try {
-        const data = await fetchUser(id);
-        setUser(data);
+        const response = await fetchUser(id);
+        setUser(response.data);
       } catch (error) {
         console.error("Fehler beim Abrufen der Benutzerdaten:", error);
       }
@@ -30,8 +35,8 @@ function User() {
 
     const fetchAndSetRoles = async () => {
       try {
-        const data = await fetchRoles();
-        setRoles(data);
+        const response = await fetchRoles();
+        setRoles(response.data);
       } catch (error) {
         console.error("Fehler beim Abrufen der Rollen:", error);
       }
@@ -41,73 +46,54 @@ function User() {
     Promise.all([fetchAndSetUser(), fetchAndSetRoles()]).finally(() => {
       setLoading(false);
     });
-  }, [id]);
+  }, [id, reload]);
 
   const handleSave = async () => {
-    try {
-      await updateUser(id, user);
-    } catch (error) {
-      console.error("Fehler beim Speichern der Benutzerdaten:", error);
+    const response = await updateUser(user);
+    if (response.status === 200) {
+      showSnackbar(response.data.message, "success");
+      setReload(true);
     }
+    else if (response.status === 400) {
+      showSnackbar(response.data.message, "error");
+    }
+
 
   };
 
   if (loading) {
     return (
       <div>
- 
+
         <Skeleton width="10%" height={56} />
 
 
-      {/* Skeleton für das erste Textfeld */}
-      <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
+        {/* Skeleton für das erste Textfeld */}
+        <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
 
-      {/* Skeleton für das zweite Textfeld */}
-      <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
+        {/* Skeleton für das zweite Textfeld */}
+        <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
 
-      {/* Skeleton für das Dropdown */}
-      <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
+        {/* Skeleton für das Dropdown */}
+        <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
 
-      {/* Skeleton für die Schaltfläche */}
-      <Skeleton variant="rectangular" width="10%" height={40} sx={{ marginTop: "1rem" }} />
-    </div>
+        {/* Skeleton für die Schaltfläche */}
+        <Skeleton variant="rectangular" width="10%" height={40} sx={{ marginTop: "1rem" }} />
+      </div>
     )
   }
 
   return (
     <>
-      <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Benutzer {user?.id}</Typography>
-      <TextField
-        value={user?.name || ""}
-        label="Username"
-        sx={{ width: "20%", marginTop: "1rem" }}
-        onChange={(e) => setUser({ ...user, name: e.target.value })}
-      />
-      <TextField
-        value={user?.email || ""}
-        label="Email"
-        sx={{ width: "20%", marginTop: "1rem" }}
-        onChange={(e) => setUser({ ...user, email: e.target.value })}
-      />
+      <Typography variant='h4'>Benutzer {user?.id}</Typography>
+      <Typography variant='body2' sx={{ color: "gray", marginBottom: "0.25rem" }}>
+        Erstellt am: {format(new Date(user.createdAt), 'dd.MM.yyyy HH:mm:ss')}
+      </Typography>
 
-      <Select
-        label="Rolle"
-        value={user?.role_id || ""}
-        sx={{ width: "20%", marginTop: "1rem" }}
-        onChange={(e) =>
-          setUser((prev) => ({ ...prev, role_id: e.target.value }))
-        }
-      >
-        {roles?.map((role) => (
-          <MenuItem key={role.id} value={role.id}>
-            {role.name}
-          </MenuItem>
-        ))}
-      </Select>
-
-      <Button variant="contained"  sx={{ width: "10%", marginTop: "1rem" }} onClick={handleSave}>
-        Speichern
-      </Button>
+      <Typography variant='body2' sx={{ color: "blue", marginBottom: "1rem" }}>
+        Aktualisiert am: {format(new Date(user.updatedAt), 'dd.MM.yyyy HH:mm:ss')}
+      </Typography>
+      <UserForm user={user} setUser={setUser} onSave={handleSave} roles={roles} />
     </>
   );
 }
