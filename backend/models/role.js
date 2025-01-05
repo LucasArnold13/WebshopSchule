@@ -17,10 +17,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Role.init({
-    name: DataTypes.STRING
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Role name cannot be null'
+        }
+      }
+    }
   }, {
     sequelize,
     modelName: 'Role',
+    tableName: 'roles',
   });
   return Role;
 };

@@ -40,7 +40,7 @@ function Orders() {
   useEffect(() => {
     const fetchAndSetOrders = async () => {
       try {
-        const response = fetchOrders();
+        const response = await fetchOrders();
         setRows(transformData(response.data))        
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);

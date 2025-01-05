@@ -22,10 +22,10 @@ module.exports = {
     }
 
     // Datensätze in die Datenbank einfügen
-    await queryInterface.bulkInsert('Products', products);
+    await queryInterface.bulkInsert('products', products);
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Products', null, {});
+    await queryInterface.bulkDelete('products', null, {});
   }
 };

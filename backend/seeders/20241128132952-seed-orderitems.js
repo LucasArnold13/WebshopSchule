@@ -18,10 +18,10 @@ module.exports = {
     }
 
 
-    await queryInterface.bulkInsert('Orderitems', orderDetails);
+    await queryInterface.bulkInsert('orderitems', orderDetails);
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Orderitems', null, {});
+    await queryInterface.bulkDelete('orderitems', null, {});
   }
 };

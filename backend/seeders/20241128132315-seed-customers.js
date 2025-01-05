@@ -18,11 +18,11 @@ module.exports = {
     }
 
     // Kunden in die Datenbank einfügen
-    await queryInterface.bulkInsert('Customers', customers);
+    await queryInterface.bulkInsert('customers', customers);
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Customers', null, {});
+    await queryInterface.bulkDelete('customers', null, {});
 
   }
 };

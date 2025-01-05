@@ -12,17 +12,17 @@ module.exports = {
         name: "admin",//faker.person.fullName(), // Zufälliger Benutzername
         email: faker.internet.email(), // Zufällige E-Mail-Adresse
         password: await bcrypt.hash("test", 10), //faker.internet.password(), // Zufälliges Passwort
-        role_id: faker.number.int({ min: 1, max: 3 }), // Zufällige Role-ID (angenommen, 1–3 existieren)
+        role_id: faker.number.int({ min: 1, max: 2 }), // Zufällige Role-ID
         createdAt: new Date(),
         updatedAt: new Date()
       });
     }
 
     // Benutzer in die Users-Tabelle einfügen
-    await queryInterface.bulkInsert('Users', users);
+    await queryInterface.bulkInsert('users', users);
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Users', null, {});
+    await queryInterface.bulkDelete('users', null, {});
   }
 };

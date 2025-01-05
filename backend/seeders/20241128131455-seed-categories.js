@@ -16,10 +16,10 @@ module.exports = {
     }
 
     // Daten in die Categories-Tabelle einfügen
-    await queryInterface.bulkInsert('Categories', categories);
+    await queryInterface.bulkInsert('categories', categories);
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Categories', null, {});
+    await queryInterface.bulkDelete('categories', null, {});
   }
 };

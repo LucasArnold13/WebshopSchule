@@ -27,12 +27,37 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Order.init({
-    status_id: DataTypes.INTEGER,
-    customer_id: DataTypes.INTEGER,
-    total_price_float: DataTypes.FLOAT
+    status_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'status_id cannot be null'
+        }
+      }
+    },
+    customer_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'customer_id cannot be null'
+        }
+      }
+    },
+    total_price_float: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'total_price_float cannot be null'
+        }
+      }
+    }
   }, {
     sequelize,
     modelName: 'Order',
+    tableName: 'orders',
   });
   return Order;
 };

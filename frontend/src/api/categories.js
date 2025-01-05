@@ -13,3 +13,10 @@ export const fetchCategory = async (id) => {
         method: 'GET',
     });
 };
+
+export const createCategory = async (category) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/backend/categories/new`,
+        method: 'GET',
+    });
+};

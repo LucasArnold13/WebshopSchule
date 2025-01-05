@@ -25,7 +25,6 @@ function Customers() {
     }));
   };
   const handleCellClick = (params) => {
-
     navigate(`/backend/customers/${params.row.col1}`);
   };
 

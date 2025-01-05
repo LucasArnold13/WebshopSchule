@@ -17,10 +17,10 @@ module.exports = {
     }
 
     // Daten in die CartItems-Tabelle einfügen
-    await queryInterface.bulkInsert('Cartitems', cartItems);
+    await queryInterface.bulkInsert('cartitems', cartItems);
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Cartitems', null, {});
+    await queryInterface.bulkDelete('cartitems', null, {});
   }
 };

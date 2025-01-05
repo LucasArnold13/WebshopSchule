@@ -56,7 +56,7 @@ router.get('/auth', backendSession, (req, res) => {
 
 router.get('/orders', async (req, res) => {
   try {
-    const customerOrders = await Order.findAll({
+    const orders = await Order.findAll({
       include: [
         {
           model: Orderitems,
@@ -73,8 +73,7 @@ router.get('/orders', async (req, res) => {
         },
       ],
     });
-
-    return res.json(customerOrders);
+    return res.status(200).json(orders);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
@@ -332,12 +331,11 @@ router.post('/users', async (req, res) => {
     const user = req.body;
 
     const newUser = await User.create(user);
-    console.log(newUser);
+
     if (newUser) {
       return res.status(201).json({ message: 'User wurde erfolgreich angelegt', user: newUser });
     }
     else {
-      console.log(newUser);
       return res.status(400).json({ message: 'Fehler bei Erstellung des Users' });
     }
   } catch (error) {
@@ -412,6 +410,27 @@ router.get('/categories/:id', async (req, res) => {
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
+
+
+router.post('/categories', async (req, res) => {
+  try {
+    const category = req.body;
+
+    const newCategory = await Category.create(category);
+
+    if (newCategory) {
+      return res.status(201).json({ message: 'Kategorie wurde erfolgreich angelegt', category: newCategory });
+    }
+    else {
+      return res.status(400).json({ message: 'Fehler bei Erstellung der Kategorie' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 //#endregion
 
 
