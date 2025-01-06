@@ -64,7 +64,7 @@ function Orders() {
         marginBottom: 2,
       }}>
         <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Bestellungen</Typography>
-        <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Bestellungen hinzufügen</Button>
+        <Button variant="contained" onClick={() => navigate('/backend/orders/new')}>Bestellungen hinzufügen</Button>
       </Box>
       <Box sx={{overflow: "auto", }}>
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />

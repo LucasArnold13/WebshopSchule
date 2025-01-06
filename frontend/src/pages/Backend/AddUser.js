@@ -19,9 +19,9 @@ function AddUser() {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
     const [user, setUser] = useState({
-        name : "",
-        email : "",
-        is_active : true
+        name: "",
+        email: "",
+        is_active: true
     });
     const [roles, setRoles] = useState([]);
     const [isloading, setisLoading] = useState(true);
@@ -36,17 +36,18 @@ function AddUser() {
             }
         };
 
-        Promise.all([ fetchAndSetRoles()]).finally(() => {
+        Promise.all([fetchAndSetRoles()]).finally(() => {
             setisLoading(false);
         });
     }, []);
 
-    
+
     const handleUpdate = async () => {
         const response = await createUser(user);
+        console.log(response.data.message);
         if (response.status === 201) {
             showSnackbar(response.data.message, "success");
-            navigate('/backend/users/' + response.data.user.id); 
+            navigate('/backend/users/' + response.data.user.id);
         }
         else if (response.status === 400) {
             showSnackbar(response.data.message, "error");

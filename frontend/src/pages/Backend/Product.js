@@ -15,8 +15,8 @@ function Product() {
   useEffect(() => {
     const fetchAndSetProduct = async () => {
       try {
-        const data = await fetchProduct(id);
-        setProduct(data);
+        const response = await fetchProduct(id);
+        setProduct(response.data);
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
@@ -24,8 +24,8 @@ function Product() {
 
     const fetchAndSetCategories = async () => {
       try {
-        const data = await fetchCategories();
-        setCategories(data);
+        const response = await fetchCategories();
+        setCategories(response.data);
       } catch (error) {
         
       }
@@ -47,6 +47,7 @@ function Product() {
             <TextField value={product?.name} label="Name" onChange={(e) => setProduct({ ...product, name: e.target.value })} />
             <TextField value={product?.sku} label="SKU" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
             <TextField value={product?.price} label="Preis" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
+            <TextField value={product?.quantity} label="Anzahl" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
             <Select
         label="Kategorie"
         value={product?.category_id || ""}

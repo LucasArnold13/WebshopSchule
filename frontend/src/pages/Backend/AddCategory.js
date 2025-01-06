@@ -5,18 +5,33 @@ import Table from "../../Components/Table";
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { create } from "../../api/categories";
+import { createCategory } from "../../api/categories";
+import { useSnackbar } from "../../Context/SnackbarContext";
 import Textarea from '@mui/joy/Textarea';
 
-function Category() {
-  const [category, setCategory] = useState({});
+function AddCategory() {
+  const [category, setCategory] = useState({
+    name: "",
+    description: "",
+  });
+  const { showSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
 
 
 
-  const handleSave = async () => { 
-
+  const handleSave = async () => {
+    if (!category.name || !category.description) {
+      showSnackbar("Alle Felder müssen gesetzt sein", "info");
+      return;
+    }
+    const response = await createCategory(category);
+    if (response.status === 201) {
+      showSnackbar(response.data.message, "success");
+      navigate('/backend/categories/' + response.data.category.id);
+    } else if (response.status === 400) {
+      showSnackbar(response.data.message, "error");
+    }
 
   };
 
@@ -48,4 +63,4 @@ function Category() {
   )
 }
 
-export default Category;
+export default AddCategory;

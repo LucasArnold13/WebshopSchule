@@ -1,91 +1,83 @@
 
-import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert } from "@mui/material";
+import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Box, Typography, Select, MenuItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams } from "react-router-dom";
 import { fetchOrder } from "../../api/orders";
+import { fetchStatus } from "../../api/status";
 
 function Customer() {
     const [order, setOrder] = useState({});
-    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [status, setStatus] = useState([]);
     const { id } = useParams();
 
-
-    useEffect(() => {
-        const fetchAndSetOrder = async () => {
-            try {
-                const data = await fetchOrder(id);
-                setOrder(data);
-            } catch (error) {
-                console.error('Fehler beim Abrufen der Daten:', error);
-            }
-        };
-
-        fetchAndSetOrder();
-    }, [id]);
-
-    const handleClick = async () => {
+    const fetchAndSetOrder = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/backend/orders/' + id, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(order),
-            });
-
-            if (response.ok) {
-                setOpenSnackbar(true);
-                console.log("Kunde wurde erfolgreich gespeichert");
-            } else {
-                console.error("Fehler bei der API-Anfrage:", response.statusText);
-            }
+            const response = await fetchOrder(id);
+            setOrder(response.data);
         } catch (error) {
             console.error('Fehler beim Abrufen der Daten:', error);
         }
     };
 
-    const handleAdd = async () => 
-    {
-        
-    }
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return; // Snackbar bleibt geöffnet, wenn der Benutzer außerhalb klickt
+    const fetchAndSetStatus = async () => {
+        try {
+            const response = await fetchStatus();
+            console.log(response.data)
+            setStatus(response.data);
+        } catch (error) {
+            console.error('Fehler beim Abrufen der Daten:', error);
         }
-        setOpenSnackbar(false); // Schließt die Snackbar
     };
+
+    useEffect(() => {
+        fetchAndSetStatus();
+        fetchAndSetOrder();
+    }, [id]);
+
+
+
 
 
     return (
         <>
-            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleClose} >
-                <Alert
-                    severity="success"
-                    variant="filled"
-                    sx={{ width: '100%' }}
+            <Box sx={{ padding: "2rem" }}>
+                <Typography variant='h4' sx={{ marginBottom: "1rem" }}>Bestellungen {order?.id}</Typography>
+                <Select
+                    label="Status"
+                    value={order?.status_id || ""}
+                    sx={{ width: "20%", marginBottom: "1rem" }}
+                    onChange={(e) =>
+                        setOrder((prev) => ({ ...prev, status_id: e.target.value }))
+                    }
                 >
-                    This is a success Alert inside a Snackbar!
-                </Alert>
-            </Snackbar>
-            <NavLink to="/backend/customers">{order?.customer?.lastname}</NavLink>
-            <TextField label="Produktnummer" />
-            <Button variant="contained" color="primary" onClick={handleAdd}>hinzufügen</Button>
-
-            {order.orderitems && order.orderitems.length > 0 ? (
-                <ul>
-                    {order.orderitems.map((item) => (
-                        <li key={item.id}>
-                            {item.product?.name}: {item.quantity} Stück - {item.price.toFixed(2)} €
-                        </li>
+                    {status?.map((status) => (
+                        <MenuItem key={status.id} value={status.id}>
+                            {status.name}
+                        </MenuItem>
                     ))}
-                </ul>
-            ) : (
-                <p>Es sind keine Artikel in der Bestellung enthalten.</p>
-            )}
-
-
-            <Button variant="contained" color="primary" onClick={handleClick}>Speichern</Button>
+                </Select>
+                <Box sx={{ marginBottom: "1rem" }}></Box>
+                <Typography variant='h6'>{order.customer?.firstname} {order.customer?.lastname}</Typography>
+                <Typography variant="body1">{new Date(order.createdAt).toLocaleDateString()}</Typography>
+            </Box>
+            <Box sx={{ marginBottom: "1rem" }}>
+                <Typography variant="h6">Lieferdatum</Typography>
+                <Typography variant="body1">11.1.2025</Typography>
+            </Box>
+            <Box sx={{ marginBottom: "1rem" }}>
+                <Typography variant="h6">Bestelldatum</Typography>
+                <Typography variant="body1">11.1.2025</Typography>
+            </Box>
+            <Box>
+                {order?.orderitems?.map((item) => (
+                    <Box key={item.id} sx={{ marginBottom: "1rem", padding: "1rem", border: "1px solid #ccc", borderRadius: "8px" }}>
+                        <Typography variant='h6'>{item.name}</Typography>
+                        <Typography>Quantity: {item.quantity}</Typography>
+                        <Typography>Price: {item.price}€</Typography>
+                        <Typography>SKU: {item.product.sku}</Typography>
+                    </Box>
+                ))}
+            </Box>
         </>
     );
 }

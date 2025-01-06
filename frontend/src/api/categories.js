@@ -16,7 +16,16 @@ export const fetchCategory = async (id) => {
 
 export const createCategory = async (category) => {
     return await apiCall({
-        url: `${API_BASE_URL}api/backend/categories/new`,
-        method: 'GET',
+        url: `${API_BASE_URL}api/backend/categories`,
+        method: 'POST',
+        body: category
+    });
+};
+
+export const updateCategory = async (category) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/backend/categories/${category.id}`,
+        method: 'PUT',
+        body: category
     });
 };

@@ -2,16 +2,18 @@ import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert, Typogra
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Table from "../../Components/Table";
 
-
+import { useSnackbar } from "../../Context/SnackbarContext";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchCategory } from "../../api/categories";
+import { fetchCategory, updateCategory } from "../../api/categories";
 import Textarea from '@mui/joy/Textarea';
 
 function Category() {
   const [category, setCategory] = useState({});
   const [rows, setRows] = useState([]);
+  const { showSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const [reload, setReload] = useState(false);
   const columns = [
     { field: 'col1', headerName: 'SKU', headerAlign: "center", flex: 1, },
     { field: 'col2', headerName: 'Name', headerAlign: "center", flex: 1, },
@@ -40,20 +42,35 @@ function Category() {
 
 
   useEffect(() => {
+    console.log('reload', reload);
     const fetchAndSetCategory = async () => {
       try {
-        const data = await fetchCategory(id);
-        setCategory(data);
-        setRows(transformData(data.products));
+        const response = await fetchCategory(id);
+        setCategory(response.data);
+        setRows(transformData(response.data.products));
+        setReload(false);
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
     };
 
     fetchAndSetCategory();
-  }, []);
+  }, [reload]);
 
-  const handleSave = async () => { };
+  const handleSave = async () => { 
+
+    if (!category.name || !category.description) {
+      showSnackbar("Alle Felder müssen gesetzt sein", "info");
+      return;
+    }
+    const response = await updateCategory(category);
+    if (response.status === 200) {
+      showSnackbar(response.data.message, "success");
+      setReload(true);
+    } else if (response.status === 400) {
+      showSnackbar(response.data.message, "error");
+    }
+  };
 
   return (
     <>
@@ -79,7 +96,9 @@ function Category() {
           Speichern
         </Button>
       </Box>
+      <Box sx={{overflow: "auto", }}>
       <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      </Box>
     </>
   )
 }

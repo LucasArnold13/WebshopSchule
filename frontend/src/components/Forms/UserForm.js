@@ -29,6 +29,13 @@ function UserForm({ user, setUser, onSave, roles }) {
                 sx={{ width: "20%", marginTop: "1rem" }}
                 onChange={(e) => setUser({ ...user, email: e.target.value })}
             />
+            <TextField
+                value={user?.password || ""}
+                label="Password"
+                type="password"
+                sx={{ width: "20%", marginTop: "1rem" }}
+                onChange={(e) => setUser({ ...user, password: e.target.value })}
+            />
 
             <FormControl
                 sx={{ width: "20%", marginTop: "1rem" }}

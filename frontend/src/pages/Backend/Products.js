@@ -53,7 +53,7 @@ function Products() {
         marginBottom: 2,
       }}>
         <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Produkte</Typography>
-        <Button variant="contained" onClick={() => navigate('/backend/categories/new')}>Produkt hinzufügen</Button>
+        <Button variant="contained" onClick={() => navigate('/backend/products/new')}>Produkt hinzufügen</Button>
       </Box>
       <Box sx={{overflow: "auto", }}>
       <Table  rows={rows} columns={columns} handleCellClick={handleCellClick} />

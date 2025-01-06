@@ -30,6 +30,9 @@ import AddUser from './Pages/Backend/AddUser';
 import BackendLogin from './Pages/Backend/BackendLogin';
 import Categories from './Pages/Backend/Categories';
 import Category from './Pages/Backend/Category';
+import AddCategory from './Pages/Backend/AddCategory';
+import AddProduct from './Pages/Backend/AddProduct';
+import AddOrder from './Pages/Backend/AddOrder';
 
 
 function App() {
@@ -79,11 +82,11 @@ function App() {
 
                 <Route path='orders' element={<Backendorders />} />
                 <Route path='orders/:id' element={<Backendorder />} />
-                <Route path='orders/new' element={<Backendorder />} />
+                <Route path='orders/new' element={<AddOrder />} />
 
                 <Route path='products' element={<Products />} />
                 <Route path='products/:id' element={<Product />} />
-                <Route path='products/new' element={<Product />} />
+                <Route path='products/new' element={<AddProduct />} />
 
                 <Route path='users' element={<Users />} />
                 <Route path='users/:id' element={<User />} />
@@ -91,7 +94,7 @@ function App() {
 
                 <Route path='categories' element={<Categories />} />
                 <Route path='categories/:id' element={<Category />} />
-                <Route path='categories/new' element={<Category />} />
+                <Route path='categories/new' element={<AddCategory />} />
 
                 <Route path="*" element={<NotFoundBackend />} />
               </Route>

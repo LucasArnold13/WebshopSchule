@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const session = require('express-session');
-const { Customer, Order, Orderitems, Status, User, Product, Role, Category } = require('../models');
+const { Address, Customer, Order, Orderitems, Status, User, Product, Role, Category } = require('../models');
 const bcrypt = require("bcrypt");
-const { where } = require("sequelize");
+
 
 const backendSession = session({
   name: "BSID",
@@ -141,10 +141,20 @@ router.get('/customers/:id', async (req, res) => {
       where: { id: customerId },
       attributes: { exclude: ['password'] }, // für die Sicherheit
       include: [
+      {
+        model: Order,
+        as: 'orders',
+        include: [
         {
-          model: Order,
-          as: 'orders',
+          model: Status,
+          as: 'status',
         },
+        ],
+      },
+      {
+        model: Address,
+        as: 'addresses',
+      },
       ],
     });
 
@@ -329,6 +339,9 @@ router.put('/users/:id', async (req, res) => {
 router.post('/users', async (req, res) => {
   try {
     const user = req.body;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+    user.password = hashedPassword;
 
     const newUser = await User.create(user);
 
@@ -415,7 +428,7 @@ router.get('/categories/:id', async (req, res) => {
 router.post('/categories', async (req, res) => {
   try {
     const category = req.body;
-
+    console.log(category);
     const newCategory = await Category.create(category);
 
     if (newCategory) {
@@ -431,8 +444,48 @@ router.post('/categories', async (req, res) => {
   }
 });
 
+router.put('/categories/:id', async (req, res) => {
+  try {
+
+    const category = req.body;
+    const categoryID = req.params.id;
+
+    if (isNaN(categoryID)) {
+      return res.status(400).json({ message: 'Ungültige Kategorie-ID.' });
+    }
+
+    const updateCategory = await Category.update(category,
+      { where: { id: categoryID } }
+    );
+
+    if (updateCategory == 0) {
+      return res.status(404).json({ message: 'Kategorie mit der ID wurde nicht gefunden ' });
+    }
+    else {
+      return res.status(200).json({ message: 'Kategorie wurde erfolgreich aktualisiert.' });
+    }
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 //#endregion
 
+//#region status
+router.get('/status', async (req, res) => {
+  try {
+    const status = await Status.findAll();
 
+    return res.status(200).json(status);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+//#endregion
 
 module.exports = router;
