@@ -3,6 +3,7 @@ const router = express.Router();
 const session = require('express-session');
 const { Address, Customer, Order, Orderitems, Status, User, Product, Role, Category } = require('../models');
 const bcrypt = require("bcrypt");
+const { Op } = require('sequelize');
 
 
 const backendSession = session({
@@ -257,20 +258,49 @@ router.get('/products/:id', async (req, res) => {
   }
 });
 
-//ändern zu suchfunktion!
-router.get('/products/active', async (req, res) => {
+
+router.get('/products/search/query', async (req, res) => {
+  const searchQuery = req.query.q;
+  console.log('Suchparameter:', searchQuery);
+
+  if (!searchQuery) {
+    return res.status(400).json({ error: 'Suchbegriff erforderlich' });
+  }
+
   try {
+    const whereClause = [];
+
+    // Prüfen, ob der Suchbegriff eine Zahl ist
+    if (!isNaN(searchQuery)) {
+      // Suche nach ID oder SKU (exakte Übereinstimmung oder Teilstring)
+      whereClause.push(
+        { id: searchQuery }, // Exakte Übereinstimmung für ID
+        { sku: { [Op.like]: `%${searchQuery}%` } } // Teilstring-Suche für SKU
+      );
+    } else {
+      // Suche nach Name (case-insensitive)
+      whereClause.push(
+        { name: { [Op.iLike]: `%${searchQuery}%` } } // Name durchsuchen
+      );
+    }
+
+    // Kombinierte Abfrage für alle Bedingungen
     const products = await Product.findAll({
-      where: { is_active: true }
+      where: {
+        [Op.or]: whereClause,
+      },
     });
 
-    return res.json(products);
+    if (products.length === 0) {
+      return res.status(404).json({ message: 'Keine Produkte gefunden.' });
+    }
+    console.log(products);
+    res.json(products);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
-
 //#endregion
 
 

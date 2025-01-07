@@ -1,4 +1,4 @@
-import { TextField, Checkbox, FormControlLabel, Button, Divider, Box, Typography, Select, MenuItem } from "@mui/material";
+import { TextField, Modal, FormControlLabel, Button, Divider, Box, Typography, Select, MenuItem, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams, useNavigate } from "react-router-dom";
 import { fetchOrder } from "../../api/orders";
@@ -12,12 +12,15 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 function EditBackendorder() {
     const [order, setOrder] = useState({});
     const [status, setStatus] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [openModal, setOpenModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const { id } = useParams();
     const navigate = useNavigate();
 
     const totalCost = order?.orderitems?.reduce((total, item) => {
         return total + item.product.price * item.quantity;
-      }, 0);
+    }, 0);
 
     const fetchAndSetOrder = async () => {
         try {
@@ -40,18 +43,106 @@ function EditBackendorder() {
 
     const handleDeleteItem = (itemId) => {
         const updatedOrder = {
-          ...order,
-          orderitems: order.orderitems.filter((item) => item.id !== itemId),
+            ...order,
+            orderitems: order.orderitems.filter((item) => item.id !== itemId),
         };
         setOrder(updatedOrder);
+    };
+
+    const openProductModal = () => {
+        setOpenModal(true);
+    }
+
+    const handleClose = () => setOpenModal(false);
+
+    const style = {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: 400,
+        height: "50%",
+        bgcolor: "background.paper",
+        border: "2px solid #000",
+        boxShadow: 24,
+        p: 4,
+    };
+
+    const handleSearch = async (query) => {
+        try {
+          console.log('Suchanfrage:', query);
+          const response = await fetch(`http://localhost:3000/api/backend/products/search/query?q=${query}`);
+          console.log(response);
+          const data = await response.json();
+          console.log(data);
+
+        setProducts(data)
+        } catch (error) {
+          console.error('Fehler bei der Suche:', error);
+        }
+      };
+    
+      const handleChange = (event) => {
+        const query = event.target.value;
+        setSearchQuery(query);
+    
+        // Nur bei nicht-leeren Werten die Suche ausführen
+        if (query.trim() !== '') {
+          handleSearch(query);
+        }
       };
 
     useEffect(() => {
         fetchAndSetStatus();
         fetchAndSetOrder();
     }, [id]);
+
+
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
+            <Modal
+                open={openModal}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Box sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", }}>
+                        <TextField
+                            id="filled-basic"
+                            label="Search"
+                            variant="filled"
+                            sx={{ width: '100%' }}
+                            value={searchQuery}
+                            onChange={handleChange} // Event-Handler bei Eingabe
+                        />
+                    </Box>
+                    <Box sx={{width : "100%" , overflow : "scroll"}}>
+                    {products?.map((item) => (
+                           <Paper
+                           elevation={3} // Schatten für das Paper
+                           sx={{
+                             display: 'flex',       // Flexbox aktivieren
+                             alignItems: 'center',  // Vertikale Ausrichtung der Texte
+                             justifyContent: 'space-between', // Platz zwischen den Texten
+                             padding: 2,            // Innenabstand
+                           }}
+                         >
+                           {/* Linker Text */}
+                           <Typography variant="body1">{item.name}</Typography>
+                     
+                           {/* Rechter Text */}
+                           <Typography variant="body1">Text auf der rechten Seite</Typography>
+                         </Paper>
+))}
+                    </Box>
+
+                </Box>
+            </Modal >
+
+
+
+
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Typography variant="h4" sx={{ paddingBottom: 1 }}>
                     Bestellung {order.id}
@@ -70,9 +161,8 @@ function EditBackendorder() {
                     </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                    <Box sx={{ display: 'flex', }}>
-                        <Button variant="contained" onClick={() => { navigate("/backend/orders/" + order?.id + "/edit") }} color="success">speichern</Button>
-                    </Box>
+                    <Button variant="contained" onClick={() => { navigate("/backend/orders/" + order?.id + "/edit") }} color="success">speichern</Button>
+
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
@@ -84,51 +174,54 @@ function EditBackendorder() {
                         borderRadius: "8px",
                     }}
                 >
-                    {/* Überschrift */}
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            fontWeight: "bold",
-                            padding: 1,
-                            paddingLeft: 2,
-                        }}
-                    >
-                        Bestellungsdetails
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 1 }}>
+                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                            Bestellungsdetails
+                        </Typography>
+                        <Button variant="contained" color="primary" onClick={() => openProductModal()} sx={{ minWidth: 80, height: "36px" }}>
+                            Produkt hinzufügen
+                        </Button>
+                    </Box>
+
+
+
                     <Divider sx={{ marginBottom: 2 }} />
 
-                    {/* Spaltenüberschriften */}
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: "2fr 1fr 1fr 1fr  1fr", // Definiert die Breiten der Spalten
-                            alignItems: "center",
-                            padding: 2,
-                            borderBottom: "1px solid #e0e0e0",
-                            backgroundColor: "#f9f9f9",
+                            gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", // Einheitliches Layout
+                            padding: "8px 16px",
+                            borderBottom: "2px solid #e0e0e0",
                         }}
                     >
-                        <Typography variant="subtitle2">Produkt</Typography>
-                        <Typography variant="subtitle2" sx={{ textAlign: "right" }}>
+                        <Typography variant="body1" sx={{ fontWeight: "bold", textAlign: "left" }}>
+                            Produkt
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: "bold", textAlign: "center" }}>
                             Preis
                         </Typography>
-                        <Typography variant="subtitle2" sx={{ textAlign: "center" }}>
+                        <Typography variant="body1" sx={{ fontWeight: "bold", textAlign: "center" }}>
                             Menge
                         </Typography>
-
+                        <Typography variant="body1" sx={{ fontWeight: "bold", textAlign: "center" }}>
+                            Gesamtpreis
+                        </Typography>
                     </Box>
 
-                    {/* Artikel-Details */}
+                    {/* Inhalte */}
                     {order?.orderitems?.map((item) => (
                         <Box
                             key={item.id}
                             sx={{
                                 display: "grid",
-                                gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
+                                gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", // Gleiche Spaltenaufteilung
                                 alignItems: "center",
-                                padding: 2,
+                                padding: "8px 16px",
                                 borderBottom: "1px solid #e0e0e0",
-                            }}>
+                            }}
+                        >
+
                             <Box sx={{ display: "flex", alignItems: "center" }}>
                                 <img
                                     src={item.product.image_url}
@@ -141,7 +234,7 @@ function EditBackendorder() {
                                     }}
                                 />
                                 <Box>
-                                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                                         {item.product.name}
                                     </Typography>
                                     <Typography variant="body2">
@@ -151,35 +244,121 @@ function EditBackendorder() {
                                 </Box>
                             </Box>
 
-                            {/* Einzelpreis */}
-                            <Typography variant="body1" sx={{ textAlign: "right" }}>
-                                {item.product.price.toFixed(2)}€
-                            </Typography>
 
-                            {/* Menge */}
-                            <Typography variant="body1" sx={{ textAlign: "center" }}>
-                                {item.quantity}
-                            </Typography>
+                            <Box sx={{ textAlign: "center" }}>
+                                <TextField
+                                    value={item.product.price.toString()} // Zeigt die Roh-Eingabe an
+                                    size="small"
+                                    onChange={(e) => {
+                                        const inputValue = e.target.value.replace(",", "."); // Komma durch Punkt ersetzen
+                                        const regex = /^[0-9]*[.,]?[0-9]*$/; // Nur Zahlen mit optionalem Dezimalpunkt/Komma
 
-                            {/* Gesamtpreis */}
-                            <Typography variant="body1" sx={{ textAlign: "right", fontWeight: "bold" }}>
-                                {(item.product.price * item.quantity).toFixed(2)}€
-                            </Typography>
-                            <Box
-                                sx={{
-                                    display: "flex", // Aktiviert Flexbox
-                                    justifyContent: "center", // Horizontale Zentrierung
-                                    alignItems: "center", // Vertikale Zentrierung
-                                }}
-                            >
-                                <Button variant="contained"
-                                  onClick={() => handleDeleteItem(item.id)} // Aufruf der Löschfunktion
-                                 color="error">
-                                    löschen
+                                        // Eingabe validieren
+                                        if (regex.test(inputValue) || inputValue === "") {
+                                            const updatedOrderItems = order.orderitems.map((orderItem) => {
+                                                if (orderItem.id === item.id) {
+                                                    return {
+                                                        ...orderItem,
+                                                        product: {
+                                                            ...orderItem.product,
+                                                            price: inputValue === "" ? "" : inputValue, // Eingabe direkt speichern
+                                                        },
+                                                    };
+                                                }
+                                                return orderItem;
+                                            });
+                                            setOrder({ ...order, orderitems: updatedOrderItems });
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        // Formatierung anwenden, wenn das Feld verlassen wird
+                                        const updatedOrderItems = order.orderitems.map((orderItem) => {
+                                            if (orderItem.id === item.id) {
+                                                return {
+                                                    ...orderItem,
+                                                    product: {
+                                                        ...orderItem.product,
+                                                        price: parseFloat(orderItem.product.price) || 0, // In Zahl umwandeln
+                                                    },
+                                                };
+                                            }
+                                            return orderItem;
+                                        });
+                                        setOrder({ ...order, orderitems: updatedOrderItems });
+                                    }}
+                                    sx={{
+                                        width: 80,
+                                        "& .MuiInputBase-input": {
+                                            textAlign: "center",
+                                            padding: "4px 8px",
+                                        },
+                                    }}
+                                    input={{
+                                        inputMode: "decimal", // Virtuelle Tastatur für Dezimalzahlen
+                                        pattern: "[0-9]*[.,]?[0-9]*", // Nur gültige Zahlen erlauben
+                                    }}
+                                />
+
+                            </Box>
+
+
+                            <Box sx={{ textAlign: "center" }}>
+                                <TextField
+                                    value={item.quantity}
+                                    size="small"
+                                    onChange={(e) => {
+                                        const value = parseFloat(e.target.value);
+                                        if (!isNaN(value)) {
+                                            const updatedOrderItems = order.orderitems.map((orderItem) => {
+                                                if (orderItem.id === item.id) {
+                                                    return {
+                                                        ...orderItem,
+                                                        quantity: value,
+                                                    };
+                                                }
+                                                return orderItem;
+                                            });
+                                            setOrder({ ...order, orderitems: updatedOrderItems });
+                                        }
+                                    }}
+                                    sx={{
+                                        width: 80,
+                                        "& .MuiInputBase-input": {
+                                            textAlign: "center",
+                                            padding: "4px 8px",
+                                        },
+                                    }}
+                                />
+                            </Box>
+
+
+                            <Box sx={{ textAlign: "center" }}>
+                                <Typography
+                                    variant="body1"
+                                    sx={{ fontWeight: "bold" }}
+                                >
+                                    {(item.product.price * item.quantity).toFixed(2)}€
+                                </Typography>
+                            </Box>
+
+                            {/* Löschen-Button */}
+                            <Box sx={{ textAlign: "center" }}>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => handleDeleteItem(item.id)}
+                                    color="error"
+                                    sx={{
+                                        minWidth: 80,
+                                        height: "36px",
+                                    }}
+                                >
+                                    Löschen
                                 </Button>
                             </Box>
                         </Box>
                     ))}
+
+
 
                     {/* Gesamtkosten */}
                     <Box
@@ -191,7 +370,7 @@ function EditBackendorder() {
                         }}
                     >
                         <Typography variant="h6" sx={{ fontWeight: "bold", paddingRight: 1 }}>
-                                 Gesamtkosten: {totalCost?.toFixed(2)} €
+                            Gesamtkosten: {totalCost?.toFixed(2)} €
                         </Typography>
                     </Box>
                 </Box>
@@ -276,7 +455,7 @@ function EditBackendorder() {
 
                 </Box>
             </Box>
-        </Box>
+        </Box >
     );
 };
 
