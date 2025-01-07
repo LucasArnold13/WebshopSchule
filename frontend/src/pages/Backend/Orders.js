@@ -1,10 +1,9 @@
-import { DataGrid } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Typography, Box, Button } from '@mui/material';
+import { Typography, Box, Button, Paper } from '@mui/material';
 import { fetchOrders } from '../../api/orders';
 import Table from "../../Components/Table";
+
 
 
 
@@ -15,9 +14,32 @@ function Orders() {
   const columns = [
     { field: 'col1', headerName: 'ID', headerAlign: "center", flex: 1, },
     { field: 'col2', headerName: 'Kunde', headerAlign: "center", flex: 1, },
-    { field: 'col3', headerName: 'Status', headerAlign: "center", flex: 1 },
-    { field: 'col4', headerName: 'Erstellt am', headerAlign: "center", flex: 1 },
-    { field: 'col5', headerName: 'Preis', headerAlign: "center", flex: 1 },
+    { field: 'col3', headerName: 'Status',  renderCell: (params) => {
+      const status = params.row.col3;
+      return (
+        <Paper
+          sx={{
+        backgroundColor:
+          status?.id === 1 // Pending
+            ? "orange"
+            : status?.id === 2 // Approved
+            ? "green"
+            : status?.id === 3 // Rejected
+            ? "red"
+            : "gray", // Default color
+        padding: 1,
+        lineHeight: 1,
+        display: "inline-block",
+        height: "auto",
+          }}
+        >
+          {status.name}
+        </Paper>
+      );
+    },headerAlign: "center", flex: 1, padding : 0, margin : 0, },
+    { field: 'col4', headerName: 'Bestelldatum', headerAlign: "center", flex: 1 },
+    { field: 'col5', headerName: 'Lieferdatum', headerAlign: "center", flex: 1 },
+    { field: 'col6', headerName: 'Preis', headerAlign: "center", flex: 1 },
   ];
 
 
@@ -26,9 +48,10 @@ function Orders() {
       id: index + 1,
       col1: item.id,
       col2: item.customer.firstname + " " + item.customer.firstname,
-      col3: item.status.name,
-      col4: item.createdAt,
-      col5: item.total_price_float + "€"
+      col3: item.status,
+      col4: item.order_date,
+      col5: item.delivery_date,
+      col6: item.total_price_float + "€"
     }));
   };
 

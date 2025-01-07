@@ -171,19 +171,35 @@ router.get('/customers/:id', async (req, res) => {
 
 router.put('/customers/:id', async (req, res) => {
   try {
+    console.log("test");
+    const customerId = req.params.id;
+    const  customer  = req.body;
+    console.log(customer); 
+    // 1. Aktualisiere den Kunden
+    const updatedCustomer = await Customer.update(customer, {
+      where: { id: customerId },
+    });
 
-    const customer = req.body;
-    const updatedtCustomer = await Customer.update(customer,
-      { where: { id: req.params.id } }
-    );
-    if (updatedtCustomer == 0) {
+    if (updatedCustomer == 0) {
       return res.status(400).json({ message: 'Kunde konnte nicht aktualisiert werden.' });
     }
-    else {
-      return res.status(200).json({ message: 'Kunde wurde erfolgreich aktualisiert.' });
+
+    // 2. Aktualisiere oder füge Adressen hinzu
+    if (customer.addresses && Array.isArray(customer.addresses)) {
+      for (const address of customer.addresses) {
+        if (address.id) {
+          // Adresse existiert bereits -> Aktualisiere sie
+          await Address.update(address, {
+            where: { id: address.id, customer_id: customerId },
+          });
+        } else {
+          // Neue Adresse -> Füge sie hinzu
+          await Address.create({ ...address, customer_id: customerId });
+        }
+      }
     }
 
-
+    return res.status(200).json({ message: 'Kunde und Adressen wurden erfolgreich aktualisiert.' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });

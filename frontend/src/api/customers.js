@@ -16,6 +16,7 @@ export const fetchCustomer = async (id) => {
 };
 
 export const updateCustomer = async (customer) => {
+    console.log(customer.id)
     return await apiCall({
         url: `${API_BASE_URL}api/backend/customers/${customer.id}`,
         method: 'PUT',

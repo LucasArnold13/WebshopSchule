@@ -11,18 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Order.hasMany(models.Orderitems, {
-        foreignKey: 'order_id', 
-        as: 'orderitems',    
+        foreignKey: 'order_id',
+        as: 'orderitems',
       });
 
       Order.belongsTo(models.Status, {
-        foreignKey: 'status_id', 
-        as: 'status',    
+        foreignKey: 'status_id',
+        as: 'status',
       });
 
       Order.belongsTo(models.Customer, {
-        foreignKey: 'customer_id', 
-        as: 'customer',        
+        foreignKey: 'customer_id',
+        as: 'customer',
       });
     }
   }
@@ -53,7 +53,70 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'total_price_float cannot be null'
         }
       }
-    }
+    },
+    order_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'order_date cannot be null'
+        }
+      }
+    },
+    delivery_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'delivery_date cannot be null'
+        }
+      }
+    },
+    street: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Street is required'
+        }
+      }
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'City is required'
+        }
+      }
+    },
+    state: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'State is required'
+        }
+      }
+    },
+    postalCode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Postal Code is required'
+        }
+      }
+    },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Country is required'
+        }
+      }
+    },
   }, {
     sequelize,
     modelName: 'Order',

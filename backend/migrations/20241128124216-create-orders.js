@@ -33,6 +33,34 @@ module.exports = {
         allowNull: false,
         type: Sequelize.FLOAT
       },
+      street: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      city: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      state: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      postalCode: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      country: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      order_date: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      delivery_date: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -1,4 +1,3 @@
-
 import { TextField, Checkbox, FormControlLabel, Button, Divider, Box, Typography, Select, MenuItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams, useNavigate } from "react-router-dom";
@@ -9,11 +8,16 @@ import StatusBox from "../../Components/StatusBox";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
-function Customer() {
+
+function EditBackendorder() {
     const [order, setOrder] = useState({});
     const [status, setStatus] = useState([]);
     const { id } = useParams();
     const navigate = useNavigate();
+
+    const totalCost = order?.orderitems?.reduce((total, item) => {
+        return total + item.product.price * item.quantity;
+      }, 0);
 
     const fetchAndSetOrder = async () => {
         try {
@@ -34,15 +38,18 @@ function Customer() {
         }
     };
 
+    const handleDeleteItem = (itemId) => {
+        const updatedOrder = {
+          ...order,
+          orderitems: order.orderitems.filter((item) => item.id !== itemId),
+        };
+        setOrder(updatedOrder);
+      };
+
     useEffect(() => {
         fetchAndSetStatus();
         fetchAndSetOrder();
     }, [id]);
-
-
-
-
-
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -63,8 +70,8 @@ function Customer() {
                     </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button variant="contained" onClick={() =>  {navigate("/backend/orders/" + order?.id + "/edit")}} color="primary">Bearbeiten</Button>
+                    <Box sx={{ display: 'flex', }}>
+                        <Button variant="contained" onClick={() => { navigate("/backend/orders/" + order?.id + "/edit") }} color="success">speichern</Button>
                     </Box>
                 </Box>
             </Box>
@@ -94,7 +101,7 @@ function Customer() {
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: "2fr 1fr 1fr 1fr", // Definiert die Breiten der Spalten
+                            gridTemplateColumns: "2fr 1fr 1fr 1fr  1fr", // Definiert die Breiten der Spalten
                             alignItems: "center",
                             padding: 2,
                             borderBottom: "1px solid #e0e0e0",
@@ -117,13 +124,11 @@ function Customer() {
                             key={item.id}
                             sx={{
                                 display: "grid",
-                                gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                                gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr",
                                 alignItems: "center",
                                 padding: 2,
                                 borderBottom: "1px solid #e0e0e0",
-                            }}
-                        >
-                            {/* Produktinformationen */}
+                            }}>
                             <Box sx={{ display: "flex", alignItems: "center" }}>
                                 <img
                                     src={item.product.image_url}
@@ -160,6 +165,19 @@ function Customer() {
                             <Typography variant="body1" sx={{ textAlign: "right", fontWeight: "bold" }}>
                                 {(item.product.price * item.quantity).toFixed(2)}€
                             </Typography>
+                            <Box
+                                sx={{
+                                    display: "flex", // Aktiviert Flexbox
+                                    justifyContent: "center", // Horizontale Zentrierung
+                                    alignItems: "center", // Vertikale Zentrierung
+                                }}
+                            >
+                                <Button variant="contained"
+                                  onClick={() => handleDeleteItem(item.id)} // Aufruf der Löschfunktion
+                                 color="error">
+                                    löschen
+                                </Button>
+                            </Box>
                         </Box>
                     ))}
 
@@ -173,7 +191,7 @@ function Customer() {
                         }}
                     >
                         <Typography variant="h6" sx={{ fontWeight: "bold", paddingRight: 1 }}>
-                            Gesamtkosten: {order.total_price_float} €
+                                 Gesamtkosten: {totalCost?.toFixed(2)} €
                         </Typography>
                     </Box>
                 </Box>
@@ -260,6 +278,6 @@ function Customer() {
             </Box>
         </Box>
     );
-}
+};
 
-export default Customer;
+export default EditBackendorder;

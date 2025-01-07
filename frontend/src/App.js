@@ -33,6 +33,7 @@ import Category from './Pages/Backend/Category';
 import AddCategory from './Pages/Backend/AddCategory';
 import AddProduct from './Pages/Backend/AddProduct';
 import AddOrder from './Pages/Backend/AddOrder';
+import EditBackendorder from './Pages/Backend/EditBackendorder';
 
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
 
                 <Route path='orders' element={<Backendorders />} />
                 <Route path='orders/:id' element={<Backendorder />} />
+                <Route path='orders/:id/edit' element={<EditBackendorder />} />
                 <Route path='orders/new' element={<AddOrder />} />
 
                 <Route path='products' element={<Products />} />

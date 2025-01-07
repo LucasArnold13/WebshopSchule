@@ -37,15 +37,16 @@ function Table({rows, columns, handleCellClick})
                           "& .MuiDataGrid-columnHeader:focus": {
                             outline: "none",
                           },
-                        "& .MuiDataGrid-columnHeaders": {
-                        },
                         '& .MuiDataGrid-cell': {
                             backgroundColor:  "rgba(255, 255, 255, 0.9) !important", 
                             cursor: 'pointer',
+                            padding: "0 !important", // Entfernt unnötiges Padding
                             display: 'flex',
                             justifyContent: 'center',
-                            alignItems: 'center',
-
+                            alignItems: "center", // Zentriert vertikal
+                          },
+                          "& .MuiDataGrid-row:hover": {
+                            backgroundColor: "rgba(0, 123, 255, 0.8)", // Leicht blauer Hintergrund beim Hover
                           },
                         }} />
             </Box>

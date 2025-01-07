@@ -1,4 +1,4 @@
-import { TextField, Button, Typography, Grid, Paper, FormControlLabel, Checkbox, Box,   CircularProgress, } from "@mui/material";
+import { TextField, Button, Typography, Grid, Paper, FormControlLabel, Checkbox, Box, CircularProgress, } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
@@ -53,8 +53,8 @@ function Customer() {
         fetchAndSetCustomer();
     }, [id, loading]);
 
-    const handleUpdate = async (updatedCustomer) => {
-        const response = await updateCustomer(updatedCustomer);
+    const handleUpdate = async () => {
+        const response = await updateCustomer(customer);
         console.log(response);
         if (response.status === 200) {
             showSnackbar(response.data.message, "success");
@@ -62,26 +62,40 @@ function Customer() {
             showSnackbar(response.data.message, "error");
         }
     };
+
+    const addAdress = ( ) => {
+        let newAddress = {
+            street : "",
+            city : "", 
+            country : "",
+            postalCode : ""
+        }
+        setCustomer(prevState => ({
+            ...prevState,
+            addresses: [...prevState.addresses, newAddress]
+        }));
+    }
     if (loading) {
-        return (<CircularProgress/>);
+        return (<CircularProgress />);
 
     }
     return (
-        <Box sx={{  height: "100vh", overflow: "auto",}}>
+        <Box sx={{ height: "100%", width: "100%", overflow: "auto" }}>
             <Typography variant="h4" sx={{ paddingBottom: 3 }}>Kunden {customer.id}</Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 2, }}>
-                <Box sx={{ flex: 2, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, }}>
+                <Box sx={{ width: "30%", display: 'flex', flexDirection: 'column' }}>
                     <TextField
                         id="firstname"
                         label="Vorname"
                         variant="outlined"
+
                         value={customer?.firstname}
                         onChange={(e) => setCustomer({
                             ...customer,
                             firstname: e.target.value,
                         })}
                         size="small"
-                        sx={{ marginBottom: 2 }}
+                        sx={{ marginBottom: 2, width: "40%" }}
                     />
                     <TextField
                         id="lastname"
@@ -93,7 +107,7 @@ function Customer() {
                             lastname: e.target.value,
                         })}
                         size="small"
-                        sx={{ marginBottom: 2 }}
+                        sx={{ marginBottom: 2, width: "40%" }}
                     />
                     <TextField
                         id="email"
@@ -106,7 +120,7 @@ function Customer() {
                             email: e.target.value,
                         })}
                         size="small"
-                        sx={{ marginBottom: 2 }}
+                        sx={{ marginBottom: 2, width: "70%" }}
                     />
                     <FormControlLabel
                         control={
@@ -122,12 +136,35 @@ function Customer() {
                         }
                         label="Ist deaktiviert"
                     />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ marginTop: 2 }}
+                        onClick={handleUpdate}
+                    >
+                        User speichern
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ marginTop: 2 }}
+                        onClick={addAdress}
+                    >
+                        Adresse hinzufügen
+                    </Button>
                 </Box>
 
                 {/* Rechte Box */}
-                <Box sx={{ flex: 5, overflow: "auto", height: "400px" }}>
+                <Box sx={{
+                    width: "40%",
+                    overflow: "auto",
+                    height: "400px",
+                    border: "2px solid #1976d2",
+                    borderRadius: "8px"
+                }}>
                     {customer?.addresses?.map((address, index) => (
-                        <Paper key={index} sx={{ padding: 2, marginBottom: 2 }}>
+                        <Paper key={index} sx={{ padding: 2, marginBottom: 2, marginLeft: "auto" }}>
                             <Typography variant="h6">Adresse {index + 1}</Typography>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
                                 <TextField
@@ -188,9 +225,11 @@ function Customer() {
                     ))}
                 </Box>
             </Box>
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{}}>
                 <Typography variant="h5">Bestellungen</Typography>
-                <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+                <Box sx={{ height: "100px" }}>
+                    <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+                </Box>
             </Box>
         </Box>
     );
