@@ -1,20 +1,25 @@
-import { TextField, Modal, FormControlLabel, Button, Divider, Box, Typography, Select, MenuItem, Paper } from "@mui/material";
+import { TextField, Modal, FormControl, Button, Divider, Box, Typography, Select, MenuItem, Paper, InputLabel, } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams, useNavigate } from "react-router-dom";
-import { fetchOrder } from "../../api/orders";
+import { fetchOrder, updateOrder } from "../../api/orders";
 import { fetchStatus } from "../../api/status";
 import { Avatar, IconButton } from "@mui/material";
 import StatusBox from "../../Components/StatusBox";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { useSnackbar } from "../../Context/SnackbarContext";
+import dayjs from "dayjs";
 
+import SearchModal from "../../Components/SearchModal";
 
 function EditBackendorder() {
+    const { showSnackbar } = useSnackbar();
     const [order, setOrder] = useState({});
     const [status, setStatus] = useState([]);
-    const [products, setProducts] = useState([]);
     const [openModal, setOpenModal] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -49,96 +54,58 @@ function EditBackendorder() {
         setOrder(updatedOrder);
     };
 
+    const handleAddressChange = (event) => {
+        const selectedAddressId = event.target.value;
+        const selectedAddress = order.customer.addresses[selectedAddressId];
+
+        setOrder((prevOrder) => ({
+            ...prevOrder,
+            street: selectedAddress.street,
+            city: selectedAddress.city,
+            state: selectedAddress.state,
+            country: selectedAddress.country,
+        }));
+    };
+
     const openProductModal = () => {
         setOpenModal(true);
     }
 
-    const handleClose = () => setOpenModal(false);
 
-    const style = {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: 400,
-        height: "50%",
-        bgcolor: "background.paper",
-        border: "2px solid #000",
-        boxShadow: 24,
-        p: 4,
-    };
 
-    const handleSearch = async (query) => {
-        try {
-          console.log('Suchanfrage:', query);
-          const response = await fetch(`http://localhost:3000/api/backend/products/search/query?q=${query}`);
-          console.log(response);
-          const data = await response.json();
-          console.log(data);
 
-        setProducts(data)
-        } catch (error) {
-          console.error('Fehler bei der Suche:', error);
-        }
-      };
-    
-      const handleChange = (event) => {
-        const query = event.target.value;
-        setSearchQuery(query);
-    
-        // Nur bei nicht-leeren Werten die Suche ausführen
-        if (query.trim() !== '') {
-          handleSearch(query);
-        }
-      };
+    const handleSave = async () => {
+        const response = await updateOrder(order);
+        if (response.status === 200) {
+            showSnackbar(response.data.message, "success");
+          }
+          else if (response.status === 400) {
+            showSnackbar(response.data.message, "error");
+          }
+          navigate("/backend/orders/" + order?.id)
+      
+    }
+
+
+
+
 
     useEffect(() => {
         fetchAndSetStatus();
         fetchAndSetOrder();
-    }, [id]);
+        console.log("Aktualisierter Zustand:", order);
+    }, [id,]);
 
 
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
-            <Modal
-                open={openModal}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <Box sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", }}>
-                        <TextField
-                            id="filled-basic"
-                            label="Search"
-                            variant="filled"
-                            sx={{ width: '100%' }}
-                            value={searchQuery}
-                            onChange={handleChange} // Event-Handler bei Eingabe
-                        />
-                    </Box>
-                    <Box sx={{width : "100%" , overflow : "scroll"}}>
-                    {products?.map((item) => (
-                           <Paper
-                           elevation={3} // Schatten für das Paper
-                           sx={{
-                             display: 'flex',       // Flexbox aktivieren
-                             alignItems: 'center',  // Vertikale Ausrichtung der Texte
-                             justifyContent: 'space-between', // Platz zwischen den Texten
-                             padding: 2,            // Innenabstand
-                           }}
-                         >
-                           {/* Linker Text */}
-                           <Typography variant="body1">{item.name}</Typography>
-                     
-                           {/* Rechter Text */}
-                           <Typography variant="body1">Text auf der rechten Seite</Typography>
-                         </Paper>
-))}
-                    </Box>
 
-                </Box>
-            </Modal >
+            <SearchModal
+                open={openModal}
+                setOpen={setOpenModal}
+                order={order} // Order direkt übergeben
+                setOrder={setOrder} // Setter direkt übergeben
+            />
 
 
 
@@ -151,17 +118,31 @@ function EditBackendorder() {
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
                 <Box>
-                    <Typography variant="body1" sx={{ paddingBottom: 0.1 }}>
+                    <Typography variant="body1" sx={{ paddingBottom: 1 }}>
                         <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
                         Bestelldatum: {new Date(order.order_date).toLocaleDateString()}
                     </Typography>
-                    <Typography variant="body1" sx={{ paddingBottom: 0.5 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2, }}>
                         <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        Lieferdatum: {new Date(order.delivery_date).toLocaleDateString()}
-                    </Typography>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="Lieferdatum auswählen"
+                                format="DD/MM/YYYY"
+                                minDate={dayjs()}
+                                value={dayjs(order.delivery_date)}
+                                onChange={(newDate) => {
+                                    setOrder((prevOrder) => ({
+                                        ...prevOrder,
+                                        delivery_date: newDate ? newDate.format("YYYY-MM-DD") : null,
+                                    }));
+                                }}
+                            />
+                        </LocalizationProvider>
+                    </Box>
+
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                    <Button variant="contained" onClick={() => { navigate("/backend/orders/" + order?.id + "/edit") }} color="success">speichern</Button>
+                    <Button variant="contained" onClick={() => handleSave()} color="success">speichern</Button>
 
                 </Box>
             </Box>
@@ -431,26 +412,44 @@ function EditBackendorder() {
                         </Typography>
                     </Box>
                     <Divider sx={{ marginBottom: 2 }} />
-                    <Box
-                        sx={{
+                    <Box sx={{ width: "100%", display: 'flex', justifyContent: 'space-between' }}>
+                        <Box sx={{
                             paddingLeft: 2,
-                        }}
-                    >
-                        <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
-                            Lieferadresse
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.street}
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.city}
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.postalCode}
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.country}
-                        </Typography>
+                            flex: 1
+                        }}>
+                            <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
+                                Lieferadresse
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
+                                {order?.street}
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
+                                {order?.city}
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
+                                {order?.postalCode}
+                            </Typography>
+                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
+                                {order?.country}
+                            </Typography>
+                        </Box>
+
+                        <Box sx={{ flex: 1, marginRight: 2 }}>
+                            <FormControl fullWidth sx={{ marginTop: 1 }}>
+                                <InputLabel id="address-select-label">Adresse auswählen</InputLabel>
+                                <Select
+                                    labelId="address-select-label"
+                                    onChange={handleAddressChange}
+                                >
+                                    {order?.customer?.addresses.map((address, index) => (
+                                        <MenuItem key={index} value={index}>
+                                            {`${address.street}, ${address.city}`}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+
                     </Box>
 
                 </Box>

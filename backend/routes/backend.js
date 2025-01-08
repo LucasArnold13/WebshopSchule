@@ -3,7 +3,7 @@ const router = express.Router();
 const session = require('express-session');
 const { Address, Customer, Order, Orderitems, Status, User, Product, Role, Category } = require('../models');
 const bcrypt = require("bcrypt");
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require("sequelize");
 
 
 const backendSession = session({
@@ -81,7 +81,45 @@ router.get('/orders', async (req, res) => {
   }
 });
 
+router.put('/orders/:id', async (req, res) => {
+  try {
+    // alles noch in einer transaktion packen
+    const order = req.body;
+    console.log(order);
+    const orderID = req.params.id;
+    if (isNaN(orderID)) {
+      return res.status(400).json({ message: 'Ungültige Bestellungs-ID.' });
+    }
 
+    for (const item of order.orderitems) {
+      console.log(item);
+      if (item.id) {
+        await Orderitems.update(
+          { price: item.price, quantity: item.quantity },
+          { where: { id: item.id } }
+        );
+      } else {
+        console.log(item);
+        await Orderitems.create(item);
+      }
+    }
+
+    const updatedOrder = await Order.update(order,
+      { where: { id: orderID } }
+    );
+
+
+    if (updatedOrder == 0) {
+      return res.status(404).json({ message: 'Bestellung mit der ID wurde nicht gefunden ' });
+    }
+    else {
+      return res.status(200).json({ message: 'Bestellung wurde erfolgreich aktualisiert.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
 
 router.get('/orders/:id', async (req, res) => {
   try {
@@ -94,7 +132,7 @@ router.get('/orders/:id', async (req, res) => {
           as: 'orderitems',
           include: [
             {
-              model: Product, // Beispiel für das verknüpfte Model
+              model: Product,
               as: 'product',
             },
           ],
@@ -106,7 +144,13 @@ router.get('/orders/:id', async (req, res) => {
         {
           model: Customer,
           as: 'customer',
-          attributes: { exclude: ['password'] }, // für die Sicherheit
+          attributes: { exclude: ['password'] },
+          include: [
+            {
+              model: Address,
+              as: 'addresses',
+            },
+          ],
         },
       ],
     });
@@ -142,20 +186,20 @@ router.get('/customers/:id', async (req, res) => {
       where: { id: customerId },
       attributes: { exclude: ['password'] }, // für die Sicherheit
       include: [
-      {
-        model: Order,
-        as: 'orders',
-        include: [
         {
-          model: Status,
-          as: 'status',
+          model: Order,
+          as: 'orders',
+          include: [
+            {
+              model: Status,
+              as: 'status',
+            },
+          ],
         },
-        ],
-      },
-      {
-        model: Address,
-        as: 'addresses',
-      },
+        {
+          model: Address,
+          as: 'addresses',
+        },
       ],
     });
 
@@ -174,8 +218,8 @@ router.put('/customers/:id', async (req, res) => {
   try {
     console.log("test");
     const customerId = req.params.id;
-    const  customer  = req.body;
-    console.log(customer); 
+    const customer = req.body;
+    console.log(customer);
     // 1. Aktualisiere den Kunden
     const updatedCustomer = await Customer.update(customer, {
       where: { id: customerId },
@@ -261,28 +305,31 @@ router.get('/products/:id', async (req, res) => {
 
 router.get('/products/search/query', async (req, res) => {
   const searchQuery = req.query.q;
-  console.log('Suchparameter:', searchQuery);
 
   if (!searchQuery) {
-    return res.status(400).json({ error: 'Suchbegriff erforderlich' });
+    return res.status(400).json({ message: 'Suchbegriff erforderlich' });
   }
 
   try {
     const whereClause = [];
 
-    // Prüfen, ob der Suchbegriff eine Zahl ist
     if (!isNaN(searchQuery)) {
-      // Suche nach ID oder SKU (exakte Übereinstimmung oder Teilstring)
+      console.log(searchQuery);
+  
       whereClause.push(
-        { id: searchQuery }, // Exakte Übereinstimmung für ID
-        { sku: { [Op.like]: `%${searchQuery}%` } } // Teilstring-Suche für SKU
+          { id: searchQuery }, // Exakte Übereinstimmung für ID
+          Sequelize.where(
+              Sequelize.cast(Sequelize.col("sku"), "TEXT"), // SKU in Text umwandeln
+              { [Op.like]: `%${searchQuery}%` } // Teilstring-Suche
+          )
       );
-    } else {
+  } else {
       // Suche nach Name (case-insensitive)
       whereClause.push(
-        { name: { [Op.iLike]: `%${searchQuery}%` } } // Name durchsuchen
+          { name: { [Op.iLike]: `%${searchQuery}%` } } // Name durchsuchen
       );
-    }
+  }
+  
 
     // Kombinierte Abfrage für alle Bedingungen
     const products = await Product.findAll({
@@ -292,10 +339,10 @@ router.get('/products/search/query', async (req, res) => {
     });
 
     if (products.length === 0) {
-      return res.status(404).json({ message: 'Keine Produkte gefunden.' });
+      return res.status(404).json([]);
     }
     console.log(products);
-    res.json(products);
+    res.status(200).json(products);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
     res.status(500).json({ message: 'Interner Serverfehler.' });

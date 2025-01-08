@@ -13,3 +13,11 @@ export const fetchOrder = async (id) => {
         method: 'GET',
     });
 };
+
+export const updateOrder = async (order) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/backend/orders/${order.id}`,
+        method: 'PUT',
+        body : order
+    });
+};

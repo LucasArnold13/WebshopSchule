@@ -15,3 +15,10 @@ export const fetchProduct = async (id) => {
         method: 'GET',
     });
 }; 
+
+export const searchProducts = async (query) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/backend/products/search/query?q=${query}`,
+        method: 'GET',
+    });
+}; 

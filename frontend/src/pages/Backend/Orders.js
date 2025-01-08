@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Typography, Box, Button, Paper } from '@mui/material';
 import { fetchOrders } from '../../api/orders';
 import Table from "../../Components/Table";
-
+import dayjs from "dayjs";
 
 
 
@@ -11,32 +11,39 @@ import Table from "../../Components/Table";
 function Orders() {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
+
+  const fixDate = (date) => {
+  return dayjs(date).format("DD.MM.YYYY")
+}
+
   const columns = [
     { field: 'col1', headerName: 'ID', headerAlign: "center", flex: 1, },
     { field: 'col2', headerName: 'Kunde', headerAlign: "center", flex: 1, },
-    { field: 'col3', headerName: 'Status',  renderCell: (params) => {
-      const status = params.row.col3;
-      return (
-        <Paper
-          sx={{
-        backgroundColor:
-          status?.id === 1 // Pending
-            ? "orange"
-            : status?.id === 2 // Approved
-            ? "green"
-            : status?.id === 3 // Rejected
-            ? "red"
-            : "gray", // Default color
-        padding: 1,
-        lineHeight: 1,
-        display: "inline-block",
-        height: "auto",
-          }}
-        >
-          {status.name}
-        </Paper>
-      );
-    },headerAlign: "center", flex: 1, padding : 0, margin : 0, },
+    {
+      field: 'col3', headerName: 'Status', renderCell: (params) => {
+        const status = params.row.col3;
+        return (
+          <Paper
+            sx={{
+              backgroundColor:
+                status?.id === 1 // Pending
+                  ? "orange"
+                  : status?.id === 2 // Approved
+                    ? "green"
+                    : status?.id === 3 // Rejected
+                      ? "red"
+                      : "gray", // Default color
+              padding: 1,
+              lineHeight: 1,
+              display: "inline-block",
+              height: "auto",
+            }}
+          >
+            {status.name}
+          </Paper>
+        );
+      }, headerAlign: "center", flex: 1, padding: 0, margin: 0, valueGetter: (status) => status?.name,
+    },
     { field: 'col4', headerName: 'Bestelldatum', headerAlign: "center", flex: 1 },
     { field: 'col5', headerName: 'Lieferdatum', headerAlign: "center", flex: 1 },
     { field: 'col6', headerName: 'Preis', headerAlign: "center", flex: 1 },
@@ -49,8 +56,8 @@ function Orders() {
       col1: item.id,
       col2: item.customer.firstname + " " + item.customer.firstname,
       col3: item.status,
-      col4: item.order_date,
-      col5: item.delivery_date,
+      col4: fixDate(item.order_date),
+      col5: fixDate(item.delivery_date),
       col6: item.total_price_float + "€"
     }));
   };
@@ -64,7 +71,7 @@ function Orders() {
     const fetchAndSetOrders = async () => {
       try {
         const response = await fetchOrders();
-        setRows(transformData(response.data))        
+        setRows(transformData(response.data))
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
@@ -89,8 +96,8 @@ function Orders() {
         <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Bestellungen</Typography>
         <Button variant="contained" onClick={() => navigate('/backend/orders/new')}>Bestellungen hinzufügen</Button>
       </Box>
-      <Box sx={{overflow: "auto", }}>
-      <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      <Box sx={{ overflow: "auto", }}>
+        <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
       </Box>
     </>
 
