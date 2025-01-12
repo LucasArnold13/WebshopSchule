@@ -3,7 +3,7 @@ import Table from "../../Components/Table";
 import { Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { fetchUsers } from "../../api/users";
-import { format } from 'date-fns';
+import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
 
 
 function Users() {
@@ -30,7 +30,7 @@ function Users() {
           col3: item.email,
           col4: item.role.name,
           col5: item.is_active ? "Ja" : "Nein",
-          col6: format(new Date(item.createdAt), 'dd.MM.yyyy')
+          col6: getFormattedDatetime(item.createdAt)
         }))
       );
     } catch (error) {

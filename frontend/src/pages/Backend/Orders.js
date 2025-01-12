@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Typography, Box, Button, Paper } from '@mui/material';
 import { fetchOrders } from '../../api/orders';
 import Table from "../../Components/Table";
-import dayjs from "dayjs";
+import { getStatusColor } from '../../utils/getStatusColor';
+import { getFormattedDatetime } from '../../utils/getFormattedDatetime';
 
 
 
@@ -12,9 +13,7 @@ function Orders() {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
 
-  const fixDate = (date) => {
-  return dayjs(date).format("DD.MM.YYYY")
-}
+
 
   const columns = [
     { field: 'col1', headerName: 'ID', headerAlign: "center", flex: 1, },
@@ -25,14 +24,7 @@ function Orders() {
         return (
           <Paper
             sx={{
-              backgroundColor:
-                status?.id === 1 // Pending
-                  ? "orange"
-                  : status?.id === 2 // Approved
-                    ? "green"
-                    : status?.id === 3 // Rejected
-                      ? "red"
-                      : "gray", // Default color
+              backgroundColor: getStatusColor(status?.id),
               padding: 1,
               lineHeight: 1,
               display: "inline-block",
@@ -56,8 +48,8 @@ function Orders() {
       col1: item.id,
       col2: item.customer.firstname + " " + item.customer.firstname,
       col3: item.status,
-      col4: fixDate(item.order_date),
-      col5: fixDate(item.delivery_date),
+      col4: getFormattedDatetime(item.order_date),
+      col5: getFormattedDatetime(item.delivery_date),
       col6: item.total_price_float + "€"
     }));
   };

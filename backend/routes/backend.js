@@ -3,7 +3,11 @@ const router = express.Router();
 const session = require('express-session');
 const { Address, Customer, Order, Orderitems, Status, User, Product, Role, Category } = require('../models');
 const bcrypt = require("bcrypt");
+const dayjs = require('dayjs');
 const { Op, Sequelize } = require("sequelize");
+const { getAllOrdersData, getTodaysRevenue, getNewCustomersFromThisMonth, getOrderChartData } = require("../services/DashboardService");
+
+
 
 
 const backendSession = session({
@@ -53,6 +57,28 @@ router.get('/auth', backendSession, (req, res) => {
 
 
 
+//#region Dashboard 
+
+
+//#endregion
+router.get('/dashboard', async (req, res) => {
+  try {
+    
+   const data = {
+    allOrders : await getAllOrdersData(),
+    todaysRevenue : await getTodaysRevenue(),
+    newCustomers : await getNewCustomersFromThisMonth(),
+    orderChartData : await getOrderChartData(),
+    
+   }
+
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 //#region orders
 
 router.get('/orders', async (req, res) => {
@@ -85,14 +111,14 @@ router.put('/orders/:id', async (req, res) => {
   try {
     // alles noch in einer transaktion packen
     const order = req.body;
-    console.log(order);
+
     const orderID = req.params.id;
     if (isNaN(orderID)) {
       return res.status(400).json({ message: 'Ungültige Bestellungs-ID.' });
     }
 
     for (const item of order.orderitems) {
-      console.log(item);
+ 
       if (item.id) {
         await Orderitems.update(
           { price: item.price, quantity: item.quantity },
@@ -216,11 +242,9 @@ router.get('/customers/:id', async (req, res) => {
 
 router.put('/customers/:id', async (req, res) => {
   try {
-    console.log("test");
     const customerId = req.params.id;
     const customer = req.body;
-    console.log(customer);
-    // 1. Aktualisiere den Kunden
+
     const updatedCustomer = await Customer.update(customer, {
       where: { id: customerId },
     });
@@ -229,16 +253,14 @@ router.put('/customers/:id', async (req, res) => {
       return res.status(400).json({ message: 'Kunde konnte nicht aktualisiert werden.' });
     }
 
-    // 2. Aktualisiere oder füge Adressen hinzu
     if (customer.addresses && Array.isArray(customer.addresses)) {
       for (const address of customer.addresses) {
+        console.log(address);
         if (address.id) {
-          // Adresse existiert bereits -> Aktualisiere sie
           await Address.update(address, {
             where: { id: address.id, customer_id: customerId },
           });
         } else {
-          // Neue Adresse -> Füge sie hinzu
           await Address.create({ ...address, customer_id: customerId });
         }
       }

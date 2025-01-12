@@ -63,23 +63,7 @@ function User() {
 
   if (loading) {
     return (
-      <div>
-
-        <Skeleton width="10%" height={56} />
-
-
-        {/* Skeleton für das erste Textfeld */}
-        <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
-
-        {/* Skeleton für das zweite Textfeld */}
-        <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
-
-        {/* Skeleton für das Dropdown */}
-        <Skeleton variant="rectangular" width="20%" height={56} sx={{ marginTop: "1rem" }} />
-
-        {/* Skeleton für die Schaltfläche */}
-        <Skeleton variant="rectangular" width="10%" height={40} sx={{ marginTop: "1rem" }} />
-      </div>
+      <CircularProgress/>
     )
   }
 

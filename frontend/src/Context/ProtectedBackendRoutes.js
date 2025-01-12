@@ -40,11 +40,11 @@ function ProtectedBackendRoutes()
   
   console.log("isAuthenticated: ", isAuthenticated);
     if (!isAuthenticated) {
-      //localStorage.setItem("isLoggedIn", "false");
+      localStorage.setItem("isLoggedIn", "false");
       return <Navigate to="/backend/login" state={{ from: location }} replace />;
     }
   
-    //localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("isLoggedIn", "true");
     return <Outlet />;
 }
 

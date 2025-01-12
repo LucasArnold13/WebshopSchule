@@ -59,7 +59,7 @@ function SearchModal({ open, setOpen, order, setOrder }) {
             product: item
         };
     
-
+        console.log(newOrderItem);
         setOrder((prevOrder) => ({
             ...prevOrder,
             orderitems: [...prevOrder.orderitems, newOrderItem],

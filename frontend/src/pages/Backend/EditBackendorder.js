@@ -11,6 +11,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useSnackbar } from "../../Context/SnackbarContext";
+import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
 import dayjs from "dayjs";
 
 import SearchModal from "../../Components/SearchModal";
@@ -19,6 +20,7 @@ function EditBackendorder() {
     const { showSnackbar } = useSnackbar();
     const [order, setOrder] = useState({});
     const [status, setStatus] = useState([]);
+    const [currentAddress, setCurrentAddress] = useState({});
     const [openModal, setOpenModal] = useState(false);
     const { id } = useParams();
     const navigate = useNavigate();
@@ -39,7 +41,6 @@ function EditBackendorder() {
     const fetchAndSetStatus = async () => {
         try {
             const response = await fetchStatus();
-            console.log(response.data)
             setStatus(response.data);
         } catch (error) {
             console.error('Fehler beim Abrufen der Daten:', error);
@@ -47,9 +48,10 @@ function EditBackendorder() {
     };
 
     const handleDeleteItem = (itemId) => {
+        console.log(itemId);
         const updatedOrder = {
             ...order,
-            orderitems: order.orderitems.filter((item) => item.id !== itemId),
+            orderitems: order.orderitems.filter((item) => item.product_id !== itemId),
         };
         setOrder(updatedOrder);
     };
@@ -78,12 +80,12 @@ function EditBackendorder() {
         const response = await updateOrder(order);
         if (response.status === 200) {
             showSnackbar(response.data.message, "success");
-          }
-          else if (response.status === 400) {
+        }
+        else if (response.status === 400) {
             showSnackbar(response.data.message, "error");
-          }
-          navigate("/backend/orders/" + order?.id)
-      
+        }
+        navigate("/backend/orders/" + order?.id)
+
     }
 
 
@@ -93,8 +95,22 @@ function EditBackendorder() {
     useEffect(() => {
         fetchAndSetStatus();
         fetchAndSetOrder();
+
+        if (order) {
+            const currentAddress = {
+                street: order?.street,
+                city: order?.city,
+                country: order?.country,
+                state: order?.state,
+                postalCode: order?.postalCode
+            };
+
+            setCurrentAddress(currentAddress)
+        }
+
+
         console.log("Aktualisierter Zustand:", order);
-    }, [id,]);
+    }, [id]);
 
 
     return (
@@ -110,11 +126,22 @@ function EditBackendorder() {
 
 
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Typography variant="h4" sx={{ paddingBottom: 1 }}>
-                    Bestellung {order.id}
-                </Typography>
-                <StatusBox status={order?.status} />
+            <Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Typography
+                        variant="h4">
+                        Bestellung {order.id}
+                    </Typography>
+                    <StatusBox status={order?.status} />
+                    <Typography variant='body2' sx={{ color: "gray", }}>
+                        Erstellt am: {getFormattedDatetime(order?.createdAt)}
+                    </Typography>
+
+                    <Typography variant='body2' sx={{ color: "blue", }}>
+                        Aktualisiert am: {getFormattedDatetime(order?.updatedAt)}
+                    </Typography>
+                </Box>
+                <Divider />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
                 <Box>
@@ -326,7 +353,7 @@ function EditBackendorder() {
                             <Box sx={{ textAlign: "center" }}>
                                 <Button
                                     variant="contained"
-                                    onClick={() => handleDeleteItem(item.id)}
+                                    onClick={() => handleDeleteItem(item.product_id)}
                                     color="error"
                                     sx={{
                                         minWidth: 80,
@@ -439,6 +466,13 @@ function EditBackendorder() {
                                 <InputLabel id="address-select-label">Adresse auswählen</InputLabel>
                                 <Select
                                     labelId="address-select-label"
+                                    value={order?.customer?.addresses.findIndex(
+                                        (address) =>
+                                            address.street === currentAddress.street &&
+                                            address.city === currentAddress.city &&
+                                            address.country === currentAddress.country &&
+                                            address.state === currentAddress.state
+                                    )}
                                     onChange={handleAddressChange}
                                 >
                                     {order?.customer?.addresses.map((address, index) => (
@@ -446,6 +480,9 @@ function EditBackendorder() {
                                             {`${address.street}, ${address.city}`}
                                         </MenuItem>
                                     ))}
+                                    <MenuItem key={-1} value={-1}>
+                                        {`${currentAddress.street}, ${currentAddress.city}`}
+                                    </MenuItem>
                                 </Select>
                             </FormControl>
                         </Box>

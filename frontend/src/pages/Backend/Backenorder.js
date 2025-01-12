@@ -8,7 +8,7 @@ import { Avatar, IconButton } from "@mui/material";
 import StatusBox from "../../Components/StatusBox";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-
+import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
 function Customer() {
     const [order, setOrder] = useState({});
     const [status, setStatus] = useState([]);
@@ -45,26 +45,48 @@ function Customer() {
 
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Typography variant="h4" sx={{ paddingBottom: 1 }}>
-                    Bestellung {order.id}
-                </Typography>
-                <StatusBox status={order?.status} />
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
-                <Box>
-                    <Typography variant="body1" sx={{ paddingBottom: 0.1 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        Bestelldatum: {new Date(order.order_date).toLocaleDateString()}
+            <Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Typography
+                        variant="h4">
+                        Bestellung {order.id}
                     </Typography>
-                    <Typography variant="body1" sx={{ paddingBottom: 0.5 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        Lieferdatum: {new Date(order.delivery_date).toLocaleDateString()}
+                    <StatusBox status={order?.status} />
+                    <Typography variant='body2' sx={{ color: "gray", }}>
+                        Erstellt am: {getFormattedDatetime(order?.createdAt)}
+                    </Typography>
+
+                    <Typography variant='body2' sx={{ color: "blue", }}>
+                        Aktualisiert am: {getFormattedDatetime(order?.updatedAt)}
                     </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                <Divider />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                        }}>Bestelldatum: {getFormattedDatetime(order.order_date)}</Typography>
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                        }}>Lieferdatum: {getFormattedDatetime(order.delivery_date)}
+                    </Typography>
+                </Box>
+
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, marginTop: 2 }}>
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button variant="contained" onClick={() =>  {navigate("/backend/orders/" + order?.id + "/edit")}} color="primary">Bearbeiten</Button>
+                        <Button variant="contained" onClick={() => { navigate("/backend/orders/" + order?.id + "/edit") }} color="primary">Bearbeiten</Button>
                     </Box>
                 </Box>
             </Box>
@@ -192,32 +214,37 @@ function Customer() {
                     </Typography>
                     <Divider sx={{ marginBottom: 2 }} />
                     <Box
+                        onClick={() => { navigate("/backend/customers/" + order?.customer?.id) }}
                         sx={{
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            paddingLeft: 2
+                            paddingLeft: 2,
+                            cursor: "pointer",
+                            "&:hover": {
+                                color: "rgba(22, 139, 248, 0.9)"
+                            },
                         }}
                     >
+
                         {/* Avatar und Name */}
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box sx={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                        >
                             <Avatar
                                 alt="bAmanda Harvey"
                                 sx={{ width: 50, height: 50, marginRight: 2 }}
                             />
-                            <Typography
-                                sx={{
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                        color: "blue",
-                                    },
-                                }}
-                                onClick={() => { navigate("/backend/customers/" + order?.customer?.id) }}
-                            >
+                            <Typography>
                                 {order?.customer?.firstname} {order?.customer?.lastname}
                             </Typography>
-
                         </Box>
+                        <Box sx={{ marginLeft: 2 }}>
+                            <ArrowForwardIosIcon />
+                        </Box>
+
                     </Box>
                     <Divider sx={{ marginTop: 2 }} />
                     <Box

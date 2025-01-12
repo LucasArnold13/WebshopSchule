@@ -55,10 +55,11 @@ function BackendLayout() {
                     alignItems: "center",
                     width: "100%",
                     padding: 2,
+                  
                     boxSizing: "border-box",
                 }}>
-                    <NotificationsIcon />
-                    <AccountCircleIcon />
+                    <AccountCircleIcon sx={{ fontSize: 25 }} />
+
                 </Box>
                 <Box sx={{ height: "95vh", display: "flex", flexDirection: "column", padding: "15px", boxSizing: "border-box" }}>
                     <Outlet />

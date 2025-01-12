@@ -1,4 +1,4 @@
-import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert, Typography, Box } from "@mui/material";
+import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert, Typography, Box, CircularProgress } from "@mui/material";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Table from "../../Components/Table";
 
@@ -14,6 +14,7 @@ function Category() {
   const { showSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [reload, setReload] = useState(false);
+  const [loading, setLoading] = useState(true);
   const columns = [
     { field: 'col1', headerName: 'SKU', headerAlign: "center", flex: 1, },
     { field: 'col2', headerName: 'Name', headerAlign: "center", flex: 1, },
@@ -49,13 +50,14 @@ function Category() {
         setCategory(response.data);
         setRows(transformData(response.data.products));
         setReload(false);
+        setLoading(false);
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
     };
 
     fetchAndSetCategory();
-  }, [reload]);
+  }, [reload, loading]);
 
   const handleSave = async () => { 
 
@@ -71,6 +73,10 @@ function Category() {
       showSnackbar(response.data.message, "error");
     }
   };
+
+  if (loading){
+    return <CircularProgress/>
+  }
 
   return (
     <>

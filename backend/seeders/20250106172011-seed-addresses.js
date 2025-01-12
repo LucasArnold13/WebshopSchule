@@ -10,7 +10,7 @@ module.exports = {
   const addresses = [];
   for (let i = 0; i < 100; i++) {
     addresses.push({
-      customer_id: faker.number.int({ min: 1, max: 10 }), 
+      customer_id: faker.number.int({ min: 1, max: 100 }), 
       street: faker.location.streetAddress(),
       city: faker.location.city(),
       state: faker.location.state(),

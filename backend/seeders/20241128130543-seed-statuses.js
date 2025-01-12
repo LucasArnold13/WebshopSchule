@@ -4,9 +4,9 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('statuses', [
-      { name: 'Pending', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Approved', createdAt: new Date(), updatedAt: new Date() },
-      { name: 'Rejected', createdAt: new Date(), updatedAt: new Date() }
+      { name: 'Offen', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Geschlossen', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'Storniert', createdAt: new Date(), updatedAt: new Date() }
     ]);
   },
 
