@@ -21,3 +21,11 @@ export const updateOrder = async (order) => {
         body : order
     });
 };
+
+export const createOrder = async (order) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/backend/orders`,
+        method: 'POST',
+        body : order
+    });
+};

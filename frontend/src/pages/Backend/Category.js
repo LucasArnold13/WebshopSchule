@@ -1,4 +1,4 @@
-import { TextField, Checkbox, FormControlLabel, Button, Snackbar, Alert, Typography, Box, CircularProgress } from "@mui/material";
+import { TextField, Checkbox, FormControlLabel, Button, Divider, Typography, Box, CircularProgress } from "@mui/material";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Table from "../../Components/Table";
 
@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchCategory, updateCategory } from "../../api/categories";
 import Textarea from '@mui/joy/Textarea';
+import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
 
 function Category() {
   const [category, setCategory] = useState({});
@@ -59,7 +60,7 @@ function Category() {
     fetchAndSetCategory();
   }, [reload, loading]);
 
-  const handleSave = async () => { 
+  const handleSave = async () => {
 
     if (!category.name || !category.description) {
       showSnackbar("Alle Felder müssen gesetzt sein", "info");
@@ -74,13 +75,26 @@ function Category() {
     }
   };
 
-  if (loading){
-    return <CircularProgress/>
+  if (loading) {
+    return <CircularProgress />
   }
 
   return (
     <>
-      <Typography variant="h4" style={{ marginBottom: '2rem' }}>Kategorie {category?.id}</Typography>
+      <Box sx={{ paddingBottom: 3 }}>
+        <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+          <Typography variant="h4" sx={{}}>Kategorie {category?.id}</Typography>
+          <Typography variant='body2' sx={{ color: "gray", }}>
+            Erstellt am: {getFormattedDatetime(category?.createdAt)}
+          </Typography>
+
+          <Typography variant='body2' sx={{ color: "blue", }}>
+            Aktualisiert am: {getFormattedDatetime(category?.updatedAt)}
+          </Typography>
+        </Box>
+
+        <Divider />
+      </Box>
       <Box style={{ flexDirection: 'column', alignItems: 'center' }}>
         <TextField
           value={category?.name}
@@ -88,22 +102,27 @@ function Category() {
           sx={{ width: "80%", maxWidth: "500px", marginBottom: "1rem" }}
           onChange={(e) => setCategory({ ...category, name: e.target.value })}
         />
-        <Textarea
-          value={category?.description}
-          placeholder="Beschreibung"
-          onChange={(e) => setCategory({ ...category, description: e.target.value })}
-          style={{ width: '80%', maxWidth: '500px', padding: '8px', fontSize: '16px', marginBottom: "1rem" }}
-        />
+        <Box>
+          <Typography variant="h5">Beschreibung</Typography>
+          <Textarea
+            value={category?.description}
+            onChange={(e) => setCategory({ ...category, description: e.target.value })}
+            style={{height: 100 ,width: '80%', padding: '8px', fontSize: '16px', marginBottom: "1rem" }}
+          />
+        </Box>
+
         <Button
           variant="contained"
+          color="success"
           onClick={handleSave}
-          sx={{ width: "80%", maxWidth: "500px", marginBottom: "2rem" }}
+          sx={{ width: "80%", maxWidth: "100px", marginBottom: "2rem", marginTop : "1rem" }}
         >
           Speichern
         </Button>
       </Box>
-      <Box sx={{overflow: "auto", }}>
-      <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
+      <Typography variant="h5">Produkte mit der ausgewählten Kategorie</Typography>
+      <Box sx={{ overflow: "auto", }}>
+        <Table rows={rows} columns={columns} handleCellClick={handleCellClick} />
       </Box>
     </>
   )
