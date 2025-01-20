@@ -1,13 +1,19 @@
-import { TextField, Typography, Checkbox, FormControlLabel, Button, Snackbar, Alert, Box, Select, MenuItem } from "@mui/material";
+import { TextField, Typography, Checkbox, FormControl, Button, InputLabel, Divider, Box, Select, MenuItem, CircularProgress } from "@mui/material";
 import Textarea from '@mui/joy/Textarea';
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProduct } from "../../api/products";
 import { fetchCategories, fetchCategory } from "../../api/categories";
+import { useSnackbar } from "../../Context/SnackbarContext";
+import { updateProduct } from "../../api/products";
+import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
 
 function Product() {
+  const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState({});
+  const { showSnackbar } = useSnackbar();
   const [categories, setCategories] = useState([]);
   const { id } = useParams();
 
@@ -27,46 +33,147 @@ function Product() {
         const response = await fetchCategories();
         setCategories(response.data);
       } catch (error) {
-        
+
       }
     }
-    fetchAndSetCategories();
-    fetchAndSetProduct();
+
+
+    Promise.all([fetchAndSetCategories(), fetchAndSetProduct()]).finally(() => {
+      setLoading(false);
+    });
   }, []);
 
+  const handleSave = async () => {
+    const response = await updateProduct(product);
+    if (response.status === 200) {
+      showSnackbar(response.data.message, "success");
+    }
+    else {
+      showSnackbar(response.data.message, "error");
+    }
+
+  };
+
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = e.target.result;
+
+        // Aktualisiere das product-Objekt mit dem Bild
+        setProduct((prev) => ({
+          ...prev,
+          image: imageData, // Speichert die Bilddaten als Base64
+        }));
+
+        // Setze die Vorschau
+        setImagePreview(imageData);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  if (loading) {
+    return (
+      <CircularProgress />
+    )
+  }
+
   return (
-    <>
-      <Typography variant='h4' sx={{ padding: "10,10,10,10" }}>Produkt {product?.id}</Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Box sx={{ display: "flex" }}>
-          <Box sx={{ flex: 1 }}>
-            <img src={product.image_url} alt="Beschreibung des Bildes" width="300px" height="300px" />
+    <Box sx={{ width: "100%", height: "100%" }}>
+      <Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography
+            variant="h4">
+            Produkt {product?.id}
+          </Typography>
+          <Typography variant='body2' sx={{ color: "gray", }}>
+            Erstellt am: {getFormattedDatetime(product?.createdAt)}
+          </Typography>
+
+          <Typography variant='body2' sx={{ color: "blue", }}>
+            Aktualisiert am: {getFormattedDatetime(product?.updatedAt)}
+          </Typography>
+        </Box>
+        <Divider />
+      </Box>
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 2, marginTop: 2 }}>
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              p: 2,
+              border: imagePreview || product.image_url ? "none" : "2px dashed #ccc",
+              borderRadius: "8px",
+              width: "300px",
+              height: "300px",
+              cursor: "pointer",
+              backgroundImage: imagePreview
+                ? `url(${imagePreview})`
+                : product.image_url
+                  ? `url(${product.image_url})`
+                  : "none",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              "&:hover": {
+                borderColor: imagePreview || product.image_url ? "none" : "#1976d2",
+              },
+            }}
+            onClick={() => document.getElementById("imageInput").click()}
+          >
+            {!imagePreview || !product.image_url && (
+              <Typography variant="body1" color="textSecondary">
+                Klicke hier, um ein Bild hochzuladen
+              </Typography>
+            )}
+            <input
+              type="file"
+              id="imageInput"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleImageUpload}
+            />
           </Box>
 
           <Box sx={{ flex: 3, display: "flex", flexDirection: "column", gap: 2 }}>
             <TextField value={product?.name} label="Name" onChange={(e) => setProduct({ ...product, name: e.target.value })} />
             <TextField value={product?.sku} label="SKU" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
-            <TextField value={product?.price} label="Preis" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
-            <TextField value={product?.quantity} label="Anzahl" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
-            <Select
-        label="Kategorie"
-        value={product?.category_id || ""}
-        sx={{ width: "20%", marginTop: "1rem" }}
-        onChange={(e) =>
-          setProduct((prev) => ({ ...prev, role_id: e.target.value }))
-        }
-      >
-        {categories?.map((category) => (
-          <MenuItem key={category.id} value={category.id}>
-            {category.name}
-          </MenuItem>
-        ))}
-      </Select>
+            <TextField value={product?.price} label="Preis" onChange={(e) => setProduct({ ...product, price: e.target.value })} />
+            <TextField value={product?.quantity} label="Anzahl" onChange={(e) => setProduct({ ...product, quantity: e.target.value })} />
+            <FormControl
+              sx={{  marginTop: "1rem" }}
+            >
+              <InputLabel id="category-label">Kategorie</InputLabel>
+              <Select
+                label="Kategorie"
+                value={product?.category_id || ""}
+                sx={{ width: "20%", marginTop: "1rem" }}
+                onChange={(e) =>
+                  setProduct((prev) => ({ ...prev, role_id: e.target.value }))
+                }
+              >
+                {categories?.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
         </Box>
         <Textarea value={product?.description} placeholder="Beschreibung" onChange={(e) => setProduct({ ...product, description: e.target.value })} style={{ width: '100%', padding: '8px', fontSize: '16px' }} />
       </Box>
-    </>
+      <Button variant="contained" color="success" sx={{ width: "10%", marginTop: "1rem" }} onClick={() => handleSave()} >
+        Speichern
+      </Button>
+    </Box>
   )
 }
 

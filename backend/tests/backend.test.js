@@ -43,9 +43,11 @@ describe('GET /users', () => {
   it('should contain an Array with data', async () => {
 
     await sequelize.models.User.bulkCreate([
-      { id: 1, name: 'John Doe', email: 'john@example.com', role_id: 1, is_active: true },
-      { id: 2, name: 'Jane Doe', email: 'jane@example.com', role_id: 2, is_active: true },
+      { name: 'John Doe', email: 'john@example.com', password: "test", role_id: 1, is_active: true },
+      { name: 'Jane Doe', email: 'jane@example.com', password: "test", role_id: 2, is_active: true },
     ]);
+
+
 
     const response = await request(app).get(backend + 'users');
     expect(Array.isArray(response.body)).toBe(true);
@@ -57,8 +59,8 @@ describe('GET /users', () => {
   it('should contain an array with user objects', async () => {
 
     await sequelize.models.User.bulkCreate([
-      { id: 1, name: 'John Doe', email: 'john@example.com', role_id: 1, is_active: true },
-      { id: 2, name: 'Jane Doe', email: 'jane@example.com', role_id: 2, is_active: true },
+      { name: 'John Doe', email: 'john@example.com', password: "test", role_id: 1, is_active: true },
+      { name: 'Jane Doe', email: 'jane@example.com', password: "test", role_id: 2, is_active: true },
     ]);
 
     const response = await request(app).get(backend + 'users');
@@ -282,14 +284,14 @@ describe('POST /users', () => {
     let user =
     {
       name: "test",
-      email: "test",
+      email: "test@gmail.com",
       password: "test",
       role_id: 1,
       is_active: true
     }
 
     const response = await request(app)
-      .post(backend + 'users/')
+      .post(backend + 'users')
       .send(user)
       .set('Content-Type', 'application/json');
 
@@ -315,7 +317,12 @@ describe('POST /users', () => {
       where: { email: user.email },
     });
 
-    expect(createdUser).toMatchObject(user);
+    expect(createdUser).toMatchObject({
+      name: user.name,
+      email: user.email,
+      role_id: user.role_id,
+      is_active: user.is_active,
+    });
 
   });
 

@@ -1,20 +1,25 @@
 import {
-  TextField,
   Button,
   Select,
   MenuItem,
   CircularProgress,
-  Skeleton,
+  Divider,
+  TextField, 
+  Checkbox, 
+  FormControlLabel, 
+  FormControl, 
+  InputLabel,
   Typography,
+  Box,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchUser, updateUser } from "../../api/users";
 import { fetchRoles } from "../../api/roles";
 import { useSnackbar } from "../../Context/SnackbarContext";
-import UserForm from "../../Components/Forms/UserForm";
 import { format } from 'date-fns';
- 
+import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+
 function User() {
   const { showSnackbar } = useSnackbar();
   const [user, setUser] = useState(null);
@@ -49,12 +54,17 @@ function User() {
   }, [id, reload]);
 
   const handleSave = async () => {
+    if (!user.name || !user.email || !user.role_id) {
+      showSnackbar("Alle Felder müssen gesetzt sein", "info");
+      return;
+  }
+
     const response = await updateUser(user);
     if (response.status === 200) {
       showSnackbar(response.data.message, "success");
       setReload(true);
     }
-    else if (response.status === 400) {
+    else  {
       showSnackbar(response.data.message, "error");
     }
 
@@ -62,22 +72,92 @@ function User() {
   };
 
   if (loading) {
+    console.log("lädt");
     return (
-      <CircularProgress/>
-    )
+      
+      <CircularProgress />
+    );
   }
 
   return (
     <>
-      <Typography variant='h4'>Benutzer {user?.id}</Typography>
-      <Typography variant='body2' sx={{ color: "gray", marginBottom: "0.25rem" }}>
-        Erstellt am: {format(new Date(user.createdAt), 'dd.MM.yyyy HH:mm:ss')}
-      </Typography>
+      <Box sx={{ marginBottom: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, }}>
+          <Typography
+            variant="h4">
+            Benutzer {user?.id}
+          </Typography>
+          <Typography variant='body2' sx={{ color: "gray", }}>
+            Erstellt am: {getFormattedDatetime(user?.createdAt)}
+          </Typography>
 
-      <Typography variant='body2' sx={{ color: "blue", marginBottom: "1rem" }}>
-        Aktualisiert am: {format(new Date(user.updatedAt), 'dd.MM.yyyy HH:mm:ss')}
-      </Typography>
-      <UserForm user={user} setUser={setUser} onSave={handleSave} roles={roles} />
+          <Typography variant='body2' sx={{ color: "blue", }}>
+            Aktualisiert am: {getFormattedDatetime(user?.updatedAt)}
+          </Typography>
+        </Box>
+        <Divider />
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <TextField
+          value={user?.name || ""}
+          label="Username"
+          sx={{ width: "20%", marginTop: "1rem" }}
+          onChange={(e) => setUser({ ...user, name: e.target.value })}
+        />
+        <TextField
+          value={user?.email || ""}
+          label="Email"
+          sx={{ width: "20%", marginTop: "1rem" }}
+          onChange={(e) => setUser({ ...user, email: e.target.value })}
+        />
+        <TextField
+          value={user?.password || ""}
+          label="Password"
+          type="password"
+          sx={{ width: "20%", marginTop: "1rem" }}
+          onChange={(e) => setUser({ ...user, password: e.target.value })}
+        />
+
+        <FormControl
+          sx={{ width: "20%", marginTop: "1rem" }}
+          variant="outlined" // oder "standard"/"filled"
+        >
+          <InputLabel id="role-label">Rolle</InputLabel>
+          <Select
+            labelId="role-label"         // Verknüpft Select mit dem Label
+            id="role-select"
+            label="Rolle"
+            value={user?.role_id || ""}
+            onChange={(e) =>
+              setUser((prev) => ({ ...prev, role_id: e.target.value }))
+            }
+          >
+            {roles?.map((role) => (
+              <MenuItem key={role.id} value={role.id}>
+                {role.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={user?.is_active}
+              onChange={(e) =>
+                setUser({
+                  ...user,
+                  is_active: e.target.checked,
+                })
+              }
+            />
+          }
+          label="Ist aktiv"
+        />
+        <Button variant="contained" color="success" sx={{ width: "10%", marginTop: "1rem" }} onClick={handleSave}>
+          Speichern
+        </Button>
+      </Box>
     </>
   );
 }

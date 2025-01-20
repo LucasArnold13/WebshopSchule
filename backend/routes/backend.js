@@ -3,10 +3,11 @@ const router = express.Router();
 const session = require('express-session');
 const { Address, Customer, Order, Orderitems, Status, User, Product, Role, Category } = require('../models');
 const bcrypt = require("bcrypt");
+
 const dayjs = require('dayjs');
 const { Op, Sequelize } = require("sequelize");
 const { getAllOrdersData, getTodaysRevenue, getNewCustomersFromThisMonth, getOrderChartData } = require("../services/DashboardService");
-
+const { storeImage } = require("../services/test");
 
 
 
@@ -63,14 +64,14 @@ router.get('/auth', backendSession, (req, res) => {
 //#endregion
 router.get('/dashboard', async (req, res) => {
   try {
-    
-   const data = {
-    allOrders : await getAllOrdersData(),
-    todaysRevenue : await getTodaysRevenue(),
-    newCustomers : await getNewCustomersFromThisMonth(),
-    orderChartData : await getOrderChartData(),
-    
-   }
+
+    const data = {
+      allOrders: await getAllOrdersData(),
+      todaysRevenue: await getTodaysRevenue(),
+      newCustomers: await getNewCustomersFromThisMonth(),
+      orderChartData: await getOrderChartData(),
+
+    }
 
     return res.status(200).json(data);
   } catch (error) {
@@ -107,25 +108,70 @@ router.get('/orders', async (req, res) => {
   }
 });
 
-router.put('/orders/:id', async (req, res) => {
+router.post('/orders', async (req, res) => {
   try {
-    // alles noch in einer transaktion packen
     const order = req.body;
 
+    const newOrder = await Order.create(order);
+
+    for (const item of order.orderitems) {
+      const product = await Product.findByPk(item.product_id);
+      if (item.quantity > product.quantity) {
+        return res.status(400).json({ message: `SKU: ${product.sku} überschreitet angegebe Menge` });
+      }
+      await product.update({ quantity: product.quantity - item.quantity });
+      item.order_id = newOrder.id;
+      Orderitems.create(item);
+    }
+
+    if (newOrder) {
+      return res.status(201).json({ message: 'Bestellung wurde erfolgreich angelegt', order: newOrder });
+    }
+    else {
+      return res.status(400).json({ message: 'Fehler bei Erstellung der Bestellung' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+// alles noch in einer transaktion packen
+router.put('/orders/:id', async (req, res) => {
+  try {
+    const order = req.body;
     const orderID = req.params.id;
+
     if (isNaN(orderID)) {
       return res.status(400).json({ message: 'Ungültige Bestellungs-ID.' });
     }
 
     for (const item of order.orderitems) {
- 
+      const product = await Product.findByPk(item.product_id);
       if (item.id) {
-        await Orderitems.update(
-          { price: item.price, quantity: item.quantity },
-          { where: { id: item.id } }
-        );
+        const orderitem = await Orderitems.findByPk(item.id);
+        const difference = item.quantity - orderitem.quantity;
+        product.quantity = product.quantity - difference;
+
+        if (product.quantity > 0) {
+          await Orderitems.update(
+            { price: item.price, quantity: item.quantity },
+            { where: { id: item.id } }
+          );
+
+          await product.save();
+
+        }
+        else {
+          return res.status(400).json({ message: `SKU: ${product.sku} überschreitet angegebe Menge` });
+        }
+
+
       } else {
-        console.log(item);
+        if (item.quantity > product.quantity) {
+          return res.status(400).json({ message: `SKU: ${product.sku} überschreitet angegebe Menge` });
+        }
+        await product.update({ quantity: product.quantity - item.quantity });
         await Orderitems.create(item);
       }
     }
@@ -292,6 +338,51 @@ router.post('/customers', async (req, res) => {
   }
 });
 
+router.get('/customers/search/query', async (req, res) => {
+  const searchQuery = req.query.q;
+
+  if (!searchQuery) {
+    return res.status(400).json({ message: 'Suchbegriff erforderlich' });
+  }
+
+  try {
+    const whereClause = [];
+
+    if (!isNaN(searchQuery)) {
+
+      whereClause.push(
+        { id: searchQuery }, // Exakte Übereinstimmung für ID
+      );
+    } else {
+      // Suche nach Name (case-insensitive)
+      whereClause.push({
+        [Op.or]: [
+          { firstname: { [Op.iLike]: `%${searchQuery}%` } },  // Vorname durchsuchen
+          { lastname: { [Op.iLike]: `%${searchQuery}%` } },   // Nachname durchsuchen
+          { email: { [Op.iLike]: `%${searchQuery}%` } }       // E-Mail durchsuchen
+        ]
+      });
+    }
+
+
+    // Kombinierte Abfrage für alle Bedingungen
+    const customers = await Customer.findAll({
+      where: {
+        [Op.or]: whereClause,
+      },
+    });
+
+    if (customers.length === 0) {
+      return res.status(404).json([]);
+    }
+    console.log(customers);
+    res.status(200).json(customers);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Kunden:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 //#endregion
 
 
@@ -324,6 +415,29 @@ router.get('/products/:id', async (req, res) => {
   }
 });
 
+router.post('/products', async (req, res) => {
+  try {
+    const product = req.body;
+    const fileName = await storeImage(product.image)
+    delete product.image;
+    product.image_url = `http://localhost:3000/images/${fileName}`;
+
+    product.is_active = true;
+
+    const newProduct = await Product.create(product);
+
+    if (newProduct) {
+      return res.status(201).json({ message: 'Produkt wurde erfolgreich angelegt', product: newProduct });
+    }
+    else {
+      return res.status(400).json({ message: 'Fehler bei Erstellung des Produktes' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 
 router.get('/products/search/query', async (req, res) => {
   const searchQuery = req.query.q;
@@ -337,21 +451,21 @@ router.get('/products/search/query', async (req, res) => {
 
     if (!isNaN(searchQuery)) {
       console.log(searchQuery);
-  
+
       whereClause.push(
-          { id: searchQuery }, // Exakte Übereinstimmung für ID
-          Sequelize.where(
-              Sequelize.cast(Sequelize.col("sku"), "TEXT"), // SKU in Text umwandeln
-              { [Op.like]: `%${searchQuery}%` } // Teilstring-Suche
-          )
+        { id: searchQuery }, // Exakte Übereinstimmung für ID
+        Sequelize.where(
+          Sequelize.cast(Sequelize.col("sku"), "TEXT"), // SKU in Text umwandeln
+          { [Op.like]: `%${searchQuery}%` } // Teilstring-Suche
+        )
       );
-  } else {
+    } else {
       // Suche nach Name (case-insensitive)
       whereClause.push(
-          { name: { [Op.iLike]: `%${searchQuery}%` } } // Name durchsuchen
+        { name: { [Op.iLike]: `%${searchQuery}%` } } // Name durchsuchen
       );
-  }
-  
+    }
+
 
     // Kombinierte Abfrage für alle Bedingungen
     const products = await Product.findAll({
@@ -367,6 +481,40 @@ router.get('/products/search/query', async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+router.put('/products/:id', async (req, res) => {
+  try {
+
+    const product = req.body;
+    const productId = req.params.id;
+
+    if (isNaN(productId)) {
+      return res.status(400).json({ message: 'Ungültige Produkt-ID.' });
+    }
+
+    if (product.image) {
+      const fileName = await storeImage(product.image)
+      delete product.image;
+      product.image_url = `http://localhost:3000/images/${fileName}`;
+    }
+
+    const updatetProduct = await Product.update(product,
+      { where: { id: productId } }
+    );
+
+    if (updatetProduct == 0) {
+      return res.status(404).json({ message: 'Produkt mit der ID wurde nicht gefunden ' });
+    }
+    else {
+      return res.status(200).json({ message: 'Produkt wurde erfolgreich aktualisiert.' });
+    }
+
+
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -468,7 +616,7 @@ router.post('/users', async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Interner Serverfehler.' });
+    res.status(500).json({ message: "Serverfehler" });
   }
 });
 

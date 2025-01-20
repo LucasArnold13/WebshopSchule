@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { fetchCustomer, updateCustomer } from "../../api/customers";
-import CustomerForm from "../../Components/Forms/CustomerForm";
 import { getStatusColor } from "../../utils/getStatusColor";
 import { useSnackbar } from "../../Context/SnackbarContext";
 import Table from "../../Components/Table";
@@ -289,7 +288,7 @@ function Customer() {
                     <Button
                         variant="contained"
                         color="success"
-                        sx={{ marginTop: 2, }}
+                        sx={{ marginTop: 2, width : 200 }}
                         onClick={handleUpdate}
                     >
                         User speichern

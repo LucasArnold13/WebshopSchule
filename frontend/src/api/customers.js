@@ -31,3 +31,10 @@ export const createCustomer = async (customer) => {
         body : customer
     });
 };
+
+export const searchCustomers = async (query) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/backend/customers/search/query?q=${query}`,
+        method: 'GET',
+    });
+};

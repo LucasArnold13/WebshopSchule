@@ -1,5 +1,5 @@
 
-import { TextField, Checkbox, FormControlLabel, Button, Divider, Box, Typography, Select, MenuItem } from "@mui/material";
+import { TextField, Checkbox, CircularProgress, Button, Divider, Box, Typography, Select, MenuItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams, useNavigate } from "react-router-dom";
 import { fetchOrder } from "../../api/orders";
@@ -9,9 +9,10 @@ import StatusBox from "../../Components/StatusBox";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+
 function Customer() {
     const [order, setOrder] = useState({});
-    const [status, setStatus] = useState([]);
+    const [loading, setLoading] = useState(true);
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -19,27 +20,29 @@ function Customer() {
         try {
             const response = await fetchOrder(id);
             setOrder(response.data);
+            setLoading(false);
         } catch (error) {
             console.error('Fehler beim Abrufen der Daten:', error);
         }
     };
 
-    const fetchAndSetStatus = async () => {
-        try {
-            const response = await fetchStatus();
-            console.log(response.data)
-            setStatus(response.data);
-        } catch (error) {
-            console.error('Fehler beim Abrufen der Daten:', error);
-        }
-    };
 
     useEffect(() => {
-        fetchAndSetStatus();
         fetchAndSetOrder();
-    }, [id]);
+        setLoading(false);
+        Promise.all([fetchAndSetOrder()]).finally(() => {
+            setLoading(false);
+        });
+
+    }, [id, loading]);
 
 
+    if (loading) {
+        console.log("lädt");
+        return (
+            <CircularProgress />
+        );
+    }
 
 
 
@@ -69,17 +72,19 @@ function Customer() {
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
                             flex: 1,
-                        }}>Bestelldatum: {getFormattedDatetime(order.order_date)}</Typography>
+                        }}>
+                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
+                        Bestelldatum: {getFormattedDatetime(order.order_date)}</Typography>
                     <Typography
                         variant="body1"
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
                             flex: 1,
-                        }}>Lieferdatum: {getFormattedDatetime(order.delivery_date)}
+                        }}>
+                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
+                        Lieferdatum: {getFormattedDatetime(order.delivery_date)}
                     </Typography>
                 </Box>
 
@@ -132,59 +137,59 @@ function Customer() {
                         </Typography>
 
                     </Box>
-
-                    {/* Artikel-Details */}
-                    {order?.orderitems?.map((item) => (
-                        <Box
-                            key={item.id}
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: "2fr 1fr 1fr 1fr",
-                                alignItems: "center",
-                                padding: 2,
-                                borderBottom: "1px solid #e0e0e0",
-                            }}
-                        >
-                            {/* Produktinformationen */}
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <img
-                                    src={item.product.image_url}
-                                    alt={item.product.name}
-                                    style={{
-                                        width: 80,
-                                        height: 80,
-                                        objectFit: "cover",
-                                        marginRight: 16,
-                                    }}
-                                />
-                                <Box>
-                                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                                        {item.product.name}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        <span style={{ color: "gray" }}>SKU:</span>
-                                        <span style={{ color: "black" }}> {item.product.sku}</span>
-                                    </Typography>
+                    <Box sx={{ maxHeight: "450px", overflow: "scroll" }}>
+                        {/* Artikel-Details */}
+                        {order?.orderitems?.map((item) => (
+                            <Box
+                                key={item.id}
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: "2fr 1fr 1fr 1fr",
+                                    alignItems: "center",
+                                    padding: 2,
+                                    borderBottom: "1px solid #e0e0e0",
+                                }}
+                            >
+                                {/* Produktinformationen */}
+                                <Box sx={{ display: "flex", alignItems: "center" }}>
+                                    <img
+                                        src={item.product.image_url}
+                                        alt={item.product.name}
+                                        style={{
+                                            width: 80,
+                                            height: 80,
+                                            objectFit: "cover",
+                                            marginRight: 16,
+                                        }}
+                                    />
+                                    <Box>
+                                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                                            {item.product.name}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <span style={{ color: "gray" }}>SKU:</span>
+                                            <span style={{ color: "black" }}> {item.product.sku}</span>
+                                        </Typography>
+                                    </Box>
                                 </Box>
+
+                                {/* Einzelpreis */}
+                                <Typography variant="body1" sx={{ textAlign: "right" }}>
+                                    {item.product.price.toFixed(2)}€
+                                </Typography>
+
+                                {/* Menge */}
+                                <Typography variant="body1" sx={{ textAlign: "center" }}>
+                                    {item.quantity}
+                                </Typography>
+
+                                {/* Gesamtpreis */}
+                                <Typography variant="body1" sx={{ textAlign: "right", fontWeight: "bold" }}>
+                                    {(item.product.price * item.quantity).toFixed(2)}€
+                                </Typography>
                             </Box>
-
-                            {/* Einzelpreis */}
-                            <Typography variant="body1" sx={{ textAlign: "right" }}>
-                                {item.product.price.toFixed(2)}€
-                            </Typography>
-
-                            {/* Menge */}
-                            <Typography variant="body1" sx={{ textAlign: "center" }}>
-                                {item.quantity}
-                            </Typography>
-
-                            {/* Gesamtpreis */}
-                            <Typography variant="body1" sx={{ textAlign: "right", fontWeight: "bold" }}>
-                                {(item.product.price * item.quantity).toFixed(2)}€
-                            </Typography>
-                        </Box>
-                    ))}
-
+                        ))}
+                    </Box>
                     {/* Gesamtkosten */}
                     <Box
                         sx={{
@@ -231,10 +236,8 @@ function Customer() {
                         <Box sx={{
                             display: "flex",
                             alignItems: "center",
-                        }}
-                        >
+                        }}>
                             <Avatar
-                                alt="bAmanda Harvey"
                                 sx={{ width: 50, height: 50, marginRight: 2 }}
                             />
                             <Typography>
@@ -266,22 +269,23 @@ function Customer() {
                             paddingLeft: 2,
                         }}
                     >
-                        <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
+                        <Typography variant="h6" sx={{ marginBottom: 1, fontWeight: "bold" }}>
                             Lieferadresse
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.street}
+                        <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
+                            <strong>Straße:</strong> {order.street}
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.city}
+                        <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
+                            <strong>Stadt:</strong> {order.city}
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.postalCode}
+                        <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
+                            <strong>PLZ:</strong> {order.postalCode}
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                            {order?.country}
+                        <Typography variant="subtitle1" sx={{ marginBottom: 0 }}>
+                            <strong>Land:</strong> {order.country}
                         </Typography>
                     </Box>
+
 
                 </Box>
             </Box>

@@ -23,7 +23,7 @@ function SearchModal({ open, setOpen, order, setOrder }) {
     const debouncedSearch = useCallback(
         _.debounce((query) => {
             handleSearch(query);
-        }, 500), 
+        }, 500),
         []
     );
 
@@ -45,10 +45,10 @@ function SearchModal({ open, setOpen, order, setOrder }) {
         const isProductInOrder = order.orderitems.some(
             (orderItem) => orderItem.product_id === item.id
         );
-    
+
         if (isProductInOrder) {
             showSnackbar("Produkt bereits in der Bestellung enthalten", "info");
-            return; 
+            return;
         }
 
         const newOrderItem = {
@@ -58,16 +58,16 @@ function SearchModal({ open, setOpen, order, setOrder }) {
             product_id: item.id,
             product: item
         };
-    
+
         console.log(newOrderItem);
         setOrder((prevOrder) => ({
             ...prevOrder,
             orderitems: [...prevOrder.orderitems, newOrderItem],
         }));
-    
+
         onClose();
     };
-    
+
 
     const style = {
         position: "absolute",
@@ -91,7 +91,7 @@ function SearchModal({ open, setOpen, order, setOrder }) {
         };
     }, [debouncedSearch]);
 
-    
+
     return (
         <Modal
             open={open}
@@ -154,12 +154,13 @@ function SearchModal({ open, setOpen, order, setOrder }) {
                                     padding: 2,
                                     marginTop: 1,
                                     marginBottom: 1,
-                                    cursor: "pointer",
+                                    cursor: item.quantity > 0 ? "pointer" : "not-allowed", // Cursor ändern, wenn quantity 0
+                                    backgroundColor: item.quantity > 0 ? "inherit" : "rgba(0, 0, 0, 0.1)", // Ausgrauen bei quantity 0
                                     "&:hover": {
-                                        backgroundColor: "rgba(22, 139, 248, 0.27)",
+                                        backgroundColor: item.quantity > 0 ? "rgba(22, 139, 248, 0.27)" : "rgba(0, 0, 0, 0.1)", // Kein Hover-Effekt bei quantity 0
                                     },
                                 }}
-                                onClick={() => addProduct(item)}
+                                onClick={item.quantity > 0 ? () => addProduct(item) : undefined} // Nur bei quantity > 0 aktiv
                                 key={item.id}
                             >
                                 <Typography variant="body1">{item.id}</Typography>
@@ -170,16 +171,17 @@ function SearchModal({ open, setOpen, order, setOrder }) {
                         ))
                     ) : (
                         <Typography
-                            variant="body1"
-                            sx={{
-                                textAlign: "center",
-                                color: "gray",
-                                marginTop: "1rem",
-                            }}
-                        >
-                            Keine Produkte gefunden.
-                        </Typography>
+                        variant="body1"
+                        sx={{
+                          textAlign: "center",
+                          color: "gray",
+                          marginTop: "1rem",
+                        }}
+                      >
+                        Keine Produkte gefunden.
+                      </Typography>
                     )}
+
                 </Box>
 
             </Box>

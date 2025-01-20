@@ -19,6 +19,7 @@ function Products() {
   const transformData = (apiData) => {
     return apiData.map((item, index) => ({
       id: index + 1,
+      productID : item.id,
       col1: item.sku,
       col2: item.name,
       col3: item.quantity,
@@ -27,8 +28,7 @@ function Products() {
     }));
   };
   const handleCellClick = (params) => {
-
-    navigate(`/backend/products/${params.row.id}`);
+    navigate(`/backend/products/${params.row.productID}`);
   };
 
   useEffect(() => {

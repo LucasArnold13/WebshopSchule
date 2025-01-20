@@ -1,4 +1,4 @@
-import { TextField, Modal, FormControl, Button, Divider, Box, Typography, Select, MenuItem, Paper, InputLabel, } from "@mui/material";
+import { TextField, Modal, FormControl, Button, Divider, Box, Typography, Select, MenuItem, Paper, InputLabel, CircularProgress, } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams, useNavigate } from "react-router-dom";
 import { fetchOrder, updateOrder } from "../../api/orders";
@@ -13,12 +13,15 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useSnackbar } from "../../Context/SnackbarContext";
 import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
 import dayjs from "dayjs";
-
 import SearchModal from "../../Components/SearchModal";
+import QuantityTextfield from "../../Components/Inputs/QuantityTextfield";
+import PriceTextfield from "../../Components/Inputs/PriceTextfield";
+
 
 function EditBackendorder() {
     const { showSnackbar } = useSnackbar();
     const [order, setOrder] = useState({});
+    const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState([]);
     const [currentAddress, setCurrentAddress] = useState({});
     const [openModal, setOpenModal] = useState(false);
@@ -58,7 +61,9 @@ function EditBackendorder() {
 
     const handleAddressChange = (event) => {
         const selectedAddressId = event.target.value;
+        console.log(selectedAddressId);
         const selectedAddress = order.customer.addresses[selectedAddressId];
+        console.log(selectedAddress);
 
         setOrder((prevOrder) => ({
             ...prevOrder,
@@ -77,14 +82,18 @@ function EditBackendorder() {
 
 
     const handleSave = async () => {
+        //lol 
+        order.total_price_float = totalCost
+
         const response = await updateOrder(order);
         if (response.status === 200) {
             showSnackbar(response.data.message, "success");
+            navigate("/backend/orders/" + order?.id)
         }
         else if (response.status === 400) {
             showSnackbar(response.data.message, "error");
         }
-        navigate("/backend/orders/" + order?.id)
+
 
     }
 
@@ -93,8 +102,7 @@ function EditBackendorder() {
 
 
     useEffect(() => {
-        fetchAndSetStatus();
-        fetchAndSetOrder();
+
 
         if (order) {
             const currentAddress = {
@@ -107,10 +115,17 @@ function EditBackendorder() {
 
             setCurrentAddress(currentAddress)
         }
+        Promise.all([fetchAndSetStatus(), fetchAndSetOrder()]).finally(() => {
+            setLoading(false);
+        });
 
+    }, [id, loading]);
 
-        console.log("Aktualisierter Zustand:", order);
-    }, [id]);
+    if (loading) {
+        return (
+            <CircularProgress />
+        );
+    }
 
 
     return (
@@ -143,13 +158,17 @@ function EditBackendorder() {
                 </Box>
                 <Divider />
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, marginTop: 2, gap: 3 }}>
                 <Box>
-                    <Typography variant="body1" sx={{ paddingBottom: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: "center", marginBottom: 2 }}>
                         <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        Bestelldatum: {new Date(order.order_date).toLocaleDateString()}
-                    </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2, }}>
+                        <Typography variant="body1" >
+                            Bestelldatum: {new Date(order.order_date).toLocaleDateString()}
+                        </Typography>
+                    </Box>
+
+
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: "center", marginBottom: 2 }}>
                         <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
@@ -167,6 +186,27 @@ function EditBackendorder() {
                         </LocalizationProvider>
                     </Box>
 
+                    <FormControl
+                        sx={{ width: "100px", marginTop: "1rem" }}
+                        variant="outlined" // oder "standard"/"filled"
+                    >
+                        <InputLabel id="role-label">Status</InputLabel>
+                        <Select
+                            labelId="status-label"         // Verknüpft Select mit dem Label
+                            id="status-select"
+                            label="Status"
+                            value={order.status_id}
+                            onChange={(e) =>
+                                setOrder((prev) => ({ ...prev, status_id: e.target.value }))
+                            }
+                        >
+                            {status?.map((status) => (
+                                <MenuItem key={status.id} value={status.id}>
+                                    {status.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                     <Button variant="contained" onClick={() => handleSave()} color="success">speichern</Button>
@@ -218,154 +258,78 @@ function EditBackendorder() {
                     </Box>
 
                     {/* Inhalte */}
-                    {order?.orderitems?.map((item) => (
-                        <Box
-                            key={item.id}
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", // Gleiche Spaltenaufteilung
-                                alignItems: "center",
-                                padding: "8px 16px",
-                                borderBottom: "1px solid #e0e0e0",
-                            }}
-                        >
+                    <Box sx={{ maxHeight: "450px", overflow: "scroll" }}>
+                        {order?.orderitems?.map((item) => (
+                            <Box
+                                key={item.id}
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", // Gleiche Spaltenaufteilung
+                                    alignItems: "center",
+                                    padding: "8px 16px",
+                                    borderBottom: "1px solid #e0e0e0",
+                                }}
+                            >
 
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <img
-                                    src={item.product.image_url}
-                                    alt={item.product.name}
-                                    style={{
-                                        width: 80,
-                                        height: 80,
-                                        objectFit: "cover",
-                                        marginRight: 16,
-                                    }}
-                                />
-                                <Box>
-                                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                                        {item.product.name}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        <span style={{ color: "gray" }}>SKU:</span>
-                                        <span style={{ color: "black" }}> {item.product.sku}</span>
+                                <Box sx={{ display: "flex", alignItems: "center" }}>
+                                    <img
+                                        src={item.product.image_url}
+                                        alt={item.product.name}
+                                        style={{
+                                            width: 80,
+                                            height: 80,
+                                            objectFit: "cover",
+                                            marginRight: 16,
+                                        }}
+                                    />
+                                    <Box>
+                                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                                            {item.product.name}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <span style={{ color: "gray" }}>SKU:</span>
+                                            <span style={{ color: "black" }}> {item.product.sku}</span>
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+
+                                <Box sx={{ textAlign: "center" }}>
+                                    <PriceTextfield item={item} order={order} setOrder={setOrder} />
+                                </Box>
+
+
+                                <Box sx={{ textAlign: "center" }}>
+                                    <QuantityTextfield item={item} setOrder={setOrder} order={order} />
+                                </Box>
+
+
+                                <Box sx={{ textAlign: "center" }}>
+                                    <Typography
+                                        variant="body1"
+                                        sx={{ fontWeight: "bold" }}
+                                    >
+                                        {(item.product.price * item.quantity).toFixed(2)}€
                                     </Typography>
                                 </Box>
+
+                                {/* Löschen-Button */}
+                                <Box sx={{ textAlign: "center" }}>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => handleDeleteItem(item.product_id)}
+                                        color="error"
+                                        sx={{
+                                            minWidth: 80,
+                                            height: "36px",
+                                        }}
+                                    >
+                                        Löschen
+                                    </Button>
+                                </Box>
                             </Box>
-
-
-                            <Box sx={{ textAlign: "center" }}>
-                                <TextField
-                                    value={item.product.price.toString()} // Zeigt die Roh-Eingabe an
-                                    size="small"
-                                    onChange={(e) => {
-                                        const inputValue = e.target.value.replace(",", "."); // Komma durch Punkt ersetzen
-                                        const regex = /^[0-9]*[.,]?[0-9]*$/; // Nur Zahlen mit optionalem Dezimalpunkt/Komma
-
-                                        // Eingabe validieren
-                                        if (regex.test(inputValue) || inputValue === "") {
-                                            const updatedOrderItems = order.orderitems.map((orderItem) => {
-                                                if (orderItem.id === item.id) {
-                                                    return {
-                                                        ...orderItem,
-                                                        product: {
-                                                            ...orderItem.product,
-                                                            price: inputValue === "" ? "" : inputValue, // Eingabe direkt speichern
-                                                        },
-                                                    };
-                                                }
-                                                return orderItem;
-                                            });
-                                            setOrder({ ...order, orderitems: updatedOrderItems });
-                                        }
-                                    }}
-                                    onBlur={() => {
-                                        // Formatierung anwenden, wenn das Feld verlassen wird
-                                        const updatedOrderItems = order.orderitems.map((orderItem) => {
-                                            if (orderItem.id === item.id) {
-                                                return {
-                                                    ...orderItem,
-                                                    product: {
-                                                        ...orderItem.product,
-                                                        price: parseFloat(orderItem.product.price) || 0, // In Zahl umwandeln
-                                                    },
-                                                };
-                                            }
-                                            return orderItem;
-                                        });
-                                        setOrder({ ...order, orderitems: updatedOrderItems });
-                                    }}
-                                    sx={{
-                                        width: 80,
-                                        "& .MuiInputBase-input": {
-                                            textAlign: "center",
-                                            padding: "4px 8px",
-                                        },
-                                    }}
-                                    input={{
-                                        inputMode: "decimal", // Virtuelle Tastatur für Dezimalzahlen
-                                        pattern: "[0-9]*[.,]?[0-9]*", // Nur gültige Zahlen erlauben
-                                    }}
-                                />
-
-                            </Box>
-
-
-                            <Box sx={{ textAlign: "center" }}>
-                                <TextField
-                                    value={item.quantity}
-                                    size="small"
-                                    onChange={(e) => {
-                                        const value = parseFloat(e.target.value);
-                                        if (!isNaN(value)) {
-                                            const updatedOrderItems = order.orderitems.map((orderItem) => {
-                                                if (orderItem.id === item.id) {
-                                                    return {
-                                                        ...orderItem,
-                                                        quantity: value,
-                                                    };
-                                                }
-                                                return orderItem;
-                                            });
-                                            setOrder({ ...order, orderitems: updatedOrderItems });
-                                        }
-                                    }}
-                                    sx={{
-                                        width: 80,
-                                        "& .MuiInputBase-input": {
-                                            textAlign: "center",
-                                            padding: "4px 8px",
-                                        },
-                                    }}
-                                />
-                            </Box>
-
-
-                            <Box sx={{ textAlign: "center" }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ fontWeight: "bold" }}
-                                >
-                                    {(item.product.price * item.quantity).toFixed(2)}€
-                                </Typography>
-                            </Box>
-
-                            {/* Löschen-Button */}
-                            <Box sx={{ textAlign: "center" }}>
-                                <Button
-                                    variant="contained"
-                                    onClick={() => handleDeleteItem(item.product_id)}
-                                    color="error"
-                                    sx={{
-                                        minWidth: 80,
-                                        height: "36px",
-                                    }}
-                                >
-                                    Löschen
-                                </Button>
-                            </Box>
-                        </Box>
-                    ))}
-
+                        ))}
+                    </Box>
 
 
                     {/* Gesamtkosten */}
@@ -397,32 +361,35 @@ function EditBackendorder() {
                     </Typography>
                     <Divider sx={{ marginBottom: 2 }} />
                     <Box
+                        onClick={() => { navigate("/backend/customers/" + order?.customer?.id) }}
                         sx={{
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            paddingLeft: 2
+                            paddingLeft: 2,
+                            cursor: "pointer",
+                            "&:hover": {
+                                color: "rgba(22, 139, 248, 0.9)"
+                            },
                         }}
                     >
+
                         {/* Avatar und Name */}
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Box sx={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}>
                             <Avatar
-                                alt="bAmanda Harvey"
                                 sx={{ width: 50, height: 50, marginRight: 2 }}
                             />
-                            <Typography
-                                sx={{
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                        color: "blue",
-                                    },
-                                }}
-                                onClick={() => { navigate("/backend/customers/" + order?.customer?.id) }}
-                            >
+                            <Typography>
                                 {order?.customer?.firstname} {order?.customer?.lastname}
                             </Typography>
-
                         </Box>
+                        <Box sx={{ marginLeft: 2 }}>
+                            <ArrowForwardIosIcon />
+                        </Box>
+
                     </Box>
                     <Divider sx={{ marginTop: 2 }} />
                     <Box
@@ -439,53 +406,34 @@ function EditBackendorder() {
                         </Typography>
                     </Box>
                     <Divider sx={{ marginBottom: 2 }} />
-                    <Box sx={{ width: "100%", display: 'flex', justifyContent: 'space-between' }}>
-                        <Box sx={{
-                            paddingLeft: 2,
-                            flex: 1
-                        }}>
-                            <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
-                                Lieferadresse
-                            </Typography>
-                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                                {order?.street}
-                            </Typography>
-                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                                {order?.city}
-                            </Typography>
-                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                                {order?.postalCode}
-                            </Typography>
-                            <Typography variant="subtitle1" sx={{ paddingLeft: 1 }}>
-                                {order?.country}
-                            </Typography>
-                        </Box>
+                    <Box sx={{ width: "100%",  paddingLeft: 2, display: 'flex', flexDirection: "column", justifyContent: 'space-between' }}>
+                        <Typography variant="h6" sx={{ marginBottom: 1, fontWeight: "bold" }}>
+                            Lieferadresse
+                        </Typography>
 
-                        <Box sx={{ flex: 1, marginRight: 2 }}>
-                            <FormControl fullWidth sx={{ marginTop: 1 }}>
-                                <InputLabel id="address-select-label">Adresse auswählen</InputLabel>
-                                <Select
-                                    labelId="address-select-label"
-                                    value={order?.customer?.addresses.findIndex(
-                                        (address) =>
-                                            address.street === currentAddress.street &&
-                                            address.city === currentAddress.city &&
-                                            address.country === currentAddress.country &&
-                                            address.state === currentAddress.state
-                                    )}
-                                    onChange={handleAddressChange}
-                                >
-                                    {order?.customer?.addresses.map((address, index) => (
-                                        <MenuItem key={index} value={index}>
-                                            {`${address.street}, ${address.city}`}
-                                        </MenuItem>
-                                    ))}
-                                    <MenuItem key={-1} value={-1}>
-                                        {`${currentAddress.street}, ${currentAddress.city}`}
+                        <FormControl  sx={{ marginTop: 1 }}>
+                            <Select
+                                sx={{ width : "60%"}}
+                                labelId="address-select-label"
+                                value={order.customer.addresses.findIndex(
+                                    (address) =>
+                                        address.street === currentAddress.street &&
+                                        address.city === currentAddress.city &&
+                                        address.country === currentAddress.country &&
+                                        address.state === currentAddress.state
+                                )?? -1}
+                                onChange={handleAddressChange}
+                            >
+                                {order?.customer?.addresses.map((address, index) => (
+                                    <MenuItem key={index} value={index}>
+                                        {`${address.city}, ${address.street}`}
                                     </MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Box>
+                                ))}
+                                <MenuItem key={-1} value={-1}>
+                                {`${currentAddress.city}, ${currentAddress.street}`}
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
 
                     </Box>
 
