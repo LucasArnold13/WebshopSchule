@@ -28,7 +28,6 @@ function AddOrder() {
         delivery_date: dayjs().add(2, "day"),
         total_price_float: 0,
         orderitems: [],
-        delivery_date: "",
         street: "",
         city: "",
         state: "",
@@ -44,8 +43,11 @@ function AddOrder() {
     }, 0);
 
     useEffect(() => {
-        fetchAndSetCustomer();
-    }, []);
+        Promise.all([fetchAndSetCustomer()]).finally(() => {
+            setLoading(false);
+        });
+
+    }, [loading]);
 
     const fetchAndSetCustomer = async () => {
         const response = await fetchCustomer(customerId);
@@ -55,7 +57,6 @@ function AddOrder() {
                 customer: response.data,
                 customer_id: customerId
             }));
-            setLoading(false);
         }
     };
     const openProductModal = () => {
@@ -85,9 +86,7 @@ function AddOrder() {
 
 
     const handleSave = async () => {
-        console.log("test");
         const response = await createOrder(order);
-        console.log(response.data);
         if (response.status === 201) {
             showSnackbar(response.data.message, "success");
             navigate("/backend/orders/" + response.data.order.id)
@@ -137,11 +136,11 @@ function AddOrder() {
                                 label="Lieferdatum auswählen"
                                 format="DD/MM/YYYY"
                                 minDate={dayjs()}
-                                value={order?.delivery_date ? dayjs(order.delivery_date) : null}
+                                value={order?.delivery_date}
                                 onChange={(newDate) => {
                                     setOrder((prevOrder) => ({
                                         ...prevOrder,
-                                        delivery_date: newDate ? newDate : null,
+                                        delivery_date: newDate,
                                     }));
                                 }}
                             />
@@ -241,7 +240,7 @@ function AddOrder() {
 
 
                             <Box sx={{ textAlign: "center" }}>
-                                <QuantityTextfield item={item} setOrder={setOrder} order={order} />
+                                <QuantityTextfield item={item}  order={order} setOrder={setOrder} />
                             </Box>
 
 

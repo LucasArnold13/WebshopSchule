@@ -52,7 +52,6 @@ function AddProduct() {
 
   const handleSave = async () => {
     const response = await createProduct(product);
-    console.log(response.data.product);
     if (response.status === 201) {
       showSnackbar(response.data.message, "success");
       navigate("/backend/products/" + response.data.product.id)

@@ -41,6 +41,7 @@ module.exports = {
       },
       sku: {
         allowNull: false,
+        unique: true,
         type: Sequelize.INTEGER
       },
       is_active: {

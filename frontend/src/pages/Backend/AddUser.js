@@ -47,13 +47,7 @@ function AddUser() {
 
 
     const handleUpdate = async () => {
-        if (!user.name || !user.email || !user.role_id) {
-            showSnackbar("Alle Felder müssen gesetzt sein", "info");
-            return;
-        }
-
         const response = await createUser(user);
-        console.log(response);
         if (response.status === 201) {
             showSnackbar(response.data.message, "success");
             navigate('/backend/users/' + response.data.user.id);

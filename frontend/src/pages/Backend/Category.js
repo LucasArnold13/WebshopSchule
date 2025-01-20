@@ -61,11 +61,6 @@ function Category() {
   }, [reload, loading]);
 
   const handleSave = async () => {
-
-    if (!category.name || !category.description) {
-      showSnackbar("Alle Felder müssen gesetzt sein", "info");
-      return;
-    }
     const response = await updateCategory(category);
     if (response.status === 200) {
       showSnackbar(response.data.message, "success");

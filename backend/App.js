@@ -16,8 +16,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(bodyParser.json({ limit: "10mb" })); // Erhöht die Grenze auf 10 MB
-app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
+app.use(bodyParser.json({ limit: "1000mb" })); // Erhöht die Grenze auf 10 MB
+app.use(bodyParser.urlencoded({ limit: "1000mb", extended: true }));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 

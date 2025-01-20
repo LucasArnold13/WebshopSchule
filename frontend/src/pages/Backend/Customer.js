@@ -215,7 +215,7 @@ function Customer() {
 
             <Box sx={{ paddingBottom: 3 }}>
                 <Box sx={{ display: 'flex', gap : 3, alignItems: 'center'  }}>
-                    <Typography variant="h4" sx={{}}>Kunden {customer.id}</Typography>
+                    <Typography variant="h4" sx={{}}>Kunde {customer.id}</Typography>
                     <Typography variant='body2' sx={{ color: "gray", }}>
                         Erstellt am: {getFormattedDatetime(customer.createdAt)}
                     </Typography>
@@ -291,7 +291,7 @@ function Customer() {
                         sx={{ marginTop: 2, width : 200 }}
                         onClick={handleUpdate}
                     >
-                        User speichern
+                        Kunde speichern
                     </Button>
 
                 </Box>

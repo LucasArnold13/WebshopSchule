@@ -11,7 +11,7 @@ function QuantityTextfield({item, setOrder, order}){
             // Überprüft ob der Wert leer / numerisch ist und kleiner/gleich 10.000
             if (value === "" || (/^\d*$/.test(value) && parseInt(value || "0", 10) <= 10000)) {
                 const updatedOrderItems = order.orderitems.map((orderItem) => {
-                    if (orderItem.id === item.id) {
+                    if (orderItem.product.sku === item.product.sku) {
                         return {
                             ...orderItem,
                             quantity: value === "" ? "" : parseInt(value, 10),

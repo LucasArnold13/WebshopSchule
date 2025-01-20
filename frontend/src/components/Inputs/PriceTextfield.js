@@ -13,7 +13,7 @@ function PriceTextfield({item, order, setOrder})
             // Eingabe validieren
             if (regex.test(inputValue) || inputValue === "") {
                 const updatedOrderItems = order.orderitems.map((orderItem) => {
-                    if (orderItem.id === item.id) {
+                    if (orderItem.product.sku === item.product.sku) {
                         return {
                             ...orderItem,
                             product: {

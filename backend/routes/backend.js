@@ -9,7 +9,12 @@ const { Op, Sequelize } = require("sequelize");
 const { getAllOrdersData, getTodaysRevenue, getNewCustomersFromThisMonth, getOrderChartData } = require("../services/DashboardService");
 const { storeImage } = require("../services/test");
 
-
+const orderValidation = require("../validations/orderValidation");
+const productValidation = require("../validations/productValidation")
+const categoryValidation = require("../validations/categoryValidation");
+const customerValidation = require("../validations/customerValidation")
+const userValidation = require("../validations/userValidation");
+const validate = require("../middlewares/validate");
 
 const backendSession = session({
   name: "BSID",
@@ -108,7 +113,7 @@ router.get('/orders', async (req, res) => {
   }
 });
 
-router.post('/orders', async (req, res) => {
+router.post('/orders', orderValidation(), validate, async (req, res) => {
   try {
     const order = req.body;
 
@@ -116,9 +121,6 @@ router.post('/orders', async (req, res) => {
 
     for (const item of order.orderitems) {
       const product = await Product.findByPk(item.product_id);
-      if (item.quantity > product.quantity) {
-        return res.status(400).json({ message: `SKU: ${product.sku} überschreitet angegebe Menge` });
-      }
       await product.update({ quantity: product.quantity - item.quantity });
       item.order_id = newOrder.id;
       Orderitems.create(item);
@@ -137,13 +139,36 @@ router.post('/orders', async (req, res) => {
 });
 
 // alles noch in einer transaktion packen
-router.put('/orders/:id', async (req, res) => {
+router.put('/orders/:id', orderValidation(), validate, async (req, res) => {
   try {
     const order = req.body;
     const orderID = req.params.id;
 
     if (isNaN(orderID)) {
       return res.status(400).json({ message: 'Ungültige Bestellungs-ID.' });
+    }
+
+    const existingOrderItems = await Orderitems.findAll({
+      where: {
+        order_id : orderID
+      }
+    })
+
+    const updatedOrderItemIds = order.orderitems.map((item) => item.id).filter((id) => id);
+
+    const itemsToDelete = existingOrderItems.filter(
+      (dbItem) => !updatedOrderItemIds.includes(dbItem.id)
+    );
+
+    for (const item of itemsToDelete) {
+      const product = await Product.findByPk(item.product_id);
+
+      // Menge zurücksetzen
+      product.quantity += item.quantity;
+      await product.save();
+
+      // Position löschen
+      await Orderitems.destroy({ where: { id: item.id } });
     }
 
     for (const item of order.orderitems) {
@@ -153,24 +178,16 @@ router.put('/orders/:id', async (req, res) => {
         const difference = item.quantity - orderitem.quantity;
         product.quantity = product.quantity - difference;
 
-        if (product.quantity > 0) {
-          await Orderitems.update(
-            { price: item.price, quantity: item.quantity },
-            { where: { id: item.id } }
-          );
 
-          await product.save();
+        await Orderitems.update(
+          { price: item.price, quantity: item.quantity },
+          { where: { id: item.id } }
+        );
 
-        }
-        else {
-          return res.status(400).json({ message: `SKU: ${product.sku} überschreitet angegebe Menge` });
-        }
+        await product.save();
 
 
       } else {
-        if (item.quantity > product.quantity) {
-          return res.status(400).json({ message: `SKU: ${product.sku} überschreitet angegebe Menge` });
-        }
         await product.update({ quantity: product.quantity - item.quantity });
         await Orderitems.create(item);
       }
@@ -182,10 +199,10 @@ router.put('/orders/:id', async (req, res) => {
 
 
     if (updatedOrder == 0) {
-      return res.status(404).json({ message: 'Bestellung mit der ID wurde nicht gefunden ' });
+      return res.status(404).json({ message: 'Bestellung mit der ID wurde nicht gefunden' });
     }
     else {
-      return res.status(200).json({ message: 'Bestellung wurde erfolgreich aktualisiert.' });
+      return res.status(200).json({ message: 'Bestellung wurde erfolgreich aktualisiert' });
     }
   } catch (error) {
     console.error(error);
@@ -286,7 +303,7 @@ router.get('/customers/:id', async (req, res) => {
   }
 });
 
-router.put('/customers/:id', async (req, res) => {
+router.put('/customers/:id',customerValidation(),validate, async (req, res) => {
   try {
     const customerId = req.params.id;
     const customer = req.body;
@@ -301,7 +318,6 @@ router.put('/customers/:id', async (req, res) => {
 
     if (customer.addresses && Array.isArray(customer.addresses)) {
       for (const address of customer.addresses) {
-        console.log(address);
         if (address.id) {
           await Address.update(address, {
             where: { id: address.id, customer_id: customerId },
@@ -319,14 +335,15 @@ router.put('/customers/:id', async (req, res) => {
   }
 });
 
-router.post('/customers', async (req, res) => {
+router.post('/customers',customerValidation(),validate, async (req, res) => {
   try {
     const customer = req.body;
+    customer.password = "test";
 
     const newCustomer = await Customer.create(customer);
 
     if (newCustomer) {
-      return res.status(200).json({ message: 'Kunde wurde erfolgreich angelegt' });
+      return res.status(200).json({ message: 'Kunde wurde erfolgreich angelegt', customer : newCustomer });
     }
     else {
       console.log(newUser);
@@ -415,7 +432,7 @@ router.get('/products/:id', async (req, res) => {
   }
 });
 
-router.post('/products', async (req, res) => {
+router.post('/products',productValidation(), validate,  async (req, res) => {
   try {
     const product = req.body;
     const fileName = await storeImage(product.image)
@@ -485,7 +502,7 @@ router.get('/products/search/query', async (req, res) => {
   }
 });
 
-router.put('/products/:id', async (req, res) => {
+router.put('/products/:id',productValidation(), validate, async (req, res) => {
   try {
 
     const product = req.body;
@@ -570,7 +587,7 @@ router.get('/users/:id', async (req, res) => {
 });
 
 // updates a user
-router.put('/users/:id', async (req, res) => {
+router.put('/users/:id',userValidation(), validate, async (req, res) => {
   try {
 
     const user = req.body;
@@ -599,7 +616,7 @@ router.put('/users/:id', async (req, res) => {
 });
 
 // creates a user
-router.post('/users', async (req, res) => {
+router.post('/users',userValidation(), validate,  async (req, res) => {
   try {
     const user = req.body;
     const saltRounds = 10;
@@ -688,7 +705,7 @@ router.get('/categories/:id', async (req, res) => {
 });
 
 
-router.post('/categories', async (req, res) => {
+router.post('/categories',categoryValidation(), validate, async (req, res) => {
   try {
     const category = req.body;
     console.log(category);
@@ -707,7 +724,7 @@ router.post('/categories', async (req, res) => {
   }
 });
 
-router.put('/categories/:id', async (req, res) => {
+router.put('/categories/:id',categoryValidation(), validate, async (req, res) => {
   try {
 
     const category = req.body;

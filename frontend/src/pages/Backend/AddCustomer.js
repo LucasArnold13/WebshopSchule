@@ -2,25 +2,23 @@ import { useState } from 'react';
 import { Typography, Box, Divider, TextField,Checkbox,Button, FormControlLabel  } from '@mui/material';
 import { createCustomer } from '../../api/customers';
 import { useSnackbar } from "../../Context/SnackbarContext";
+import { data, NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
 
 function AddCustomer() {
+    const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
     const [customer, setCustomer] = useState({
         firstname: "",
         lastname: "",
         email: "",
-        is_disabled: false
+        is_active: false
     })
 
-    const handleCreate = async (newCustomer) => {
-        if (!customer.firstname || !customer.lastname || !customer.email) {
-            showSnackbar("Alle Felder müssen gesetzt sein", "info");
-            return;
-          }
-        const response = await createCustomer(newCustomer);
-
+    const handleCreate = async () => {
+        const response = await createCustomer(customer);
         if (response.status === 200) {
             showSnackbar(response.data.message, "success");
+            navigate("/backend/customers/" + response.data.customer.id)
         }
         else if (response.status === 400) {
             showSnackbar(response.data.message, "error");
@@ -28,13 +26,6 @@ function AddCustomer() {
     };
 
 
-    const handleClick = () => {
-      if (!customer.firstname || !customer.lastname || !customer.email) {
-        showSnackbar("Alle Felder müssen gesetzt sein", "info");
-        return;
-      }
-      handleCreate(customer);
-    };
   
 
     return (

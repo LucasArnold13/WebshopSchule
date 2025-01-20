@@ -21,10 +21,6 @@ function AddCategory() {
 
 
   const handleSave = async () => {
-    if (!category.name || !category.description) {
-      showSnackbar("Alle Felder müssen gesetzt sein", "info");
-      return;
-    }
     const response = await createCategory(category);
     if (response.status === 201) {
       showSnackbar(response.data.message, "success");

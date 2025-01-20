@@ -28,8 +28,6 @@ function Customer() {
 
 
     useEffect(() => {
-        fetchAndSetOrder();
-        setLoading(false);
         Promise.all([fetchAndSetOrder()]).finally(() => {
             setLoading(false);
         });
