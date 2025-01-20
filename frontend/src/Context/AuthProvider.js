@@ -20,22 +20,15 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      if (response.ok) {
-          return true;
-
-      } 
-      else 
-      {
-        return false;
-      }
+      return {status : response.status, data};
     } catch (err) {
       return false
-    } 
+    }
   }
 
 
   return (
-    <AuthContext.Provider value={{ handleLogin}}>
+    <AuthContext.Provider value={{ handleLogin }}>
       {children}
     </AuthContext.Provider>
   );

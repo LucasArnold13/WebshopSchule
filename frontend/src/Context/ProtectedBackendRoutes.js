@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../store/slices/userSlice";
 
 function ProtectedBackendRoutes()
 {
     const [isAuthenticated, setIsAuthenticated] = useState(null); 
     const [isLoading, setIsLoading] = useState(true);
     const location = useLocation();
+    const dispatch = useDispatch();
   
     const checkSession = async () => {
       try {
@@ -16,6 +19,7 @@ function ProtectedBackendRoutes()
         
         if (response.ok) {
           const data = await response.json();
+          dispatch(login(data));
           setIsAuthenticated(true); 
         } else {
           console.error("Fehler bei der API-Anfrage:", response.statusText);
@@ -38,13 +42,13 @@ function ProtectedBackendRoutes()
       return <></>;
     }
   
-  console.log("isAuthenticated: ", isAuthenticated);
+
     if (!isAuthenticated) {
-      localStorage.setItem("isLoggedIn", "false");
+
       return <Navigate to="/backend/login" state={{ from: location }} replace />;
     }
   
-    localStorage.setItem("isLoggedIn", "true");
+
     return <Outlet />;
 }
 

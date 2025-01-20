@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import CustomerForm from '../../Components/Forms/CustomerForm';
-import { Typography } from '@mui/material';
+import { Typography, TextField, Button, Checkbox, FormControlLabel, Snackbar, Alert } from '@mui/material';
 import { createCustomer } from '../../api/customers';
 import { useSnackbar } from "../../Context/SnackbarContext";
-import { redirect } from 'react-router-dom';
 
 function AddCustomer() {
     const { showSnackbar } = useSnackbar();
@@ -27,10 +26,69 @@ function AddCustomer() {
             }
     };
 
+
+    const handleClick = () => {
+      if (!customer.firstname || !customer.lastname || !customer.email) {
+        showSnackbar("Alle Felder müssen gesetzt sein", "info");
+        return;
+      }
+      handleCreate(customer);
+    };
+  
+
     return (
         <>
             <Typography variant="h4" sx={{ paddingBottom : 3 }}>Neuen Kunden anlegen</Typography>
-            <CustomerForm onSave={handleCreate} customer={customer} setCustomer={setCustomer} />
+            <TextField
+        id="firstname"
+        label="Vorname"
+        variant="outlined"
+        
+        value={customer?.firstname}
+        onChange={(e) => setCustomer({
+          ...customer,
+          firstname: e.target.value,
+        })}
+      />
+      <TextField
+        id="lastname"
+        label="Nachname"
+        variant="outlined"
+        value={customer?.lastname}
+        onChange={(e) => setCustomer({
+          ...customer,
+          lastname: e.target.value,
+        })}
+      />
+      <TextField
+        id="email"
+        label="E-Mail"
+        type="email"
+        variant="outlined"
+        value={customer?.email}
+        onChange={(e) => setCustomer({
+          ...customer,
+          email: e.target.value,
+        })}
+      />
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={customer?.is_disabled}
+            onChange={(e) =>
+              setCustomer({
+                ...customer,
+                is_disabled: e.target.checked,
+              })
+            }
+          />
+        }
+        label="Ist deaktiviert"
+      />
+
+      <Button variant="contained" color="primary" onClick={handleClick}>
+        Speichern
+      </Button>
         </>
 
     )

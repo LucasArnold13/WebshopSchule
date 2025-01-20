@@ -1,10 +1,11 @@
 import { Box, Input, TextField, Typography } from "@mui/material";
 import { Outlet, NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
 function BackendLayout() {
-
+    const user = useSelector((state) => state.user.user);
     const navLinks = [
         { to: "/backend/dashboard", label: "Dashboard" },
         { to: "/backend/customers", label: "Kunden" },
@@ -59,6 +60,7 @@ function BackendLayout() {
                     boxSizing: "border-box",
                 }}>
                     <AccountCircleIcon sx={{ fontSize: 25 }} />
+                    <p>{user.name}</p>
 
                 </Box>
                 <Box sx={{ height: "95vh", display: "flex", flexDirection: "column", padding: "15px", boxSizing: "border-box" }}>

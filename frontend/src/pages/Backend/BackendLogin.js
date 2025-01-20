@@ -2,35 +2,42 @@ import { useState } from 'react';
 import { useAuth } from '../../Context/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography } from '@mui/material';
+import { useDispatch } from "react-redux";
+import { login } from '../../store/slices/userSlice';
+
+
 
 function BackendLogin() {
-  const {handleLogin} = useAuth();
+  const { handleLogin } = useAuth();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(''); 
-  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("backend login");
-    let isLoggedIn = await handleLogin('http://localhost:3000/api/backend/login',
+
+    const response = await handleLogin('http://localhost:3000/api/backend/login',
       {
         name: name,
         password: password,
       });
 
-    console.log(isLoggedIn);
+    console.log(response);
 
-    if (isLoggedIn) {
-      localStorage.setItem("isLoggedIn", "true");
-      console.log("eingeloggt");
+    if (response.status === 200) {
+      dispatch(login(response.data));
       navigate('/backend');
     }
     else {
       setError("falsch");
-      console.log("falsch");
     }
+
+
 
   };
 
@@ -80,7 +87,7 @@ function BackendLogin() {
         />
         <Button
           variant="contained"
-          type="submit" 
+          type="submit"
           color="primary"
           fullWidth
           sx={{
