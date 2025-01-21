@@ -8,13 +8,13 @@ const userValidation = () => {
         body('email')
             .notEmpty().withMessage('E-Mail-Adresse muss gesetzt sein')
             .isEmail().withMessage('E-Mail-Adresse ist ungültig')
-            .custom(async (email) => {
+            .custom(async (email, { req }) => {
                 existingUser = await User.findOne({
                     where: {
                         email: email
                     }
                 })
-                if (existingUser) {
+                if (existingUser && existingUser.id !== req.body.id) {
                     throw new Error("E-Mail-Adresse wurde bereits benutzt");
                 }
             }),

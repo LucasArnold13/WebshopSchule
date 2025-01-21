@@ -8,13 +8,13 @@ const productValidation = () => {
         body('sku')
             .notEmpty().withMessage('Die SKU muss gesetzt sein')
             .isNumeric().withMessage('Die SKU muss eine Zahl sein')
-            .custom(async (sku) => {
+            .custom(async (sku, { req }) => {
                 existingProduct = await Product.findOne({
                     where: {
                         sku: sku
                     }
                 })
-                if (existingProduct) {
+                if (existingProduct && existingProduct.id !== req.body.id) {
                     throw new Error("SKU wird schon benutzt");
                 }
             }),  

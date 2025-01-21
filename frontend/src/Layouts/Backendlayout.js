@@ -1,6 +1,7 @@
-import { Box, Input, TextField, Typography } from "@mui/material";
+import { Box, Card, TextField, Typography } from "@mui/material";
 import { Outlet, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
+import UserMenuBackend from "../Components/UserMenuBackend";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
@@ -49,21 +50,22 @@ function BackendLayout() {
                 ))}
             </Box>
             <Box sx={{ flex: 12 }}>
-                <Box sx={{
-                    height: "5vh",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    width: "100%",
-                    padding: 2,
-                  
-                    boxSizing: "border-box",
-                }}>
-                    <AccountCircleIcon sx={{ fontSize: 25 }} />
-                    <p>{user.name}</p>
-
+                <Box
+                    sx={{
+                        height: "7vh", // Die Höhe der übergeordneten Box
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                        width: "100%",
+                        paddingRight : 2,
+                        boxShadow: 1,
+                        boxSizing: "border-box",
+                    }}
+                >
+                <UserMenuBackend user={user} />
                 </Box>
-                <Box sx={{ height: "95vh", display: "flex", flexDirection: "column", padding: "15px", boxSizing: "border-box" }}>
+
+                <Box sx={{ height: "93vh", display: "flex", flexDirection: "column", padding: "15px", boxSizing: "border-box" }}>
                     <Outlet />
                 </Box>
             </Box>

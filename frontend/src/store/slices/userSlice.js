@@ -5,13 +5,11 @@ const userSlice = createSlice({
   initialState: {
     isAuthenticated: false,
     user: null,
-    role: null, 
   },
   reducers: {
     login(state, action) {
       state.isAuthenticated = true;
       state.user = action.payload.user;
-     // state.role = action.payload.role;
     },
 
     logout(state) {

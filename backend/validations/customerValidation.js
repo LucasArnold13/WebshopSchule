@@ -10,15 +10,13 @@ const customerValidation = () => {
         body('email')
             .notEmpty().withMessage('E-Mail-Adresse muss gesetzt sein')
             .isEmail().withMessage('E-Mail-Adresse ist ungültig')
-            .custom(async (email) => {
+            .custom(async (email, { req }) => {
                 existingCustomer = await Customer.findOne({
                     where: {
                         email: email
                     }
                 })
-                console.log("test");
-                console.log(existingCustomer);
-                if (existingCustomer) {
+                if (existingCustomer && existingCustomer.id !== req.body.id) {
                     throw new Error("E-Mail-Adresse wurde bereits benutzt");
                 }
             }),

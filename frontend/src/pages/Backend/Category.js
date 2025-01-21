@@ -62,6 +62,7 @@ function Category() {
 
   const handleSave = async () => {
     const response = await updateCategory(category);
+    console.log(response);
     if (response.status === 200) {
       showSnackbar(response.data.message, "success");
       setReload(true);

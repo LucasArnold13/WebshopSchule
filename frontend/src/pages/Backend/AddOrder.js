@@ -86,6 +86,7 @@ function AddOrder() {
 
 
     const handleSave = async () => {
+        order.total_price_float = totalCost;
         const response = await createOrder(order);
         if (response.status === 201) {
             showSnackbar(response.data.message, "success");

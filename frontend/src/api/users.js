@@ -4,7 +4,7 @@ import { apiCall, API_BASE_URL } from ".";
 
 export const fetchUsers = async () => {
     return await apiCall({
-        url: `${API_BASE_URL}api/backend/users`,
+        url: `${API_BASE_URL}api/users`,
         method: 'GET',
     });
     }
@@ -15,14 +15,14 @@ export const fetchUser = async (id) => {
     // Verzögerung von z.B. 2 Sekunden
     //await delay(2000);
     return await apiCall({
-        url: `${API_BASE_URL}api/backend/users/${id}`,
+        url: `${API_BASE_URL}api/users/${id}`,
         method: 'GET',
     });
     }
 
 export const updateUser = async (user) => {
     return await apiCall({
-        url: `${API_BASE_URL}api/backend/users/${user.id}`,
+        url: `${API_BASE_URL}api/users/${user.id}`,
         method: 'PUT',
         body: user, 
     });
@@ -30,8 +30,29 @@ export const updateUser = async (user) => {
 
 export const createUser = async (user) => {
     return await apiCall({
-        url: `${API_BASE_URL}api/backend/users`,
+        url: `${API_BASE_URL}api/users`,
         method: 'POST',
         body: user, 
+    });
+    }
+
+export const loginUser = async (data) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/users/login`,
+        method: 'POST',
+        body: data, 
+    });
+    }
+
+export const logoutUser = async () => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/users/logout`,
+        method: 'DELETE',
+    });
+    }
+export const authUser = async () => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/users/auth/refresh`,
+        method: 'GET',
     });
     }

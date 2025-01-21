@@ -54,10 +54,6 @@ function User() {
   }, [id, reload]);
 
   const handleSave = async () => {
-    if (!user.name || !user.email || !user.role_id) {
-      showSnackbar("Alle Felder müssen gesetzt sein", "info");
-      return;
-  }
 
     const response = await updateUser(user);
     if (response.status === 200) {

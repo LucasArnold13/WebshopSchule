@@ -8,7 +8,7 @@ function ProtectedFrontendRoutes() {
 
   const checkSession = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/frontend/auth", {
+      const response = await fetch("http://localhost:3000/api/users/auth", {
         method: "GET",
         credentials: "include",
       });

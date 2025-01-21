@@ -9,7 +9,6 @@ export const apiCall = async ({
     credentials = 'include',
     catchError = () => { }
 }) => {
-    console.log("test");
     try {
         const options = {
             method,
@@ -23,9 +22,7 @@ export const apiCall = async ({
     
             options.body = JSON.stringify(body);
         }
-        console.log("test");
         const response = await fetch(url, options);
-        console.log(response);
         const data = await response.json();
         
         return {status : response.status, data};

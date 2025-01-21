@@ -14,7 +14,7 @@ const orderValidation = () => {
                         id: status_id
                     }
                 })
-                if (existingStatus) {
+                if (!existingStatus) {
                     throw new Error("Status ist nicht vorhanden");
                 }
             }),

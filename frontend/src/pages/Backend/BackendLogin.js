@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography } from '@mui/material';
 import { useDispatch } from "react-redux";
 import { login } from '../../store/slices/userSlice';
+import { loginUser } from '../../api/users';
 
 
 
@@ -21,7 +22,7 @@ function BackendLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await handleLogin('http://localhost:3000/api/backend/login',
+    const response = await loginUser(
       {
         name: name,
         password: password,
@@ -34,7 +35,7 @@ function BackendLogin() {
       navigate('/backend');
     }
     else {
-      setError("falsch");
+      setError("Daten sind falsch");
     }
 
 
