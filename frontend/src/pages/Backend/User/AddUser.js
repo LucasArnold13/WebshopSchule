@@ -2,14 +2,11 @@ import {
     Button,
     Select,
     MenuItem,
-    CircularProgress,
-    Divider,
     TextField, 
     Checkbox, 
     FormControlLabel, 
     FormControl, 
     InputLabel,
-    Typography,
     Box
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -17,6 +14,8 @@ import { createUser } from "../../../api/users";
 import { fetchRoles } from "../../../api/roles";
 import { useSnackbar } from "../../../Context/SnackbarContext";
 import { useNavigate } from 'react-router-dom';
+import NewItemHeader from "../../../Components/Backend/NewItemHeader";
+import LoadingCircle from "../../../Components/Feedback/LoadingCricle";
 
 function AddUser() {
     const navigate = useNavigate();
@@ -60,21 +59,20 @@ function AddUser() {
 
     if (isloading) {
         return (
-            <CircularProgress />
+            <LoadingCircle />
         )
     }
 
     return (
         <>
-            <Box sx={{ marginBottom: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, }}>
-                    <Typography
-                        variant="h4">
-                        neuen Benutzer anlegen
-                    </Typography>
-                </Box>
-                <Divider />
-            </Box>
+            <NewItemHeader name="neuen Benutzer anlegen" >
+            <Button 
+                variant="contained" 
+                color="success"  
+                onClick={handleUpdate}>
+                    Speichern
+                </Button>
+            </NewItemHeader>
             <Box sx={{ display : "flex", flexDirection : "column" }}>
                 <TextField
                     value={user?.name || ""}
@@ -132,9 +130,6 @@ function AddUser() {
                     }
                     label="Ist aktiv"
                 />
-                <Button variant="contained" color="success" sx={{ width: "10%", marginTop: "1rem" }} onClick={handleUpdate}>
-                    Speichern
-                </Button>
             </Box>
         </>
     );

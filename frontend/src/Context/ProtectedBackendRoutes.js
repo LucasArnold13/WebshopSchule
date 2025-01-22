@@ -29,7 +29,6 @@ function ProtectedBackendRoutes() {
 
   useEffect(() => {
     checkSession();
-    //console.log("so oft wird die Komponente neu gerendert");
   }, [location]);
 
   if (isLoading) {

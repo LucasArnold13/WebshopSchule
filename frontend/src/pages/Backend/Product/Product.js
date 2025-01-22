@@ -7,7 +7,7 @@ import { fetchProduct } from "../../../api/products";
 import { fetchCategories, fetchCategory } from "../../../api/categories";
 import { useSnackbar } from "../../../Context/SnackbarContext";
 import { updateProduct } from "../../../api/products";
-import BackendHeader from "../../../Components/BackendHeader";
+import BackendHeader from "../../../Components/Backend/ItemHeader";
 
 function Product() {
   const [imagePreview, setImagePreview] = useState(null);

@@ -17,47 +17,47 @@ import { useParams } from "react-router-dom";
 import { fetchUser, updateUser } from "../../../api/users";
 import { fetchRoles } from "../../../api/roles";
 import { useSnackbar } from "../../../Context/SnackbarContext";
-import BackendHeader from "../../../Components/BackendHeader";
+import BackendHeader from "../../../Components/Backend/ItemHeader";
+import LoadingCircle from "../../../Components/Feedback/LoadingCricle";
+import { useNavigate } from "react-router-dom";
 
 function User() {
   const { showSnackbar } = useSnackbar();
   const [user, setUser] = useState(null);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [reload, setReload] = useState(false);
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const fetchAndSetUser = async () => {
+    try {
+      const response = await fetchUser(id);
+      setUser(response.data);
+    } catch (error) {
+      console.error("Fehler beim Abrufen der Benutzerdaten:", error);
+    }
+  };
+
+  const fetchAndSetRoles = async () => {
+    try {
+      const response = await fetchRoles();
+      setRoles(response.data);
+    } catch (error) {
+      console.error("Fehler beim Abrufen der Rollen:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchAndSetUser = async () => {
-      try {
-        const response = await fetchUser(id);
-        setUser(response.data);
-      } catch (error) {
-        console.error("Fehler beim Abrufen der Benutzerdaten:", error);
-      }
-    };
-
-    const fetchAndSetRoles = async () => {
-      try {
-        const response = await fetchRoles();
-        setRoles(response.data);
-      } catch (error) {
-        console.error("Fehler beim Abrufen der Rollen:", error);
-      }
-    };
-
-
     Promise.all([fetchAndSetUser(), fetchAndSetRoles()]).finally(() => {
       setLoading(false);
     });
-  }, [id, reload]);
+  }, [id]);
 
   const handleSave = async () => {
-
     const response = await updateUser(user);
     if (response.status === 200) {
       showSnackbar(response.data.message, "success");
-      setReload(true);
+      //navigate(0);
     }
     else {
       showSnackbar(response.data.message, "error");
@@ -67,10 +67,8 @@ function User() {
   };
 
   if (loading) {
-    console.log("lädt");
     return (
-
-      <CircularProgress />
+      <LoadingCircle />
     );
   }
 
@@ -107,11 +105,11 @@ function User() {
 
         <FormControl
           sx={{ width: "20%", marginTop: "1rem" }}
-          variant="outlined" // oder "standard"/"filled"
+          variant="outlined"
         >
           <InputLabel id="role-label">Rolle</InputLabel>
           <Select
-            labelId="role-label"         // Verknüpft Select mit dem Label
+            labelId="role-label"
             id="role-select"
             label="Rolle"
             value={user?.role_id || ""}

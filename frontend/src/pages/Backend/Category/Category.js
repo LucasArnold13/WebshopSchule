@@ -8,7 +8,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchCategory, updateCategory } from "../../../api/categories";
 import Textarea from '@mui/joy/Textarea';
 import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
-import BackendHeader from "../../../Components/BackendHeader";
+import BackendHeader from "../../../Components/Backend/ItemHeader";
 
 function Category() {
   const [category, setCategory] = useState({});
