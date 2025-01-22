@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Button, Box } from '@mui/material';
-import { fetchCustomers } from '../../api/customers';
-import Table from '../../Components/Table';
+import { fetchCustomers } from '../../../api/customers';
+import Table from '../../../Components/Table';
 
 function Customers() {
   const navigate = useNavigate();

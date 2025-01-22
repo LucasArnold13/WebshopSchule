@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Box, Button, Paper, Modal, TextField } from '@mui/material';
-import { fetchOrders } from '../../api/orders';
-import Table from "../../Components/Table";
-import { getStatusColor } from '../../utils/getStatusColor';
-import { getFormattedDatetime } from '../../utils/getFormattedDatetime';
-import { searchCustomers } from '../../api/customers';
+import { fetchOrders } from '../../../api/orders';
+import Table from "../../../Components/Table";
+import { getStatusColor } from '../../../utils/getStatusColor';
+import { getFormattedDatetime } from '../../../utils/getFormattedDatetime';
+import { searchCustomers } from '../../../api/customers';
 import _ from "lodash";
 
 

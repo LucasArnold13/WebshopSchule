@@ -18,9 +18,10 @@ app.use(cors({
   credentials: true, 
 }));
 
-app.use(express.json());
 app.use(bodyParser.json({ limit: "1000mb" })); 
 app.use(bodyParser.urlencoded({ limit: "1000mb", extended: true }));
+app.use(express.json({ limit: "1000mb" }));
+
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/api/products", productRoutes);

@@ -3,11 +3,11 @@ import Textarea from '@mui/joy/Textarea';
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchProduct } from "../../api/products";
-import { fetchCategories, fetchCategory } from "../../api/categories";
-import { useSnackbar } from "../../Context/SnackbarContext";
-import { updateProduct } from "../../api/products";
-import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+import { fetchProduct } from "../../../api/products";
+import { fetchCategories, fetchCategory } from "../../../api/categories";
+import { useSnackbar } from "../../../Context/SnackbarContext";
+import { updateProduct } from "../../../api/products";
+import BackendHeader from "../../../Components/BackendHeader";
 
 function Product() {
   const [imagePreview, setImagePreview] = useState(null);
@@ -83,22 +83,14 @@ function Product() {
 
   return (
     <Box sx={{ width: "100%", height: "100%" }}>
-      <Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography
-            variant="h4">
-            Produkt {product?.id}
-          </Typography>
-          <Typography variant='body2' sx={{ color: "gray", }}>
-            Erstellt am: {getFormattedDatetime(product?.createdAt)}
-          </Typography>
-
-          <Typography variant='body2' sx={{ color: "blue", }}>
-            Aktualisiert am: {getFormattedDatetime(product?.updatedAt)}
-          </Typography>
-        </Box>
-        <Divider />
-      </Box>
+      <BackendHeader item={product} name={"Produkt"}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => handleSave()} >
+          Speichern
+        </Button>
+      </BackendHeader>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 2, marginTop: 2 }}>
         <Box sx={{ display: "flex", gap: 3 }}>
@@ -148,7 +140,7 @@ function Product() {
             <TextField value={product?.price} label="Preis" onChange={(e) => setProduct({ ...product, price: e.target.value })} />
             <TextField value={product?.quantity} label="Anzahl" onChange={(e) => setProduct({ ...product, quantity: e.target.value })} />
             <FormControl
-              sx={{  marginTop: "1rem" }}
+              sx={{ marginTop: "1rem" }}
             >
               <InputLabel id="category-label">Kategorie</InputLabel>
               <Select
@@ -170,9 +162,7 @@ function Product() {
         </Box>
         <Textarea value={product?.description} placeholder="Beschreibung" onChange={(e) => setProduct({ ...product, description: e.target.value })} style={{ width: '100%', padding: '8px', fontSize: '16px' }} />
       </Box>
-      <Button variant="contained" color="success" sx={{ width: "10%", marginTop: "1rem" }} onClick={() => handleSave()} >
-        Speichern
-      </Button>
+
     </Box>
   )
 }

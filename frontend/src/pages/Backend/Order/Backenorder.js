@@ -2,13 +2,13 @@
 import { TextField, Checkbox, CircularProgress, Button, Divider, Box, Typography, Select, MenuItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams, useNavigate } from "react-router-dom";
-import { fetchOrder } from "../../api/orders";
-import { fetchStatus } from "../../api/status";
+import { fetchOrder } from "../../../api/orders";
+import { fetchStatus } from "../../../api/status";
 import { Avatar, IconButton } from "@mui/material";
-import StatusBox from "../../Components/StatusBox";
+import StatusBox from "../../../Components/StatusBox";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
 
 function Customer() {
     const [order, setOrder] = useState({});
@@ -36,7 +36,6 @@ function Customer() {
 
 
     if (loading) {
-        console.log("lädt");
         return (
             <CircularProgress />
         );
@@ -73,7 +72,9 @@ function Customer() {
                             flex: 1,
                         }}>
                         <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        Bestelldatum: {getFormattedDatetime(order.order_date)}</Typography>
+                        Bestelldatum: {getFormattedDatetime(order.order_date)}
+                    </Typography>
+
                     <Typography
                         variant="body1"
                         sx={{
@@ -89,8 +90,17 @@ function Customer() {
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, marginTop: 2 }}>
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button variant="contained" onClick={() => { navigate("/backend/orders/" + order?.id + "/edit") }} color="primary">Bearbeiten</Button>
+                        {order.status_id === 1 && (
+                            <Button
+                                variant="contained"
+                                onClick={() => navigate("/backend/orders/" + order?.id + "/edit")}
+                                color="primary"
+                            >
+                                Bearbeiten
+                            </Button>
+                        )}
                     </Box>
+
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>

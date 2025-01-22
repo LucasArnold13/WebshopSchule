@@ -1,9 +1,9 @@
 import { Typography, TextField, Select, MenuItem, Box, Divider, FormControl, InputLabel, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import Textarea from '@mui/joy/Textarea';
-import { fetchCategories } from "../../api/categories";
-import { createProduct } from "../../api/products";
-import { useSnackbar } from "../../Context/SnackbarContext";
+import { fetchCategories } from "../../../api/categories";
+import { createProduct } from "../../../api/products";
+import { useSnackbar } from "../../../Context/SnackbarContext";
 import { useNavigate } from 'react-router-dom';
 
 function AddProduct() {

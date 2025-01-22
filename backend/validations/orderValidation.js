@@ -52,7 +52,7 @@ const orderValidation = () => {
                         throw new Error(`Anzahl der Position mit der SKU ${item.product.sku} muss größer als 0 sein`);
                     }
 
-                    // Lade das zugehörige Produkt
+
                     const product = await Product.findByPk(item.product_id);
                     if (!product) {
                         throw new Error(`Das Produkt mit der SKU ${item.product.sku} existiert nicht`);

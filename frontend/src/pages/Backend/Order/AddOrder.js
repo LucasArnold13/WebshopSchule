@@ -4,17 +4,17 @@ import { Avatar, IconButton } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import SearchModal from "../../Components/SearchModal";
+import SearchModal from "../../../Components/SearchModal";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { data, NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
-import { fetchCustomer } from "../../api/customers";
-import { useSnackbar } from "../../Context/SnackbarContext";
-import { createOrder } from "../../api/orders";
+import { fetchCustomer } from "../../../api/customers";
+import { useSnackbar } from "../../../Context/SnackbarContext";
+import { createOrder } from "../../../api/orders";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
-import QuantityTextfield from "../../Components/Inputs/QuantityTextfield";
-import PriceTextfield from "../../Components/Inputs/PriceTextfield";
+import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
+import QuantityTextfield from "../../../Components/Inputs/QuantityTextfield";
+import PriceTextfield from "../../../Components/Inputs/PriceTextfield";
 
 function AddOrder() {
     const { showSnackbar } = useSnackbar();

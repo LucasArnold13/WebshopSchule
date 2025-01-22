@@ -64,12 +64,6 @@ router.get('/:id', async (req, res) => {
             model: Customer,
             as: 'customer',
             attributes: { exclude: ['password'] },
-            include: [
-              {
-                model: Address,
-                as: 'addresses',
-              },
-            ],
           },
         ],
       });
@@ -80,6 +74,52 @@ router.get('/:id', async (req, res) => {
       res.status(500).json({ message: 'Interner Serverfehler.' });
     }
   });
+
+// returns a specific order for edit
+router.get('/:id/edit', async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const dbOrder = await Order.findOne({
+      where: { id: orderId },
+      include: [
+        {
+          model: Orderitems,
+          as: 'orderitems',
+          include: [
+            {
+              model: Product,
+              as: 'product',
+            },
+          ],
+        },
+        {
+          model: Status,
+          as: 'status',
+        },
+        {
+          model: Customer,
+          as: 'customer',
+          attributes: { exclude: ['password'] },
+          include: [
+            {
+              model: Address,
+              as: 'addresses',
+            },
+          ],
+        },
+      ],
+    });
+
+    if(dbOrder.status_id !== 1){
+      return res.status(403).json({ message: 'Bestellung kann nicht mehr bearbeitet werden.' });
+    }
+
+    return res.json(dbOrder);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
 
 // creates a new order
 router.post('/', orderValidation(), validate, async (req, res) => {
@@ -122,6 +162,25 @@ router.put('/:id', orderValidation(), validate, async (req, res) => {
           order_id : orderID
         }
       })
+
+      if(order.status_id == 3){
+        for (const item of existingOrderItems) {
+          const product = await Product.findByPk(item.product_id);
+          product.quantity += item.quantity;
+          await product.save();
+          const updatedOrder = await Order.update(order,
+            { where: { id: orderID } }
+          );
+
+          if (updatedOrder == 0) {
+            return res.status(404).json({ message: 'Bestellung mit der ID wurde nicht gefunden' });
+          }
+          else {
+            return res.status(200).json({ message: 'Bestellung wurde erfolgreich aktualisiert' });
+          }
+
+      }
+    }
   
       const updatedOrderItemIds = order.orderitems.map((item) => item.id).filter((id) => id);
   

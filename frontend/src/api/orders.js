@@ -14,6 +14,14 @@ export const fetchOrder = async (id) => {
     });
 };
 
+export const fetchOrderForEdit = async (id) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/orders/${id}/edit`,
+        method: 'GET',
+    });
+};
+
+
 export const updateOrder = async (order) => {
     return await apiCall({
         url: `${API_BASE_URL}api/orders/${order.id}`,

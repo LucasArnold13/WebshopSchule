@@ -2,11 +2,12 @@ import { TextField, Button, Typography, Modal, Paper, FormControlLabel, Checkbox
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
-import { fetchCustomer, updateCustomer } from "../../api/customers";
-import { getStatusColor } from "../../utils/getStatusColor";
-import { useSnackbar } from "../../Context/SnackbarContext";
-import Table from "../../Components/Table";
-import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+import { fetchCustomer, updateCustomer } from "../../../api/customers";
+import { getStatusColor } from "../../../utils/getStatusColor";
+import { useSnackbar } from "../../../Context/SnackbarContext";
+import Table from "../../../Components/Table";
+import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
+import BackendHeader from "../../../Components/BackendHeader";
 
 function Customer() {
     const navigate = useNavigate();
@@ -109,8 +110,8 @@ function Customer() {
 
     if (loading) {
         return (<CircularProgress />);
-
     }
+    
     return (
 
         <Box sx={{ height: "100%", width: "100%", overflow: "auto" }}>
@@ -213,20 +214,14 @@ function Customer() {
 
 
 
-            <Box sx={{ paddingBottom: 3 }}>
-                <Box sx={{ display: 'flex', gap : 3, alignItems: 'center'  }}>
-                    <Typography variant="h4" sx={{}}>Kunde {customer.id}</Typography>
-                    <Typography variant='body2' sx={{ color: "gray", }}>
-                        Erstellt am: {getFormattedDatetime(customer.createdAt)}
-                    </Typography>
-
-                    <Typography variant='body2' sx={{ color: "blue",}}>
-                        Aktualisiert am: {getFormattedDatetime(customer.updatedAt)}
-                    </Typography>
-                </Box>
-
-                <Divider />
-            </Box>
+            <BackendHeader item={customer} name={"Kunde"}>
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleUpdate}>
+                    speichern
+                </Button>
+            </BackendHeader>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, }}>
                 <Box sx={{ width: "30%", display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -285,14 +280,7 @@ function Customer() {
                         />
                     </Box>
 
-                    <Button
-                        variant="contained"
-                        color="success"
-                        sx={{ marginTop: 2, width : 200 }}
-                        onClick={handleUpdate}
-                    >
-                        Kunde speichern
-                    </Button>
+
 
                 </Box>
 

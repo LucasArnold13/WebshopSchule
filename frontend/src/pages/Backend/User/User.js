@@ -4,21 +4,20 @@ import {
   MenuItem,
   CircularProgress,
   Divider,
-  TextField, 
-  Checkbox, 
-  FormControlLabel, 
-  FormControl, 
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  FormControl,
   InputLabel,
   Typography,
   Box,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchUser, updateUser } from "../../api/users";
-import { fetchRoles } from "../../api/roles";
-import { useSnackbar } from "../../Context/SnackbarContext";
-import { format } from 'date-fns';
-import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+import { fetchUser, updateUser } from "../../../api/users";
+import { fetchRoles } from "../../../api/roles";
+import { useSnackbar } from "../../../Context/SnackbarContext";
+import BackendHeader from "../../../Components/BackendHeader";
 
 function User() {
   const { showSnackbar } = useSnackbar();
@@ -60,7 +59,7 @@ function User() {
       showSnackbar(response.data.message, "success");
       setReload(true);
     }
-    else  {
+    else {
       showSnackbar(response.data.message, "error");
     }
 
@@ -70,29 +69,21 @@ function User() {
   if (loading) {
     console.log("lädt");
     return (
-      
+
       <CircularProgress />
     );
   }
 
   return (
     <>
-      <Box sx={{ marginBottom: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, }}>
-          <Typography
-            variant="h4">
-            Benutzer {user?.id}
-          </Typography>
-          <Typography variant='body2' sx={{ color: "gray", }}>
-            Erstellt am: {getFormattedDatetime(user?.createdAt)}
-          </Typography>
-
-          <Typography variant='body2' sx={{ color: "blue", }}>
-            Aktualisiert am: {getFormattedDatetime(user?.updatedAt)}
-          </Typography>
-        </Box>
-        <Divider />
-      </Box>
+      <BackendHeader item={user} name={"Benutzer"}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={handleSave}>
+          Speichern
+        </Button>
+      </BackendHeader>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <TextField
           value={user?.name || ""}
@@ -150,9 +141,7 @@ function User() {
           }
           label="Ist aktiv"
         />
-        <Button variant="contained" color="success" sx={{ width: "10%", marginTop: "1rem" }} onClick={handleSave}>
-          Speichern
-        </Button>
+
       </Box>
     </>
   );

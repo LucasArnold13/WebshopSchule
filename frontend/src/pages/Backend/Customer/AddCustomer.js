@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Typography, Box, Divider, TextField,Checkbox,Button, FormControlLabel  } from '@mui/material';
-import { createCustomer } from '../../api/customers';
-import { useSnackbar } from "../../Context/SnackbarContext";
+import { createCustomer } from '../../../api/customers';
+import { useSnackbar } from "../../../Context/SnackbarContext";
 import { data, NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
 
 function AddCustomer() {

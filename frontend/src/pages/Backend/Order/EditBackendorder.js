@@ -1,21 +1,22 @@
 import { TextField, Modal, FormControl, Button, Divider, Box, Typography, Select, MenuItem, Paper, InputLabel, CircularProgress, } from "@mui/material";
 import { useEffect, useState } from "react";
 import { data, NavLink, useParams, useNavigate } from "react-router-dom";
-import { fetchOrder, updateOrder } from "../../api/orders";
-import { fetchStatus } from "../../api/status";
+import { fetchOrderForEdit, updateOrder } from "../../../api/orders";
+import { fetchStatus } from "../../../api/status";
 import { Avatar, IconButton } from "@mui/material";
-import StatusBox from "../../Components/StatusBox";
+import StatusBox from "../../../Components/StatusBox";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { useSnackbar } from "../../Context/SnackbarContext";
-import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+import { useSnackbar } from "../../../Context/SnackbarContext";
+import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
 import dayjs from "dayjs";
-import SearchModal from "../../Components/SearchModal";
-import QuantityTextfield from "../../Components/Inputs/QuantityTextfield";
-import PriceTextfield from "../../Components/Inputs/PriceTextfield";
+import SearchModal from "../../../Components/SearchModal";
+import QuantityTextfield from "../../../Components/Inputs/QuantityTextfield";
+import PriceTextfield from "../../../Components/Inputs/PriceTextfield";
+import { getStatusColor } from "../../../utils/getStatusColor";
 
 
 function EditBackendorder() {
@@ -34,8 +35,16 @@ function EditBackendorder() {
 
     const fetchAndSetOrder = async () => {
         try {
-            const response = await fetchOrder(id);
-            setOrder(response.data);
+            const response = await fetchOrderForEdit(id);
+            if(response.status === 403){
+                showSnackbar(response.data.message, "error");
+                navigate("/backend/orders/")
+                return false;
+            }
+            else {
+                setOrder(response.data);
+            }
+            
         } catch (error) {
             console.error('Fehler beim Abrufen der Daten:', error);
         }
@@ -72,6 +81,13 @@ function EditBackendorder() {
             state: selectedAddress.state,
             country: selectedAddress.country,
         }));
+
+        setCurrentAddress({
+            street: selectedAddress.street,
+            city: selectedAddress.city,
+            state: selectedAddress.state,
+            country: selectedAddress.country,
+        });
     };
 
     const openProductModal = () => {
@@ -82,7 +98,6 @@ function EditBackendorder() {
 
 
     const handleSave = async () => {
-        //lol 
         order.total_price_float = totalCost
 
         const response = await updateOrder(order);
@@ -159,35 +174,38 @@ function EditBackendorder() {
                 <Divider />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, marginTop: 2, gap: 3 }}>
-                <Box>
-                    <Box sx={{ display: 'flex', alignItems: "center", marginBottom: 2 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        <Typography variant="body1" >
-                            Bestelldatum: {new Date(order.order_date).toLocaleDateString()}
-                        </Typography>
-                    </Box>
+                <Box sx={{ display: 'flex', gap: 7 }}>
+
+                    <Box>
+                        <Box sx={{ display: 'flex', alignItems: "center", marginBottom: 2 }}>
+                            <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
+                            <Typography variant="body1" >
+                                Bestelldatum: {new Date(order.order_date).toLocaleDateString()}
+                            </Typography>
+                        </Box>
 
 
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: "center", marginBottom: 2 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                label="Lieferdatum auswählen"
-                                format="DD/MM/YYYY"
-                                minDate={dayjs()}
-                                value={dayjs(order.delivery_date)}
-                                onChange={(newDate) => {
-                                    setOrder((prevOrder) => ({
-                                        ...prevOrder,
-                                        delivery_date: newDate ? newDate.format("YYYY-MM-DD") : null,
-                                    }));
-                                }}
-                            />
-                        </LocalizationProvider>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: "center", marginBottom: 2 }}>
+                            <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    label="Lieferdatum auswählen"
+                                    format="DD/MM/YYYY"
+                                    minDate={dayjs()}
+                                    value={dayjs(order.delivery_date)}
+                                    onChange={(newDate) => {
+                                        setOrder((prevOrder) => ({
+                                            ...prevOrder,
+                                            delivery_date: newDate ? newDate.format("YYYY-MM-DD") : null,
+                                        }));
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Box>
                     </Box>
 
                     <FormControl
-                        sx={{ width: "100px", marginTop: "1rem" }}
+                        sx={{ width: "200px" }}
                         variant="outlined" // oder "standard"/"filled"
                     >
                         <InputLabel id="role-label">Status</InputLabel>
@@ -202,13 +220,26 @@ function EditBackendorder() {
                         >
                             {status?.map((status) => (
                                 <MenuItem key={status.id} value={status.id}>
-                                    {status.name}
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <span
+                                            style={{
+                                                width: 10,
+                                                height: 10,
+                                                borderRadius: '50%',
+                                                backgroundColor: getStatusColor(status.id), // Farbe abhängig vom Status
+                                                marginRight: 8,
+                                            }}
+                                        ></span>
+                                        {status.name}
+                                    </div>
                                 </MenuItem>
+
                             ))}
                         </Select>
                     </FormControl>
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+
+                <Box sx={{ alignItems: 'center', marginBottom: 2 }}>
                     <Button variant="contained" onClick={() => handleSave()} color="success">speichern</Button>
 
                 </Box>
@@ -406,14 +437,14 @@ function EditBackendorder() {
                         </Typography>
                     </Box>
                     <Divider sx={{ marginBottom: 2 }} />
-                    <Box sx={{ width: "100%",  paddingLeft: 2, display: 'flex', flexDirection: "column", justifyContent: 'space-between' }}>
+                    <Box sx={{  paddingLeft: 2, display: 'flex', flexDirection: "column", justifyContent: 'space-between' }}>
                         <Typography variant="h6" sx={{ marginBottom: 1, fontWeight: "bold" }}>
                             Lieferadresse
                         </Typography>
 
-                        <FormControl  sx={{ marginTop: 1 }}>
+                        <FormControl sx={{ marginTop: 1 }}>
                             <Select
-                                sx={{ width : "60%"}}
+                                sx={{ width: "60%" }}
                                 labelId="address-select-label"
                                 value={order.customer.addresses.findIndex(
                                     (address) =>
@@ -421,7 +452,7 @@ function EditBackendorder() {
                                         address.city === currentAddress.city &&
                                         address.country === currentAddress.country &&
                                         address.state === currentAddress.state
-                                )?? -1}
+                                ) ?? -1}
                                 onChange={handleAddressChange}
                             >
                                 {order?.customer?.addresses.map((address, index) => (
@@ -430,7 +461,7 @@ function EditBackendorder() {
                                     </MenuItem>
                                 ))}
                                 <MenuItem key={-1} value={-1}>
-                                {`${currentAddress.city}, ${currentAddress.street}`}
+                                    {`${currentAddress.city}, ${currentAddress.street}`}
                                 </MenuItem>
                             </Select>
                         </FormControl>

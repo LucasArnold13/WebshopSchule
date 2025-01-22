@@ -17,23 +17,23 @@ import NotFoundBackend from './Pages/Backend/NotFoundBackend';
 import NotFoundFrontend from './Pages/Frontend/NotFoundFrontend'
 import Order from './Pages/Frontend/Customer/Order';
 import Dashboard from './Pages/Backend/Dashboard';
-import Customers from './Pages/Backend/Customers';
-import Customer from './Pages/Backend/Customer';
-import AddCustomer from './Pages/Backend/AddCustomer';
-import Backendorders from './Pages/Backend/Orders';
-import Backendorder from './Pages/Backend/Backenorder';
-import Products from './Pages/Backend/Products';
-import Product from './Pages/Backend/Product';
-import Users from './Pages/Backend/Users';
-import User from './Pages/Backend/User';
-import AddUser from './Pages/Backend/AddUser';
+import Customers from './Pages/Backend/Customer/Customers';
+import Customer from './Pages/Backend/Customer/Customer';
+import AddCustomer from './Pages/Backend/Customer//AddCustomer';
+import Backendorders from './Pages/Backend/Order/Orders';
+import Backendorder from './Pages/Backend/Order/Backenorder';
+import Products from './Pages/Backend/Product/Products';
+import Product from './Pages/Backend/Product/Product';
+import Users from './Pages/Backend/User/Users';
+import User from './Pages/Backend/User/User';
+import AddUser from './Pages/Backend/User/AddUser';
 import BackendLogin from './Pages/Backend/BackendLogin';
-import Categories from './Pages/Backend/Categories';
-import Category from './Pages/Backend/Category';
-import AddCategory from './Pages/Backend/AddCategory';
-import AddProduct from './Pages/Backend/AddProduct';
-import AddOrder from './Pages/Backend/AddOrder';
-import EditBackendorder from './Pages/Backend/EditBackendorder';
+import Categories from './Pages/Backend/Category/Categories';
+import Category from './Pages/Backend/Category/Category';
+import AddCategory from './Pages/Backend/Category/AddCategory';
+import AddProduct from './Pages/Backend/Product/AddProduct';
+import AddOrder from './Pages/Backend/Order/AddOrder';
+import EditBackendorder from './Pages/Backend/Order/EditBackendorder';
 
 
 function App() {

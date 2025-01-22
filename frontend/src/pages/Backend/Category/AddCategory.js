@@ -1,12 +1,12 @@
 import { TextField, Divider, FormControlLabel, Button, Snackbar, Alert, Typography, Box } from "@mui/material";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import Table from "../../Components/Table";
+import Table from "../../../Components/Table";
 
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { createCategory } from "../../api/categories";
-import { useSnackbar } from "../../Context/SnackbarContext";
+import { createCategory } from "../../../api/categories";
+import { useSnackbar } from "../../../Context/SnackbarContext";
 import Textarea from '@mui/joy/Textarea';
 
 function AddCategory() {

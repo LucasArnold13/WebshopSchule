@@ -1,8 +1,8 @@
-import Table from "../../Components/Table";
+import Table from "../../../Components/Table";
 import { Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchCategories } from "../../api/categories";
+import { fetchCategories } from "../../../api/categories";
 
 function Categories() {
   const navigate = useNavigate();

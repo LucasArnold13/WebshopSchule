@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Table from "../../Components/Table";
+import Table from "../../../Components/Table";
 import { Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { fetchUsers } from "../../api/users";
-import { getFormattedDatetime } from "../../utils/getFormattedDatetime";
+import { fetchUsers } from "../../../api/users";
+import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
 
 
 function Users() {
