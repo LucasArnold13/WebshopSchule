@@ -1,0 +1,17 @@
+/* src/components/Navbar.css */
+.navbar {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.nav-links li {
+    cursor: pointer;
+}

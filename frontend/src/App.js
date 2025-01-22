@@ -34,38 +34,55 @@ import AddCategory from './Pages/Backend/AddCategory';
 import AddProduct from './Pages/Backend/AddProduct';
 import AddOrder from './Pages/Backend/AddOrder';
 import EditBackendorder from './Pages/Backend/EditBackendorder';
+import Navbar from "./Components/Navbar";
+import Footer from "./Components/Footer";
+import React from "react";
+import HeroSection from "./Components/HeroSection";
+import Recommendations from "./Components/Recommendations";
+
+
 
 
 function App() {
-
-
   return (
-    <AuthProvider>
+      <AuthProvider>
         <SnackbarProvider>
-      <Routes>
+          <Routes>
 
-        {/* Frontend */}
-        <Route path="/" element={<Layout />}>
-          <Route path="login" element={<FrontendLogin />} />
-          <Route path="register" element={<Register />} />
+            {/* Frontend */}
+            <Route path="/" element={<Layout />}>
 
-          <Route element={<ProtectedFrontendRoutes />} >
-            <Route path='customer/' element={<Customerlayout />}>
-              <Route path="order/:id" element={<Order />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="orders" element={<Orders />} />
-              <Route path="addresses" element={<Address />} />
+              {/* Home route where we add the layout components */}
+              <Route index element={
+                <div className="App">
+                  <Navbar />
+                  <HeroSection />
+                  <Categories />
+                  <Recommendations />
+                  <Footer />
+                </div>
+              } />
+
+              <Route path="login" element={<FrontendLogin />} />
+              <Route path="register" element={<Register />} />
+
+              <Route element={<ProtectedFrontendRoutes />}>
+                <Route path="customer/" element={<Customerlayout />}>
+                  <Route path="order/:id" element={<Order />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="orders" element={<Orders />} />
+                  <Route path="addresses" element={<Address />} />
+                </Route>
+              </Route>
+
+              {/* Additional routes */}
+              <Route path="1" />
+              <Route path="2" />
+              <Route path="3" />
+              <Route path="4" />
+              <Route path="user" />
+              <Route path="*" element={<NotFoundFrontend />} />
             </Route>
-          </Route>
-
-
-          <Route path="1" />
-          <Route path="2" />
-          <Route path="3" />
-          <Route path="4" />
-          <Route path="user" />
-          <Route path="*" element={<NotFoundFrontend />} />
-        </Route>
 
 
         {/* Backend */}

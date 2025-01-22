@@ -1,0 +1,17 @@
+/* src/Components/Recommendations.css */
+.recommendations {
+    background-color: #f4f4f4;
+    padding: 40px;
+    text-align: center;
+}
+
+.recommendations h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.product-images img {
+    width: 100%;
+    max-width: 250px;
+    margin: 10px;
+}
