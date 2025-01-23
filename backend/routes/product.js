@@ -36,13 +36,34 @@ try {
 }
 });
 
+router.get('/name/:productName', async (req, res) => {
+    try {
+        const productName = req.params.productName;
+        const product = await Product.findOne({
+        where: { name: productName }
+        });
+    
+        return res.json(product);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Bestellungen:', error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
+    }
+    });
+
 // creates a new product
 router.post('/',productValidation(), validate,  async (req, res) => {
 try {
     const product = req.body;
-    const fileName = await storeImage(product.image)
-    delete product.image;
-    product.image_url = `http://localhost:3000/images/${fileName}`;
+    if(product.image){
+        const fileName = await storeImage(product.image)
+        delete product.image;
+        product.image_url = `http://localhost:3000/images/${fileName}`;
+    }
+    else {
+        product.image_url = `http://localhost:3000/images/default.jpg`;
+    }
+
+   
 
     product.is_active = true;
 

@@ -7,9 +7,17 @@ export const fetchCategories = async () => {
     });
 };  
 
+
 export const fetchCategory = async (id) => {
     return await apiCall({
         url: `${API_BASE_URL}api/categories/${id}`,
+        method: 'GET',
+    });
+};
+
+export const fetchCategoryWithName = async (name) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/categories/name/${name}`,
         method: 'GET',
     });
 };

@@ -8,6 +8,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { createCategory } from "../../../api/categories";
 import { useSnackbar } from "../../../Context/SnackbarContext";
 import Textarea from '@mui/joy/Textarea';
+import NewItemHeader from "../../../Components/Backend/NewItemHeader";
 
 function AddCategory() {
   const [category, setCategory] = useState({
@@ -33,10 +34,15 @@ function AddCategory() {
 
   return (
     <>
-      <Box sx={{ paddingBottom: 3 }}>
-        <Typography variant="h4" >neue Kategorie</Typography>
-        <Divider />
-      </Box>
+      <NewItemHeader name="Kategorie hinzufügen" >
+        <Button
+          variant="contained"
+          color="success"
+          onClick={handleSave}
+        >
+          Speichern
+        </Button>
+      </NewItemHeader>
       <Box style={{ flexDirection: 'column', alignItems: 'center' }}>
         <TextField
           value={category?.name}
@@ -45,22 +51,16 @@ function AddCategory() {
           onChange={(e) => setCategory({ ...category, name: e.target.value })}
         />
         <Box>
-          <Typography variant="h5">Beschreibung</Typography>
+          <Typography
+          variant="h5"
+          sx={{ paddingBottom: "0.25rem" }}
+          >Beschreibung</Typography>
           <Textarea
             value={category?.description}
             onChange={(e) => setCategory({ ...category, description: e.target.value })}
             style={{ height: 100, width: '80%', padding: '8px', fontSize: '16px', marginBottom: "1rem" }}
           />
         </Box>
-
-        <Button
-          variant="contained"
-          color="success"
-          onClick={handleSave}
-          sx={{ width: "80%", maxWidth: "100px", marginBottom: "2rem", marginTop: "1rem" }}
-        >
-          Speichern
-        </Button>
       </Box>
     </>
   )

@@ -160,7 +160,12 @@ function Product() {
             </FormControl>
           </Box>
         </Box>
-        <Textarea value={product?.description} placeholder="Beschreibung" onChange={(e) => setProduct({ ...product, description: e.target.value })} style={{ width: '100%', padding: '8px', fontSize: '16px' }} />
+        <Textarea 
+        value={product?.description} 
+        placeholder="Beschreibung" 
+        onChange={(e) => setProduct({ ...product, description: e.target.value })} 
+        style={{ width: '100%', padding: '8px', fontSize: '16px', height: '200px' }} 
+        />
       </Box>
 
     </Box>

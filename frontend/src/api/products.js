@@ -16,6 +16,13 @@ export const fetchProduct = async (id) => {
     });
 };
 
+export const fetchProductWithName = async (name) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/products/name/${name}`,
+        method: 'GET',
+    });
+};
+
 export const searchProducts = async (query) => {
     return await apiCall({
         url: `${API_BASE_URL}api/products/search/query?q=${query}`,

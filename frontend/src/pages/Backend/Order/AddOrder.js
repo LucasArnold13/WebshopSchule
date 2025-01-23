@@ -4,7 +4,7 @@ import { Avatar, IconButton } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import SearchModal from "../../../Components/SearchModal";
+import SearchModal from "../../../Components/Modals/SearchProductModal";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { data, NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
@@ -15,6 +15,8 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
 import QuantityTextfield from "../../../Components/Inputs/QuantityTextfield";
 import PriceTextfield from "../../../Components/Inputs/PriceTextfield";
+import NewItemHeader from "../../../Components/Backend/NewItemHeader";
+import CustomerBox from "../../../Components/Backend/CustomerBox";
 
 function AddOrder() {
     const { showSnackbar } = useSnackbar();
@@ -115,46 +117,38 @@ function AddOrder() {
             />
 
 
-            <Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography
-                        variant="h4">
-                        Bestellung erstellen
-                    </Typography>
-                </Box>
-                <Divider />
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
-                <Box>
-                    <Typography variant="body1" sx={{ paddingBottom: 1 }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
+            <NewItemHeader name={"Bestellung hinzufügen"}>
+                <Button variant="contained" onClick={() => handleSave()} color="success">speichern</Button>
+            </NewItemHeader>
+
+            <Box sx={{ display: 'flex', flexDirection: "column", justifyContent: 'space-between', gap: 1 }}>
+                <Box sx={{ display: "flex" }}>
+                    <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
+                    <Typography sx={{ paddingBottom: 1, alignItems: "center" }}>
                         Bestelldatum: {getFormattedDatetime(order?.order_date)}
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2, }}>
-                        <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                label="Lieferdatum auswählen"
-                                format="DD/MM/YYYY"
-                                minDate={dayjs()}
-                                value={order?.delivery_date}
-                                onChange={(newDate) => {
-                                    setOrder((prevOrder) => ({
-                                        ...prevOrder,
-                                        delivery_date: newDate,
-                                    }));
-                                }}
-                            />
-                        </LocalizationProvider>
-                    </Box>
-
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                    <Button variant="contained" onClick={() => handleSave()} color="success">speichern</Button>
 
+                <Box sx={{ display: 'flex', alignItems: "center", }}>
+                    <CalendarTodayIcon sx={{ fontSize: 16, marginRight: 1 }} />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="Lieferdatum auswählen"
+                            format="DD/MM/YYYY"
+                            minDate={dayjs()}
+                            value={order?.delivery_date}
+                            onChange={(newDate) => {
+                                setOrder((prevOrder) => ({
+                                    ...prevOrder,
+                                    delivery_date: newDate,
+                                }));
+                            }}
+                        />
+                    </LocalizationProvider>
                 </Box>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3, paddingTop: 2 }}>
                 <Box
                     sx={{
                         flex: 5,
@@ -241,7 +235,7 @@ function AddOrder() {
 
 
                             <Box sx={{ textAlign: "center" }}>
-                                <QuantityTextfield item={item}  order={order} setOrder={setOrder} />
+                                <QuantityTextfield item={item} order={order} setOrder={setOrder} />
                             </Box>
 
 
@@ -288,94 +282,26 @@ function AddOrder() {
                     </Box>
                 </Box>
 
+                <CustomerBox customer={order.customer}>
+                    <FormControl fullWidth sx={{ marginTop: 1 }}>
+                        <InputLabel id="address-select-label">Adresse auswählen</InputLabel>
+                        <Select
+                            sx={{ width: "300px" }}
+                            labelId="address-select-label">
+                            {order?.customer?.addresses.map((address, index) => (
+                                <MenuItem
+                                    key={index}
+                                    value={index}
+                                    onClick={() => handleAddressClick(address)}
 
-                <Box sx={{
-                    flex: 2,
-                    overflow: "auto",
-                    height: "400px",
-                    borderRadius: "8px",
-                    background: "white",
-                    border: "1px solid grey",
-                }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", padding: 1, paddingLeft: 2 }}>
-                        Kunde
-                    </Typography>
-                    <Divider sx={{ marginBottom: 2 }} />
-                    <Box
-                        onClick={() => { navigate("/backend/customers/" + order?.customer?.id) }}
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            paddingLeft: 2,
-                            cursor: "pointer",
-                            "&:hover": {
-                                color: "rgba(22, 139, 248, 0.9)"
-                            },
-                        }}
-                    >
+                                >
+                                    {`${address.street}, ${address.city}, ${address.country}`}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </CustomerBox>
 
-                        {/* Avatar und Name */}
-                        <Box sx={{
-                            display: "flex",
-                            alignItems: "center",
-                        }}>
-                            <Avatar
-                                sx={{ width: 50, height: 50, marginRight: 2 }}
-                            />
-                            <Typography>
-                                {order?.customer?.firstname} {order?.customer?.lastname}
-                            </Typography>
-                        </Box>
-                        <Box sx={{ marginLeft: 2 }}>
-                            <ArrowForwardIosIcon />
-                        </Box>
-
-                    </Box>
-                    <Divider sx={{ marginTop: 2 }} />
-                    <Box
-                        sx={{
-                            paddingLeft: 2,
-                            paddingTop: 1
-                        }}
-                    >
-                        <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
-                            Kontaktinfo
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ padding: 1 }}>
-                            {order?.customer?.email}
-                        </Typography>
-                    </Box>
-                    <Divider sx={{ marginBottom: 2 }} />
-                    <Box sx={{ width: "100%", display: 'flex', justifyContent: 'space-between' }}>
-                        <Box sx={{
-                            paddingLeft: 2,
-                        }}>
-                            <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
-                                Lieferadresse
-                            </Typography>
-                            <FormControl fullWidth sx={{ marginTop: 1 }}>
-                                <InputLabel id="address-select-label">Adresse auswählen</InputLabel>
-                                <Select
-                                    sx={{ width: "300px" }}
-                                    labelId="address-select-label">
-                                    {order?.customer?.addresses.map((address, index) => (
-                                        <MenuItem
-                                            key={index}
-                                            value={index}
-                                            onClick={() => handleAddressClick(address)}
-
-                                        >
-                                            {`${address.street}, ${address.city}, ${address.country}`}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-
-                    </Box>
-
-                </Box>
             </Box>
         </Box >
     );

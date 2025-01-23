@@ -9,8 +9,10 @@ import StatusBox from "../../../Components/StatusBox";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
+import ItemHeader from "../../../Components/Backend/ItemHeader";
+import CustomerBox from "../../../Components/Backend/CustomerBox";
 
-function Customer() {
+function BackendOrder() {
     const [order, setOrder] = useState({});
     const [loading, setLoading] = useState(true);
     const { id } = useParams();
@@ -45,23 +47,17 @@ function Customer() {
 
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
-            <Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography
-                        variant="h4">
-                        Bestellung {order.id}
-                    </Typography>
-                    <StatusBox status={order?.status} />
-                    <Typography variant='body2' sx={{ color: "gray", }}>
-                        Erstellt am: {getFormattedDatetime(order?.createdAt)}
-                    </Typography>
-
-                    <Typography variant='body2' sx={{ color: "blue", }}>
-                        Aktualisiert am: {getFormattedDatetime(order?.updatedAt)}
-                    </Typography>
-                </Box>
-                <Divider />
-            </Box>
+            <ItemHeader name={"Bestellung"} item={order}>
+                {order.status_id === 1 && (
+                    <Button
+                        variant="contained"
+                        onClick={() => navigate("/backend/orders/" + order?.id + "/edit")}
+                        color="primary"
+                    >
+                        Bearbeiten
+                    </Button>
+                )}
+            </ItemHeader>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography
@@ -86,23 +82,8 @@ function Customer() {
                         Lieferdatum: {getFormattedDatetime(order.delivery_date)}
                     </Typography>
                 </Box>
-
-
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, marginTop: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                        {order.status_id === 1 && (
-                            <Button
-                                variant="contained"
-                                onClick={() => navigate("/backend/orders/" + order?.id + "/edit")}
-                                color="primary"
-                            >
-                                Bearbeiten
-                            </Button>
-                        )}
-                    </Box>
-
-                </Box>
             </Box>
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
                 <Box
                     sx={{
@@ -213,92 +194,27 @@ function Customer() {
                     </Box>
                 </Box>
 
-
-                <Box sx={{
-                    flex: 2,
-                    overflow: "auto",
-                    height: "400px",
-                    borderRadius: "8px",
-                    background: "white",
-                    border: "1px solid grey",
-                }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", padding: 1, paddingLeft: 2 }}>
-                        Kunde
+                <CustomerBox customer={order.customer}>
+                    <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
+                        <strong>Straße:</strong> {order.street}
                     </Typography>
-                    <Divider sx={{ marginBottom: 2 }} />
-                    <Box
-                        onClick={() => { navigate("/backend/customers/" + order?.customer?.id) }}
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            paddingLeft: 2,
-                            cursor: "pointer",
-                            "&:hover": {
-                                color: "rgba(22, 139, 248, 0.9)"
-                            },
-                        }}
-                    >
-
-                        {/* Avatar und Name */}
-                        <Box sx={{
-                            display: "flex",
-                            alignItems: "center",
-                        }}>
-                            <Avatar
-                                sx={{ width: 50, height: 50, marginRight: 2 }}
-                            />
-                            <Typography>
-                                {order?.customer?.firstname} {order?.customer?.lastname}
-                            </Typography>
-                        </Box>
-                        <Box sx={{ marginLeft: 2 }}>
-                            <ArrowForwardIosIcon />
-                        </Box>
-
-                    </Box>
-                    <Divider sx={{ marginTop: 2 }} />
-                    <Box
-                        sx={{
-                            paddingLeft: 2,
-                            paddingTop: 1
-                        }}
-                    >
-                        <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
-                            Kontaktinfo
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ padding: 1 }}>
-                            {order?.customer?.email}
-                        </Typography>
-                    </Box>
-                    <Divider sx={{ marginBottom: 2 }} />
-                    <Box
-                        sx={{
-                            paddingLeft: 2,
-                        }}
-                    >
-                        <Typography variant="h6" sx={{ marginBottom: 1, fontWeight: "bold" }}>
-                            Lieferadresse
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
-                            <strong>Straße:</strong> {order.street}
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
-                            <strong>Stadt:</strong> {order.city}
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
-                            <strong>PLZ:</strong> {order.postalCode}
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ marginBottom: 0 }}>
-                            <strong>Land:</strong> {order.country}
-                        </Typography>
-                    </Box>
+                    <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
+                        <strong>Stadt:</strong> {order.city}
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ marginBottom: 0.5 }}>
+                        <strong>PLZ:</strong> {order.postalCode}
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ marginBottom: 0 }}>
+                        <strong>Land:</strong> {order.country}
+                    </Typography>
+                </CustomerBox>
 
 
-                </Box>
+
+
             </Box>
         </Box>
     );
 }
 
-export default Customer;
+export default BackendOrder;

@@ -5,7 +5,6 @@ import { fetchOrderForEdit, updateOrder } from "../../../api/orders";
 import { fetchStatus } from "../../../api/status";
 import { Avatar, IconButton } from "@mui/material";
 import StatusBox from "../../../Components/StatusBox";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -13,13 +12,15 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useSnackbar } from "../../../Context/SnackbarContext";
 import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
 import dayjs from "dayjs";
-import SearchModal from "../../../Components/SearchModal";
+import SearchProductModal from "../../../Components/Modals/SearchProductModal";
 import QuantityTextfield from "../../../Components/Inputs/QuantityTextfield";
 import PriceTextfield from "../../../Components/Inputs/PriceTextfield";
 import { getStatusColor } from "../../../utils/getStatusColor";
+import LoadingCircle from "../../../Components/Feedback/LoadingCricle";
+import CustomerBox from "../../../Components/Backend/CustomerBox";
 
 
-function EditBackendorder() {
+function EditOrder() {
     const { showSnackbar } = useSnackbar();
     const [order, setOrder] = useState({});
     const [loading, setLoading] = useState(true);
@@ -35,8 +36,10 @@ function EditBackendorder() {
 
     const fetchAndSetOrder = async () => {
         try {
+            console.log("test");
             const response = await fetchOrderForEdit(id);
-            if(response.status === 403){
+            if (response.status === 403) {
+                console.log(response.data.message);
                 showSnackbar(response.data.message, "error");
                 navigate("/backend/orders/")
                 return false;
@@ -44,7 +47,7 @@ function EditBackendorder() {
             else {
                 setOrder(response.data);
             }
-            
+
         } catch (error) {
             console.error('Fehler beim Abrufen der Daten:', error);
         }
@@ -117,7 +120,7 @@ function EditBackendorder() {
 
 
     useEffect(() => {
-
+        console.log("test");
 
         if (order) {
             const currentAddress = {
@@ -130,7 +133,7 @@ function EditBackendorder() {
 
             setCurrentAddress(currentAddress)
         }
-        Promise.all([fetchAndSetStatus(), fetchAndSetOrder()]).finally(() => {
+        Promise.all([fetchAndSetOrder(), fetchAndSetStatus()]).finally(() => {
             setLoading(false);
         });
 
@@ -138,7 +141,7 @@ function EditBackendorder() {
 
     if (loading) {
         return (
-            <CircularProgress />
+            <LoadingCircle />
         );
     }
 
@@ -146,7 +149,7 @@ function EditBackendorder() {
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
 
-            <SearchModal
+            <SearchProductModal
                 open={openModal}
                 setOpen={setOpenModal}
                 order={order} // Order direkt übergeben
@@ -173,6 +176,7 @@ function EditBackendorder() {
                 </Box>
                 <Divider />
             </Box>
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, marginTop: 2, gap: 3 }}>
                 <Box sx={{ display: 'flex', gap: 7 }}>
 
@@ -377,101 +381,45 @@ function EditBackendorder() {
                         </Typography>
                     </Box>
                 </Box>
-
-
-                <Box sx={{
-                    flex: 2,
-                    overflow: "auto",
-                    height: "400px",
-                    borderRadius: "8px",
-                    background: "white",
-                    border: "1px solid grey",
-                }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", padding: 1, paddingLeft: 2 }}>
-                        Kunde
-                    </Typography>
-                    <Divider sx={{ marginBottom: 2 }} />
-                    <Box
-                        onClick={() => { navigate("/backend/customers/" + order?.customer?.id) }}
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            paddingLeft: 2,
-                            cursor: "pointer",
-                            "&:hover": {
-                                color: "rgba(22, 139, 248, 0.9)"
-                            },
-                        }}
-                    >
-
-                        {/* Avatar und Name */}
-                        <Box sx={{
-                            display: "flex",
-                            alignItems: "center",
-                        }}>
-                            <Avatar
-                                sx={{ width: 50, height: 50, marginRight: 2 }}
-                            />
-                            <Typography>
-                                {order?.customer?.firstname} {order?.customer?.lastname}
-                            </Typography>
-                        </Box>
-                        <Box sx={{ marginLeft: 2 }}>
-                            <ArrowForwardIosIcon />
-                        </Box>
-
-                    </Box>
-                    <Divider sx={{ marginTop: 2 }} />
-                    <Box
-                        sx={{
-                            paddingLeft: 2,
-                            paddingTop: 1
-                        }}
-                    >
-                        <Typography variant="h8" sx={{ padding: 1, fontWeight: "bold" }}>
-                            Kontaktinfo
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ padding: 1 }}>
-                            {order?.customer?.email}
-                        </Typography>
-                    </Box>
-                    <Divider sx={{ marginBottom: 2 }} />
-                    <Box sx={{  paddingLeft: 2, display: 'flex', flexDirection: "column", justifyContent: 'space-between' }}>
-                        <Typography variant="h6" sx={{ marginBottom: 1, fontWeight: "bold" }}>
-                            Lieferadresse
-                        </Typography>
-
-                        <FormControl sx={{ marginTop: 1 }}>
-                            <Select
-                                sx={{ width: "60%" }}
-                                labelId="address-select-label"
-                                value={order.customer.addresses.findIndex(
-                                    (address) =>
-                                        address.street === currentAddress.street &&
-                                        address.city === currentAddress.city &&
-                                        address.country === currentAddress.country &&
-                                        address.state === currentAddress.state
-                                ) ?? -1}
-                                onChange={handleAddressChange}
-                            >
-                                {order?.customer?.addresses.map((address, index) => (
+                <CustomerBox customer={order.customer}>
+                    <FormControl sx={{ marginTop: 1 }}>
+                        <Select
+                            sx={{ width: "60%" }}
+                            labelId="address-select-label"
+                            value={
+                                Array.isArray(order.customer?.addresses)
+                                    ? order.customer.addresses.findIndex(
+                                        (address) =>
+                                            address.street === currentAddress.street &&
+                                            address.city === currentAddress.city &&
+                                            address.country === currentAddress.country &&
+                                            address.state === currentAddress.state
+                                    )
+                                    : -1
+                            }
+                            onChange={handleAddressChange}
+                            displayEmpty
+                        >
+                            {Array.isArray(order.customer?.addresses) &&
+                                order.customer.addresses.map((address, index) => (
                                     <MenuItem key={index} value={index}>
                                         {`${address.city}, ${address.street}`}
                                     </MenuItem>
                                 ))}
+                            {currentAddress.city && currentAddress.street && (
                                 <MenuItem key={-1} value={-1}>
                                     {`${currentAddress.city}, ${currentAddress.street}`}
                                 </MenuItem>
-                            </Select>
-                        </FormControl>
+                            )}
+                        </Select>
+                    </FormControl>
 
-                    </Box>
+                </CustomerBox>
 
-                </Box>
+
             </Box>
         </Box >
     );
 };
 
-export default EditBackendorder;
+export default EditOrder;

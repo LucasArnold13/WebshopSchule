@@ -6,13 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux"; // Provider aus react-redux importieren
 import store from "./store/store"; // Deinen Store importieren
 import reportWebVitals from './reportWebVitals';
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
+
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

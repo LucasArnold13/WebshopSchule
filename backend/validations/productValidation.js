@@ -32,7 +32,7 @@ const productValidation = () => {
                         id: category_id
                     }
                 })
-                if (!existingProduct) {
+                if (!existingCategory) {
                     throw new Error("Kategorie ist nicht vorhanden");
                 }
             }),

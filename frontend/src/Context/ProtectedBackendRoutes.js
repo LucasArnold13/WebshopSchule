@@ -13,7 +13,6 @@ function ProtectedBackendRoutes() {
   const checkSession = async () => {
     try {
       const response = await authUser();
-      console.log(response);
       if (response.status === 200) {
         dispatch(login(response.data));
         setIsAuthenticated(true);
@@ -37,7 +36,6 @@ function ProtectedBackendRoutes() {
 
 
   if (!isAuthenticated) {
-
     return <Navigate to="/backend/login" state={{ from: location }} replace />;
   }
 

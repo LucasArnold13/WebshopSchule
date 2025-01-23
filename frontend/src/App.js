@@ -19,9 +19,9 @@ import Order from './Pages/Frontend/Customer/Order';
 import Dashboard from './Pages/Backend/Dashboard';
 import Customers from './Pages/Backend/Customer/Customers';
 import Customer from './Pages/Backend/Customer/Customer';
-import AddCustomer from './Pages/Backend/Customer//AddCustomer';
+import AddCustomer from './Pages/Backend/Customer/AddCustomer';
 import Backendorders from './Pages/Backend/Order/Orders';
-import Backendorder from './Pages/Backend/Order/Backenorder';
+import Backendorder from './Pages/Backend/Order/BackendOrder';
 import Products from './Pages/Backend/Product/Products';
 import Product from './Pages/Backend/Product/Product';
 import Users from './Pages/Backend/User/Users';
@@ -33,7 +33,9 @@ import Category from './Pages/Backend/Category/Category';
 import AddCategory from './Pages/Backend/Category/AddCategory';
 import AddProduct from './Pages/Backend/Product/AddProduct';
 import AddOrder from './Pages/Backend/Order/AddOrder';
-import EditBackendorder from './Pages/Backend/Order/EditBackendorder';
+import EditOrder from './Pages/Backend/Order/EditOrder';
+import FrontendProduct from './Pages/Frontend/FrontendProduct';
+import FrontendCategory from './Pages/Frontend/FrontendCategory';
 
 
 function App() {
@@ -48,6 +50,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route path="login" element={<FrontendLogin />} />
           <Route path="register" element={<Register />} />
+          <Route path="product/:productName" element={<FrontendProduct />} />
+          <Route path=":categoryName" element={<FrontendCategory />} />
 
           <Route element={<ProtectedFrontendRoutes />} >
             <Route path='customer/' element={<Customerlayout />}>
@@ -83,7 +87,7 @@ function App() {
 
                 <Route path='orders' element={<Backendorders />} />
                 <Route path='orders/:id' element={<Backendorder />} />
-                <Route path='orders/:id/edit' element={<EditBackendorder />} />
+                <Route path='orders/:id/edit' element={<EditOrder />} />
                 <Route path='orders/new' element={<AddOrder />} />
 
                 <Route path='products' element={<Products />} />

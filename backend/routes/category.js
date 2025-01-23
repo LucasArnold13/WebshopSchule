@@ -48,6 +48,34 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
+router.get('/name/:categoryName', async (req, res) => {
+  try {
+    const categoryName = req.params.categoryName;
+
+    const category = await Category.findOne({
+      where: { name: categoryName },
+      include: [
+        {
+          model: Product,
+          as: 'products',
+        },
+      ],
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        message: `Kategorie konnte nicht gefunden werden`,
+      });
+    }
+
+    return res.status(200).json(category);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 // creates a new category
 router.post('/',categoryValidation(), validate, async (req, res) => {
   try {

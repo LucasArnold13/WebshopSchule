@@ -1,10 +1,10 @@
 import { TextField, Modal, FormControl, Button, Divider, Box, Typography, Select, MenuItem, Paper, InputLabel, } from "@mui/material";
 import { useEffect, useState, useCallback } from "react";
-import { searchProducts } from "../api/products";
-import { useSnackbar } from "../Context/SnackbarContext";
+import { searchProducts } from "../../api/products";
+import { useSnackbar } from "../../Context/SnackbarContext";
 import _ from "lodash";
 
-function SearchModal({ open, setOpen, order, setOrder }) {
+function SearchProductModal({ open, setOpen, order, setOrder }) {
     const { showSnackbar } = useSnackbar();
     const [searchQuery, setSearchQuery] = useState('');
     const [products, setProducts] = useState([]);
@@ -191,4 +191,4 @@ function SearchModal({ open, setOpen, order, setOrder }) {
 
 }
 
-export default SearchModal; 
+export default SearchProductModal; 

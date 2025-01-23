@@ -1,6 +1,5 @@
 export const API_BASE_URL = "http://localhost:3000/";
 
-
 export const apiCall = async ({
     url,
     method,
@@ -24,6 +23,11 @@ export const apiCall = async ({
         }
         const response = await fetch(url, options);
         const data = await response.json();
+
+        if(response.status === 403)
+        {
+
+        }
         
         return {status : response.status, data};
     } catch (error) {
