@@ -3,13 +3,15 @@ const validate = require("../middlewares/validate");
 const isAuthenticated = require("../middlewares/authentification");
 const customerValidation = require("../validations/customerValidation")
 const { Customer, Order, Status, Address } = require('../models');
+const bcrypt = require("bcrypt");
 const {
   Op,
   Sequelize
 } = require("sequelize");
+const { backendSession, frontendSession } = require("../sessions/session");
 
 // returns all customers
-router.get('/', async (req, res) => {
+router.get('/',backendSession, async (req, res) => {
     try {
       const customers = await Customer.findAll({
         attributes: { exclude: ['password'] }, // für die Sicherheit
@@ -23,7 +25,7 @@ router.get('/', async (req, res) => {
   });
 
 // returns a specific customer  
-router.get('/:id', async (req, res) => {
+router.get('/:id', backendSession, isAuthenticated, async (req, res) => {
     try {
       const customerId = req.params.id;
       const customer = await Customer.findOne({
@@ -59,7 +61,7 @@ router.get('/:id', async (req, res) => {
   });
  
 // updates a customer  
-router.put('/:id',customerValidation(),validate, async (req, res) => {
+router.put('/:id',backendSession, isAuthenticated, customerValidation(),validate, async (req, res) => {
     try {
       const customerId = req.params.id;
       const customer = req.body;
@@ -92,13 +94,13 @@ router.put('/:id',customerValidation(),validate, async (req, res) => {
   });
 
 // creates a customer  
-router.post('/',customerValidation(),validate, async (req, res) => {
+router.post('/',backendSession, isAuthenticated, customerValidation(),validate, async (req, res) => {
     try {
       const customer = req.body;
-      customer.password = "test";
+
+      customer.password = await bcrypt.hash("test", 10);
   
       const newCustomer = await Customer.create(customer);
-  
       if (newCustomer) {
         return res.status(200).json({ message: 'Kunde wurde erfolgreich angelegt', customer : newCustomer });
       }
@@ -160,45 +162,66 @@ router.get('/search/query', async (req, res) => {
 
 module.exports = router;
 
+router.post('/login',frontendSession, async (req, res) => {
+  const { email, password } = req.body;
+  const existingCustomer = await Customer.findOne({ where: { email } });
+  console.log(existingCustomer);
+  if (!existingCustomer) {
+    console.log("Ungültige Anmeldedaten");
+      return res.status(401).json({ message: "Ungültige Anmeldedaten" });
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, existingCustomer.password);
+
+  if (isPasswordValid) {
+      req.session.customer = {
+          id: existingCustomer.id,
+          email: existingCustomer.email,
+          firstname: existingCustomer.firstname,
+          lastname: existingCustomer.lastname,
+      };
+
+
+
+      return res.status(200).json({ message: "Login erfolgreich", customer: req.session.customer });
+  }
+  else {
+      return res.status(401).json({ message: "Ungültige Anmeldedaten" });
+  }
+});
+
+ 
+router.get('/auth/refresh', frontendSession,  (req, res) => {
+  if (req.session.customer) {
+      console.log(req.session.customer + " richtig");
+      res.status(200).json({ customer: req.session.customer });
+  } else {
+      console.log( + " falsch");
+      res.status(401).json({ message: "Nicht authentifiziert" });
+  }
+});
+
+router.delete('/logout',frontendSession, (req, res) => {
+  req.session.destroy((err) => {
+      if (err) {
+          console.error('Fehler beim Zerstören der Session:', err);
+          return res.status(500).json({ message: 'Logout fehlgeschlagen' });
+      }
+
+      res.clearCookie('FSID');
+      return res.status(200).json({ message: 'Logout erfolgreich' });
+  });
+
+});
 
 /*
-const express = require("express");
-const router = express.Router();
-exports.router = router;
-const { Customer, Order, Orderitems, Status } = require('../models');
-const bcrypt = require('bcrypt');
 
 
 
 
   
 
-router.post('/login',frontendSession, async (req, res) => {
-    const { email, password } = req.body;
-    const existingCustomer = await Customer.findOne({ where: { email } });
 
-    if (!existingCustomer) {
-        return res.status(401).json({ message: "Ungültige Anmeldedaten" });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, existingCustomer.password);
-
-    if (isPasswordValid) {
-        req.session.user = {
-            id: existingCustomer.id,
-            email: existingCustomer.email,
-            firstname: existingCustomer.firstname,
-            lastname: existingCustomer.lastname,
-        };
-
-
-
-        return res.status(200).json({ message: "Login erfolgreich", user: req.session.user });
-    }
-    else {
-        return res.status(401).json({ message: "Ungültige Anmeldedaten" });
-    }
-});
 
 router.post('/register',frontendSession,  async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
@@ -243,29 +266,9 @@ router.post('/register',frontendSession,  async (req, res) => {
     }
 });
 
-router.get('/auth',frontendSession,  (req, res) => {
-    console.log(req.session);
-    if (req.session.user) {
-        console.log(req.session.user + " richtig");
-        res.status(200).json({ isAuthenticated: true, user: req.session.user });
-    } else {
-        console.log(req.session.user + " falsch");
-        res.status(401).json({ isAuthenticated: false });
-    }
-});
 
-router.delete('/logout',frontendSession, (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Fehler beim Zerstören der Session:', err);
-            return res.status(500).json({ message: 'Logout fehlgeschlagen' });
-        }
 
-        res.clearCookie('connect.sid');
-        return res.status(200).json({ message: 'Logout erfolgreich' });
-    });
 
-});
 
 router.get('/customer/:id/orders', async (req, res) => {
     try {

@@ -35,6 +35,7 @@ export const createProduct = async (product) => {
         url: `${API_BASE_URL}api/products`,
         method: 'POST',
         body: product,
+        showSnackbar : true
     });
 };
 
@@ -43,5 +44,6 @@ export const updateProduct = async (product) => {
         url: `${API_BASE_URL}api/products/${product.id}`,
         method: 'PUT',
         body: product,
+        showSnackbar : true
     });
 }

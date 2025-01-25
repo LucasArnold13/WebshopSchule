@@ -25,6 +25,7 @@ export const updateUser = async (user) => {
         url: `${API_BASE_URL}api/users/${user.id}`,
         method: 'PUT',
         body: user, 
+        showSnackbar : true
     });
     }
 
@@ -33,6 +34,7 @@ export const createUser = async (user) => {
         url: `${API_BASE_URL}api/users`,
         method: 'POST',
         body: user, 
+        showSnackbar : true
     });
     }
 
@@ -54,5 +56,6 @@ export const authUser = async () => {
     return await apiCall({
         url: `${API_BASE_URL}api/users/auth/refresh`,
         method: 'GET',
+        //showSnackbar : true
     });
     }

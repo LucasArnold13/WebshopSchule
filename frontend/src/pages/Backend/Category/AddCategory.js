@@ -15,7 +15,6 @@ function AddCategory() {
     name: "",
     description: "",
   });
-  const { showSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
 
@@ -24,11 +23,8 @@ function AddCategory() {
   const handleSave = async () => {
     const response = await createCategory(category);
     if (response.status === 201) {
-      showSnackbar(response.data.message, "success");
       navigate('/backend/categories/' + response.data.category.id);
-    } else if (response.status === 400) {
-      showSnackbar(response.data.message, "error");
-    }
+    } 
 
   };
 

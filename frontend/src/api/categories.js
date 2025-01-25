@@ -26,7 +26,8 @@ export const createCategory = async (category) => {
     return await apiCall({
         url: `${API_BASE_URL}api/categories`,
         method: 'POST',
-        body: category
+        body: category,
+        showSnackbar : true
     });
 };
 
@@ -34,6 +35,7 @@ export const updateCategory = async (category) => {
     return await apiCall({
         url: `${API_BASE_URL}api/categories/${category.id}`,
         method: 'PUT',
-        body: category
+        body: category,
+        showSnackbar : true
     });
 };

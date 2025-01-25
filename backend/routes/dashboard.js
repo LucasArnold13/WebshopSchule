@@ -6,8 +6,11 @@ const {
   getOrderChartData
 } = require("../services/DashboardService");
 
+const isAuthenticated = require("../middlewares/authentification");
+const { backendSession } = require("../sessions/session");
+
 // returns all data for the dashboard
-router.get('/', async (req, res) => {
+router.get('/', backendSession, isAuthenticated, async (req, res) => {
   try {
 
     const data = {

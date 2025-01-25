@@ -1,40 +1,29 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../Context/AuthProvider';
+import { loginCustomer } from '../api/customers'; 
+import { useDispatch } from "react-redux";
+import  { customerLogin } from '../store/slices/customerSlice';
 
 
 function LoginForm() {
-  const {handleLogin, isLoggedIn} = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); 
   const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
-
-   let isLoggedIn = await handleLogin('http://localhost:3000/api/frontend/login',
-    {
-      email: email,
-      password: password,
-    });
-
-    console.log(isLoggedIn);
-    
-    if(isLoggedIn)
-    {
-      localStorage.setItem("isLoggedIn", "true");
-      console.log("eingeloggt");
-      navigate('/customer/orders');
+    const response = await loginCustomer({email, password});
+    if(response.status === 200) {
+      console.log(response.data);
+      navigate('/'); 
+      dispatch(customerLogin(response.data));
     }
-    else 
-    {
-     setError("falsch");
-    }
-   
+
   };
 
   return (

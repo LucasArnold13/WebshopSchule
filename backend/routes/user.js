@@ -131,8 +131,6 @@ router.post('/login', backendSession, async (req, res) => {
       role : existingUser.role
     };
 
-
-
     return res.status(200).json({ message: "Login erfolgreich", user: req.session.user });
   }
   else {
@@ -156,7 +154,7 @@ router.delete('/logout',backendSession, (req, res) => {
           return res.status(500).json({ message: 'Logout fehlgeschlagen' });
       }
 
-      res.clearCookie('connect.sid');
+      res.clearCookie('BSID');
       return res.status(200).json({ message: 'Logout erfolgreich' });
   });
 

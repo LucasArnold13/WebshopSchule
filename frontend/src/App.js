@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import { AuthProvider } from './Context/AuthProvider';
 import { SnackbarProvider } from "./Context/SnackbarContext";
+import { CartProvider } from './Context/CartContext';
 import ProtectedFrontendRoutes from './Context/ProtectedFrontendRoutes';
 import ProtectedBackendRoutes from './Context/ProtectedBackendRoutes';
 import FrontendLogin from "./Pages/Frontend/FrontendLogin";
@@ -42,75 +42,71 @@ function App() {
 
 
   return (
-    <AuthProvider>
-        <SnackbarProvider>
-      <Routes>
+      <SnackbarProvider>
+        <CartProvider>
+          <Routes>
 
-        {/* Frontend */}
-        <Route path="/" element={<Layout />}>
-          <Route path="login" element={<FrontendLogin />} />
-          <Route path="register" element={<Register />} />
-          <Route path="product/:productName" element={<FrontendProduct />} />
-          <Route path=":categoryName" element={<FrontendCategory />} />
+            {/* Frontend */}
+            <Route path="/" element={<Layout />}>
+              <Route path="login" element={<FrontendLogin />} />
+              <Route path="register" element={<Register />} />
+              <Route path="product/:productName" element={<FrontendProduct />} />
+              <Route path=":categoryName" element={<FrontendCategory />} />
 
-          <Route element={<ProtectedFrontendRoutes />} >
-            <Route path='customer/' element={<Customerlayout />}>
-              <Route path="order/:id" element={<Order />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="orders" element={<Orders />} />
-              <Route path="addresses" element={<Address />} />
+              <Route element={<ProtectedFrontendRoutes />} >
+                <Route path='customer/' element={<Customerlayout />}>
+                  <Route path="order/:id" element={<Order />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="orders" element={<Orders />} />
+                  <Route path="addresses" element={<Address />} />
+                </Route>
+              </Route>
+
+              <Route path="user" />
+              <Route path="*" element={<NotFoundFrontend />} />
             </Route>
-          </Route>
 
 
-          <Route path="1" />
-          <Route path="2" />
-          <Route path="3" />
-          <Route path="4" />
-          <Route path="user" />
-          <Route path="*" element={<NotFoundFrontend />} />
-        </Route>
+            {/* Backend */}
+            <Route path='/backend/' element={<BackendBackground />} >
+              <Route path='login' element={<BackendLogin />} />
 
+              <Route element={<ProtectedBackendRoutes />} >
+                <Route element={<BackendLayout />}>
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path='dashboard' element={<Dashboard />} />
 
-        {/* Backend */}
-          <Route path='/backend/' element={<BackendBackground />} >
-            <Route path='login' element={<BackendLogin />} />
+                  <Route path='customers' element={<Customers />} />
+                  <Route path='customers/:id' element={<Customer />} />
+                  <Route path='customers/new' element={<AddCustomer />} />
 
-            <Route element={<ProtectedBackendRoutes />} >
-              <Route element={<BackendLayout />}>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path='dashboard' element={<Dashboard />} />
+                  <Route path='orders' element={<Backendorders />} />
+                  <Route path='orders/:id' element={<Backendorder />} />
+                  <Route path='orders/:id/edit' element={<EditOrder />} />
+                  <Route path='orders/new' element={<AddOrder />} />
 
-                <Route path='customers' element={<Customers />} />
-                <Route path='customers/:id' element={<Customer />} />
-                <Route path='customers/new' element={<AddCustomer />} />
+                  <Route path='products' element={<Products />} />
+                  <Route path='products/:id' element={<Product />} />
+                  <Route path='products/new' element={<AddProduct />} />
 
-                <Route path='orders' element={<Backendorders />} />
-                <Route path='orders/:id' element={<Backendorder />} />
-                <Route path='orders/:id/edit' element={<EditOrder />} />
-                <Route path='orders/new' element={<AddOrder />} />
+                  <Route path='users' element={<Users />} />
+                  <Route path='users/:id' element={<User />} />
+                  <Route path='users/new' element={<AddUser />} />
 
-                <Route path='products' element={<Products />} />
-                <Route path='products/:id' element={<Product />} />
-                <Route path='products/new' element={<AddProduct />} />
+                  <Route path='categories' element={<Categories />} />
+                  <Route path='categories/:id' element={<Category />} />
+                  <Route path='categories/new' element={<AddCategory />} />
 
-                <Route path='users' element={<Users />} />
-                <Route path='users/:id' element={<User />} />
-                <Route path='users/new' element={<AddUser />} />
-
-                <Route path='categories' element={<Categories />} />
-                <Route path='categories/:id' element={<Category />} />
-                <Route path='categories/new' element={<AddCategory />} />
-
-                <Route path="*" element={<NotFoundBackend />} />
+                  <Route path="*" element={<NotFoundBackend />} />
+                </Route>
               </Route>
             </Route>
-          </Route>
 
 
-      </Routes>
+          </Routes>
+
+        </CartProvider>
       </SnackbarProvider>
-    </AuthProvider>
 
   );
 }

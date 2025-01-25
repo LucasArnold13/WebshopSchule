@@ -44,14 +44,7 @@ function Product() {
   }, []);
 
   const handleSave = async () => {
-    const response = await updateProduct(product);
-    if (response.status === 200) {
-      showSnackbar(response.data.message, "success");
-    }
-    else {
-      showSnackbar(response.data.message, "error");
-    }
-
+    await updateProduct(product);
   };
 
 
@@ -160,11 +153,11 @@ function Product() {
             </FormControl>
           </Box>
         </Box>
-        <Textarea 
-        value={product?.description} 
-        placeholder="Beschreibung" 
-        onChange={(e) => setProduct({ ...product, description: e.target.value })} 
-        style={{ width: '100%', padding: '8px', fontSize: '16px', height: '200px' }} 
+        <Textarea
+          value={product?.description}
+          placeholder="Beschreibung"
+          onChange={(e) => setProduct({ ...product, description: e.target.value })}
+          style={{ width: '100%', padding: '8px', fontSize: '16px', height: '200px' }}
         />
       </Box>
 

@@ -3,8 +3,27 @@ import { Box, Typography } from '@mui/material';
 import { Outlet } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import { useEffect } from "react";
+import  { customerLogin } from '../store/slices/customerSlice';
+import { authCustomer } from "../api/customers";
+import { useDispatch } from "react-redux";
 
 function Background() {
+    const dispatch = useDispatch();
+    
+    const checkSession = async () => {
+        const response = await authCustomer();
+        if (response.status === 200) {
+          dispatch(customerLogin(response.data));
+        }
+    }
+
+    useEffect(() => {
+        checkSession();
+      });
+    
+
+
     return (
         <Box
             sx={{

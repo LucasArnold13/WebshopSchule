@@ -19,7 +19,6 @@ import NewItemHeader from "../../../Components/Backend/NewItemHeader";
 import CustomerBox from "../../../Components/Backend/CustomerBox";
 
 function AddOrder() {
-    const { showSnackbar } = useSnackbar();
     const [loading, setLoading] = useState(true);
     const query = new URLSearchParams(useLocation().search);
     const customerId = query.get("customerId");
@@ -91,11 +90,7 @@ function AddOrder() {
         order.total_price_float = totalCost;
         const response = await createOrder(order);
         if (response.status === 201) {
-            showSnackbar(response.data.message, "success");
             navigate("/backend/orders/" + response.data.order.id)
-        }
-        else if (response.status === 400) {
-            showSnackbar(response.data.message, "error");
         }
 
 

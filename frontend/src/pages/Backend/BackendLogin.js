@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useAuth } from '../../Context/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography } from '@mui/material';
 import { useDispatch } from "react-redux";
@@ -9,7 +8,6 @@ import { loginUser } from '../../api/users';
 
 
 function BackendLogin() {
-  const { handleLogin } = useAuth();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState('');

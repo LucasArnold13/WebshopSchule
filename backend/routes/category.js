@@ -1,14 +1,15 @@
 const router = require("express").Router();
 const validate = require("../middlewares/validate");
+const isAuthenticated = require("../middlewares/authentification");
 const categoryValidation = require("../validations/categoryValidation");
 const { Category, Product } = require('../models');
+const { backendSession } = require("../sessions/session");
 
 
 // returns all categories
-router.get('/', async (req, res) => {
+router.get('/',backendSession, async (req, res) => {
   try {
     const categories = await Category.findAll();
-
     return res.status(200).json(categories);
   } catch (error) {
     console.error(error);
@@ -17,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // returns a specific category
-router.get('/:id', async (req, res) => {
+router.get('/:id',backendSession, isAuthenticated, async (req, res) => {
   try {
     const categoryID = req.params.id;
 
@@ -77,7 +78,7 @@ router.get('/name/:categoryName', async (req, res) => {
 });
 
 // creates a new category
-router.post('/',categoryValidation(), validate, async (req, res) => {
+router.post('/',backendSession, isAuthenticated, categoryValidation(), validate, async (req, res) => {
   try {
     const category = req.body;
     console.log(category);
@@ -97,7 +98,7 @@ router.post('/',categoryValidation(), validate, async (req, res) => {
 });
 
 // updates a category
-router.put('/:id',categoryValidation(), validate, async (req, res) => {
+router.put('/:id',backendSession, isAuthenticated, categoryValidation(), validate, async (req, res) => {
   try {
 
     const category = req.body;

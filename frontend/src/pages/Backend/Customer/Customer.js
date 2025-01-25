@@ -82,13 +82,7 @@ function Customer() {
     }, [id, loading]);
 
     const handleUpdate = async () => {
-        const response = await updateCustomer(customer);
-        console.log(response);
-        if (response.status === 200) {
-            showSnackbar(response.data.message, "success");
-        } else if (response.status === 400) {
-            showSnackbar(response.data.message, "error");
-        }
+       await updateCustomer(customer);
     };
 
     const DeleteAddress = () => {

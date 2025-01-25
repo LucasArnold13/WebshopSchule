@@ -65,11 +65,8 @@ function Category() {
     const response = await updateCategory(category);
     console.log(response);
     if (response.status === 200) {
-      showSnackbar(response.data.message, "success");
       setReload(true);
-    } else if (response.status === 400) {
-      showSnackbar(response.data.message, "error");
-    }
+    } 
   };
 
   if (loading) {

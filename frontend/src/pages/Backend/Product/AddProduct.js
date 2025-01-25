@@ -13,7 +13,6 @@ function AddProduct() {
     image: imagePreview
   });
   const [categories, setCategories] = useState([]);
-  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
 
@@ -53,11 +52,7 @@ function AddProduct() {
   const handleSave = async () => {
     const response = await createProduct(product);
     if (response.status === 201) {
-      showSnackbar(response.data.message, "success");
       navigate("/backend/products/" + response.data.product.id)
-    }
-    else {
-      showSnackbar(response.data.message, "error");
     }
 
   };

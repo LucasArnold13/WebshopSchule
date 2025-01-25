@@ -6,7 +6,6 @@ import { data, NavLink, useParams, useNavigate, useLocation } from "react-router
 
 function AddCustomer() {
     const navigate = useNavigate();
-    const { showSnackbar } = useSnackbar();
     const [customer, setCustomer] = useState({
         firstname: "",
         lastname: "",
@@ -17,11 +16,7 @@ function AddCustomer() {
     const handleCreate = async () => {
         const response = await createCustomer(customer);
         if (response.status === 200) {
-            showSnackbar(response.data.message, "success");
             navigate("/backend/customers/" + response.data.customer.id)
-        }
-        else if (response.status === 400) {
-            showSnackbar(response.data.message, "error");
         }
     };
 

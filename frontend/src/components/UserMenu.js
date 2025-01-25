@@ -13,12 +13,16 @@ import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import { useNavigate } from 'react-router-dom';
-
+import { useSelector,useDispatch } from "react-redux";
+import { logoutCustomer } from '../api/customers';
+import { customerLogout } from '../store/slices/customerSlice';
 
 export default function UserMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate(); 
+  const dispatch = useDispatch();
+  const customer = useSelector((state) => state.customer);
 
 
   const MenuItemStyle = () => ({ color: '#FFFFFF', fontSize: 30 });
@@ -26,10 +30,15 @@ export default function UserMenu() {
   React.useEffect(() => {
   });
 
-  const handleNavigation = () => {
+  const handleLogin = () => {
     navigate('/login'); 
   };
 
+  const handleLogout = () => {
+    logoutCustomer();
+    dispatch(customerLogout());
+    //navigate('/');
+  }
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -92,10 +101,10 @@ export default function UserMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {(localStorage.getItem("isLoggedIn") === "true") ?  (
+        {(customer.isAuthenticated) ?  (
           <div>
             <MenuItem>
-              <Typography color="white">Willkommen zurück!</Typography>
+              <Typography color="white">Willkommen zurück {customer.firstname}!</Typography>
             </MenuItem>
             <Divider />
             <MenuItem onClick={() => navigate('/customer/profile')}>
@@ -116,7 +125,7 @@ export default function UserMenu() {
                Adressen
               </Typography>
             </MenuItem>
-            <MenuItem onClick={() => console.log("logout wieder hinzufügen")}>
+            <MenuItem onClick={() => handleLogout()}>
               <Logout sx={MenuItemStyle}/>
               <Typography color="white" sx={{ marginLeft: 1, textAlign: 'center' }}>
                Logout
@@ -137,7 +146,7 @@ export default function UserMenu() {
                 Du bist noch nicht angemeldet
               </Typography>
               <Button
-                onClick={handleNavigation}
+                onClick={handleLogin}
                 sx={{
                   backgroundColor: '#007BFF',
                   color: '#fff',

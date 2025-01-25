@@ -20,7 +20,8 @@ export const updateCustomer = async (customer) => {
     return await apiCall({
         url: `${API_BASE_URL}api/customers/${customer.id}`,
         method: 'PUT',
-        body : customer
+        body : customer,
+        showSnackbar : true
     });
 };
 
@@ -28,7 +29,8 @@ export const createCustomer = async (customer) => {
     return await apiCall({
         url: `${API_BASE_URL}api/customers`,
         method: 'POST',
-        body : customer
+        body : customer,
+        showSnackbar : true
     });
 };
 
@@ -36,5 +38,29 @@ export const searchCustomers = async (query) => {
     return await apiCall({
         url: `${API_BASE_URL}api/customers/search/query?q=${query}`,
         method: 'GET',
+    });
+};
+
+export const loginCustomer = async (data) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/customers/login`,
+        method: 'POST',
+        body: data,
+    });
+};
+
+export const authCustomer = async () => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/customers/auth/refresh`,
+        method: 'GET',
+        ignoreHttpStatus: true,
+    });
+};
+
+export const logoutCustomer = async () => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/customers/logout`,
+        method: 'DELETE',
+        ignoreHttpStatus: true,
     });
 };

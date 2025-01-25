@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
 import { Snackbar, Alert } from "@mui/material";
+import { useEffect } from "react";
 import CustomSnackbar from "../Components/Feedback/CustomSnackbar";
 
 const SnackbarContext = createContext();
@@ -27,6 +28,16 @@ export function SnackbarProvider({ children }) {
         }
         setSnackbarState({ ...snackbarState, open: false });
       };
+
+      useEffect(() => {
+        const handleSnackbarEvent = (event) => {
+          const { message, severity } = event.detail; // Daten aus dem Event abrufen
+          showSnackbar(message, severity); // Snackbar anzeigen
+        };
+    
+        window.addEventListener("snackbar", handleSnackbarEvent); // Event-Listener registrieren
+        return () => window.removeEventListener("snackbar", handleSnackbarEvent); // Cleanup
+      }, []);
 
     return (
         <SnackbarContext.Provider value={{ showSnackbar }} >
