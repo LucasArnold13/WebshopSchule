@@ -15,7 +15,10 @@ const backendSession = session({
   resave: false, 
   saveUninitialized: false, 
   //rolling: true, 
-  cookie: { maxAge: 1000 * 60 * 60 }, 
+  cookie: { 
+    maxAge: 1000 * 60 * 60,
+    secure: false
+   }, 
 });
 
 module.exports = {

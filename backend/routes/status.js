@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { Status } = require('../models');
 
+
 // returns all status
 router.get('/', async (req, res) => {
     try {

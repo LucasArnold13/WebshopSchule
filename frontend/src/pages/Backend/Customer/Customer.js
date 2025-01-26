@@ -7,12 +7,16 @@ import { getStatusColor } from "../../../utils/getStatusColor";
 import { useSnackbar } from "../../../Context/SnackbarContext";
 import Table from "../../../Components/Table";
 import { getFormattedDatetime } from "../../../utils/getFormattedDatetime";
+import { updateCustomerPassword } from "../../../api/customers";
 import BackendHeader from "../../../Components/Backend/ItemHeader";
+import PasswordModal from "../../../Components/Modals/PasswordModal";
 
 function Customer() {
     const navigate = useNavigate();
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [openModal, setOpenModal] = useState(false)
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
     const [customer, setCustomer] = useState({});
     const emptyAddress = {
         street: "",
@@ -82,7 +86,7 @@ function Customer() {
     }, [id, loading]);
 
     const handleUpdate = async () => {
-       await updateCustomer(customer);
+        await updateCustomer(customer);
     };
 
     const DeleteAddress = () => {
@@ -105,10 +109,14 @@ function Customer() {
     if (loading) {
         return (<CircularProgress />);
     }
-    
-    return (
 
+    return (
         <Box sx={{ height: "100%", width: "100%", overflow: "auto" }}>
+            <PasswordModal
+                open={openPasswordModal}
+                setOpen={setOpenPasswordModal}
+                id={customer.id}
+                updatePassword={updateCustomerPassword} />
             <Modal
                 open={modalOpen}
                 onClose={handleClose}
@@ -209,6 +217,12 @@ function Customer() {
 
 
             <BackendHeader item={customer} name={"Kunde"}>
+                <Button
+                    variant="contained"
+                    onClick={() => setOpenPasswordModal(true)}>
+                    Passwort ändern
+                </Button>
+
                 <Button
                     variant="contained"
                     color="success"

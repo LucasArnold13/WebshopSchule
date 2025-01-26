@@ -19,7 +19,7 @@ function ItemHeader({ children, item, name }) {
           </Typography>
         </Box>
 
-        <Box sx={{ marginRight: "2rem", marginBottom: "0.5rem" }}>
+        <Box sx={{ marginRight: "2rem", marginBottom: "0.5rem", gap : 3, display : "flex" }}>
           {children}
         </Box>
       </Box>

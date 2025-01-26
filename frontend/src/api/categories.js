@@ -15,6 +15,7 @@ export const fetchCategory = async (id) => {
     });
 };
 
+
 export const fetchCategoryWithName = async (name) => {
     return await apiCall({
         url: `${API_BASE_URL}api/categories/name/${name}`,

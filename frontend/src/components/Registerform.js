@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Box, Typography, TextField, Button, Link, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Lock, Person, Email } from '@mui/icons-material';
 
 function Registerform() {
   const [firstname, setFirstname] = useState('');
@@ -48,89 +49,108 @@ function Registerform() {
       component="form"
       onSubmit={handleSubmit}
       sx={{
-        backgroundColor: '#333',
-        color: '#fff',
-        padding: '20px',
-        borderRadius: '10px',
-        width: '300px',
-        boxShadow: '0px 4px 10px rgba(0,0,0,0.3)',
+        backgroundColor: 'background.paper',
+        padding: 4,
+        borderRadius: 2,
+        width: '100%',
+        maxWidth: 400,
+        boxShadow: 3,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        gap: 2,
+        gap: 3,
+        position: 'relative',
       }}
     >
-      {/* Form Title */}
-      <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-        Registrierung
-      </Typography>
+      {/* Header Section */}
+      <Box textAlign="center" mb={2}>
+        <Lock sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+        <Typography variant="h4" component="h1" fontWeight="600">
+          Account erstellen
+        </Typography>
+        <Typography variant="body2" color="text.secondary" mt={1}>
+          Bereits registriert?{' '}
+          <Link href="/login" color="primary" fontWeight="500">
+            Zum Login
+          </Link>
+        </Typography>
+      </Box>
 
       {/* Input Fields */}
+      <Box display="flex" gap={2}>
+        <TextField
+          fullWidth
+          label="Vorname"
+          variant="outlined"
+          InputProps={{
+            startAdornment: <Person fontSize="small" sx={{ mr: 1, color: 'action.active' }} />,
+          }}
+        />
+        <TextField
+          fullWidth
+          label="Nachname"
+          variant="outlined"
+          InputProps={{
+            startAdornment: <Person fontSize="small" sx={{ mr: 1, color: 'action.active' }} />,
+          }}
+        />
+      </Box>
+
       <TextField
         fullWidth
-        label="Vorname"
-        variant="filled"
-        value={firstname}
-        onChange={(e) => setFirstname(e.target.value)}
+        label="E-Mail Adresse"
+        variant="outlined"
         InputProps={{
-          style: { backgroundColor: '#fff' },
+          startAdornment: <Email fontSize="small" sx={{ mr: 1, color: 'action.active' }} />,
         }}
       />
-      <TextField
-        fullWidth
-        label="Nachname"
-        variant="filled"
-        value={lastname}
-        onChange={(e) => setLastname(e.target.value)}
-        InputProps={{
-          style: { backgroundColor: '#fff' },
-        }}
-      />
-      <TextField
-        fullWidth
-        label="E-Mail"
-        variant="filled"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        InputProps={{
-          style: { backgroundColor: '#fff' },
-        }}
-      />
+
       <TextField
         fullWidth
         label="Passwort"
         type="password"
-        variant="filled"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        InputProps={{
-          style: { backgroundColor: '#fff' },
-        }}
+        variant="outlined"
+        helperText="Mindestens 8 Zeichen"
       />
 
       {/* Error Message */}
       {error && (
-        <Typography variant="body2" sx={{ color: 'red', textalign: 'center' }}>
-          {error}
-        </Typography>
+        <Box
+          bgcolor="error.light"
+          color="error.main"
+          p={1.5}
+          borderRadius={1}
+          display="flex"
+          alignItems="center"
+          gap={1}
+        >
+          <Typography variant="body2">{error}</Typography>
+        </Box>
       )}
 
       {/* Submit Button */}
       <Button
         type="submit"
         variant="contained"
-        fullWidth
+        size="large"
         disabled={loading}
         sx={{
-          backgroundColor: '#007BFF',
-          color: '#fff',
-          '&:hover': {
-            backgroundColor: '#0056b3',
-          },
+          py: 1.5,
+          fontWeight: 600,
+          textTransform: 'none',
+          fontSize: 16,
+          mt: 2,
         }}
       >
-        {loading ? 'Laden...' : 'Registrieren'}
+        {loading ? <CircularProgress size={24} /> : 'Jetzt registrieren'}
       </Button>
+
+      {/* Privacy Notice */}
+      <Typography variant="body2" color="text.secondary" textAlign="center" mt={2}>
+        Mit der Registrierung akzeptieren Sie unsere{' '}
+        <Link href="#" color="primary" fontWeight="500">
+          Datenschutzbestimmungen
+        </Link>
+      </Typography>
     </Box>
   );
 }

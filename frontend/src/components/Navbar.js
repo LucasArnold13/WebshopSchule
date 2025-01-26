@@ -9,6 +9,7 @@ import UserMenu from './UserMenu';
 import CartDrawer from './CartDrawer';
 import { fetchCategories } from '../api/categories';
 import { useCart } from '../Context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 function Navbar() {
   const [categories, setCategories] = useState([]);
@@ -16,6 +17,8 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false); // Zustand für das Öffnen/Schließen des Drawers
   const { state, dispatch } = useCart(); // Verwende den globalen State
   const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const navigate = useNavigate();
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
@@ -67,14 +70,26 @@ function Navbar() {
             alignItems: 'center',
           }}
         >
+          <Box
+            sx={{ marginRight: '10px', cursor: 'pointer' }}
+            onClick={() => navigate('/')}
+          >
+            <img src="/images/logo.png" alt="My Example" height={70} />
+          </Box>
           {/* Linke Seite der Navbar */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, overflowX: 'auto' }}>
-            <Typography
-              variant="h6"
-              sx={{ whiteSpace: 'nowrap', marginRight: '10px' }}
-            >
-              test
-            </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              overflowX: "auto",
+              scrollbarWidth: "none", // Für Firefox: Scrollbar ausblenden
+              "&::-webkit-scrollbar": {
+                display: "none", // Für Chrome, Edge, Safari: Scrollbar ausblenden
+              },
+            }}
+          >
+
             {categories.map((item) => (
               <NavLink
                 key={item.id}
@@ -89,7 +104,7 @@ function Navbar() {
           </Box>
 
           {/* Rechte Seite der Navbar */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <IconButton>
               <SearchOutlinedIcon />
             </IconButton>
@@ -98,7 +113,7 @@ function Navbar() {
               <Badge
                 badgeContent={itemCount}
                 color="primary"
-              // optional: max={99} und showZero (z.B. showZero={true})
+                max={99}
               >
                 <ShoppingBagOutlinedIcon />
               </Badge>
@@ -106,6 +121,7 @@ function Navbar() {
           </Box>
         </Toolbar>
       </AppBar>
+
       <CartDrawer open={isOpen} onClose={toggleDrawer(false)} />
 
     </>

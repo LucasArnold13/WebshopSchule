@@ -21,8 +21,11 @@ function BackendOrder() {
     const fetchAndSetOrder = async () => {
         try {
             const response = await fetchOrder(id);
-            setOrder(response.data);
-            setLoading(false);
+            if (response.status === 200) {
+                setOrder(response.data);
+                setLoading(false);
+            }
+
         } catch (error) {
             console.error('Fehler beim Abrufen der Daten:', error);
         }
@@ -45,21 +48,41 @@ function BackendOrder() {
 
 
 
+
     return (
         <Box sx={{ width: "100%", height: "100%" }}>
-            <ItemHeader name={"Bestellung"} item={order}>
-                {order.status_id === 1 && (
-                    <Button
-                        variant="contained"
-                        onClick={() => navigate("/backend/orders/" + order?.id + "/edit")}
-                        color="primary"
-                    >
-                        Bearbeiten
-                    </Button>
-                )}
-            </ItemHeader>
+            <Box sx={{ paddingBottom: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                    <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                        <Typography variant="h4" sx={{}}>Bestellung {order?.id}</Typography>
+                        <StatusBox status={order?.status} />
+                        <Typography variant='body2' sx={{ color: "gray", }}>
+                            Erstellt am: {getFormattedDatetime(order?.createdAt)}
+                        </Typography>
+
+                        <Typography variant='body2' sx={{ color: "gray", }}>
+                            Aktualisiert am: {getFormattedDatetime(order?.updatedAt)}
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ marginRight: "2rem", marginBottom: "0.5rem", gap: 3, display: "flex" }}>
+                        {order.status_id === 1 && (
+                            <Button
+                                variant="contained"
+                                onClick={() => navigate("/backend/orders/" + order?.id + "/edit")}
+                                color="primary"
+                            >
+                                Bearbeiten
+                            </Button>
+                        )}
+                    </Box>
+                </Box>
+
+                <Divider />
+            </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap : 0.25 }}>
                     <Typography
                         variant="body1"
                         sx={{

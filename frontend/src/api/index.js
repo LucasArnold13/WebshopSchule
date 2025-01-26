@@ -49,6 +49,9 @@ export const apiCall = async ({
         }
         else if (response.status === 404) // not found
         {
+            if (window.location.pathname !== "/backend") {
+                window.location.href = "/backend/404";
+            }
         }
         else if (response.status === 500) // internal server error
         {

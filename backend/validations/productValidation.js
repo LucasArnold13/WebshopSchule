@@ -17,13 +17,18 @@ const productValidation = () => {
                 if (existingProduct && existingProduct.id !== req.body.id) {
                     throw new Error("SKU wird schon benutzt");
                 }
-            }),  
+            }),
         body('price')
             .notEmpty().withMessage('Der Preis muss gesetzt sein')
             .isFloat({ min: 0.01 }).withMessage('Der Preis muss größer als 0 sein'),
         body('quantity')
             .notEmpty().withMessage('Die Menge muss gesetzt sein')
             .isNumeric().withMessage('Die Menge muss eine Zahl sein'),
+        body('is_active')
+            .notEmpty().withMessage('Ist aktiv muss gesetzt sein')
+            .isBoolean().withMessage('ist Aktiv muss ein Boolean sein'),
+        body('description')
+            .notEmpty().withMessage('Beschreibung muss gesetzt sein'),
         body('category_id')
             .notEmpty().withMessage('Die Kategorie muss gesetzt sein für das Produkt').bail()
             .custom(async (category_id) => {

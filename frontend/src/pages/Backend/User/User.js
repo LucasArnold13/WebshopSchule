@@ -3,7 +3,7 @@ import {
   Select,
   MenuItem,
   CircularProgress,
-  Divider,
+  Modal,
   TextField,
   Checkbox,
   FormControlLabel,
@@ -11,6 +11,7 @@ import {
   InputLabel,
   Typography,
   Box,
+  Stack,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -20,12 +21,15 @@ import { useSnackbar } from "../../../Context/SnackbarContext";
 import BackendHeader from "../../../Components/Backend/ItemHeader";
 import LoadingCircle from "../../../Components/Feedback/LoadingCricle";
 import { useNavigate } from "react-router-dom";
+import PasswordModal from "../../../Components/Modals/PasswordModal";
+import { updateUserPassword } from "../../../api/users";
 
 function User() {
   const { showSnackbar } = useSnackbar();
   const [user, setUser] = useState(null);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -66,6 +70,20 @@ function User() {
 
   };
 
+
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 1, // Abgerundete Ecken
+  };
+
   if (loading) {
     return (
       <LoadingCircle />
@@ -74,7 +92,16 @@ function User() {
 
   return (
     <>
+
+      <PasswordModal open={openModal} setOpen={setOpenModal} id={user.id} updatePassword={updateUserPassword} />
       <BackendHeader item={user} name={"Benutzer"}>
+
+        <Button
+          variant="contained"
+          onClick={() => setOpenModal(true)}>
+          Passwort ändern
+        </Button>
+
         <Button
           variant="contained"
           color="success"
@@ -94,13 +121,6 @@ function User() {
           label="Email"
           sx={{ width: "20%", marginTop: "1rem" }}
           onChange={(e) => setUser({ ...user, email: e.target.value })}
-        />
-        <TextField
-          value={user?.password || ""}
-          label="Password"
-          type="password"
-          sx={{ width: "20%", marginTop: "1rem" }}
-          onChange={(e) => setUser({ ...user, password: e.target.value })}
         />
 
         <FormControl

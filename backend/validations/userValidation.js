@@ -19,6 +19,7 @@ const userValidation = () => {
                 }
             }),
         body('password')
+            .if((value, { req }) => req.method === 'POST')
             .notEmpty().withMessage('Password muss gesetzt sein'),
         body('role_id')
             .notEmpty().withMessage('Die Rolle muss gesetzt sein für den Nutzer').bail()

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Link } from '@mui/material';
+import { Box, Typography, TextField, Button, Link, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { loginCustomer } from '../api/customers'; 
 import { useDispatch } from "react-redux";
-import  { customerLogin } from '../store/slices/customerSlice';
-
+import { Email, Lock, Login } from '@mui/icons-material';
+import { customerLogin } from '../store/slices/customerSlice';
+import { loginCustomer } from '../api/customers';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -20,90 +20,121 @@ function LoginForm() {
     const response = await loginCustomer({email, password});
     if(response.status === 200) {
       console.log(response.data);
-      navigate('/'); 
+      navigate('/customer/profile'); 
       dispatch(customerLogin(response.data));
     }
 
   };
 
+
   return (
     <Box
-      component="form" 
-      onSubmit={handleSubmit} 
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
-        backgroundColor: '#333',
-        color: '#fff',
-        padding: '20px',
-        borderRadius: '10px',
-        width: '300px',
-        boxShadow: '0px 4px 10px rgba(0,0,0,0.3)',
+        backgroundColor: 'background.paper',
+        padding: 4,
+        borderRadius: 2,
+        width: '100%',
+        maxWidth: 400,
+        boxShadow: 3,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        gap: 2,
+        gap: 3,
       }}
     >
-      <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-        Login
-      </Typography>
-      <TextField
-        fullWidth
-        label="Email"
-        variant="filled"
-        value={email} 
-        onChange={(e) => setEmail(e.target.value)} 
-        slotProps={{
-          input: { 
-            style: { backgroundColor: '#fff', color: '#000' }, 
-          },
-        }}
-      />
-      <TextField
-        fullWidth
-        label="Password"
-        type="password"
-        variant="filled"
-        value={password} // Password aus dem Zustand
-        onChange={(e) => setPassword(e.target.value)} // Zustand aktualisieren
-        InputProps={{
-          style: { backgroundColor: '#fff' },
-        }}
-      />
-      <Link
-  href="#"
-  underline="hover"
-  sx={{
-    alignSelf: 'flex-end',
-    fontSize: '0.8rem',
-    color: '#fff',
-  }}
->
-  Passwort vergessen?
-</Link>
-      {error && (
-        <Typography variant="body2" sx={{ color: 'red', textalign: 'center' }}>
-          {error}
+      {/* Header Section */}
+      <Box textAlign="center">
+        <Login sx={{ 
+          fontSize: 40, 
+          color: 'primary.main', 
+          mb: 1,
+          transform: 'rotate(-10deg)'
+        }} />
+        <Typography variant="h4" component="h1" fontWeight="600">
+          Willkommen zurück
         </Typography>
+      </Box>
+
+      {/* Input Fields */}
+      <TextField
+        fullWidth
+        label="E-Mail Adresse"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        variant="outlined"
+        InputProps={{
+          startAdornment: <Email fontSize="small" sx={{ mr: 1, color: 'action.active' }} />,
+        }}
+      />
+
+      <TextField
+        fullWidth
+        label="Passwort"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        variant="outlined"
+        InputProps={{
+          startAdornment: <Lock fontSize="small" sx={{ mr: 1, color: 'action.active' }} />,
+        }}
+      />
+
+      {/* Password Reset Link */}
+      <Box display="flex" justifyContent="flex-end">
+        <Link
+          href="/password-reset"
+          variant="body2"
+          color="text.secondary"
+          sx={{ textDecoration: 'none', '&:hover': { color: 'primary.main' } }}
+        >
+          Passwort vergessen?
+        </Link>
+      </Box>
+
+      {/* Error Message */}
+      {error && (
+        <Box
+          bgcolor="error.light"
+          color="error.main"
+          p={1.5}
+          borderRadius={1}
+          display="flex"
+          alignItems="center"
+          gap={1}
+        >
+          <Typography variant="body2">{error}</Typography>
+        </Box>
       )}
+
+      {/* Submit Button */}
       <Button
         type="submit"
         variant="contained"
-        fullWidth
-        disabled={loading} 
+        size="large"
+        disabled={loading}
+        startIcon={loading ? <CircularProgress size={20} /> : null}
         sx={{
-          backgroundColor: '#007BFF',
-          color: '#fff',
-          '&:hover': {
-            backgroundColor: '#0056b3',
-          },
+          py: 1.5,
+          fontWeight: 600,
+          textTransform: 'none',
+          fontSize: 16,
+          mt: 1,
         }}
       >
-        {loading ? 'Laden...' : 'Login'}
+        {loading ? 'Anmeldung läuft...' : 'Jetzt anmelden'}
       </Button>
-      <Typography variant="body2" sx={{ textalign: 'center' }}>
+
+      {/* Registration Link */}
+      <Typography variant="body2" color="text.secondary" textAlign="center" mt={2}>
         Noch keinen Account?{' '}
-        <Link href="/register" underline="hover" sx={{ color: '#007BFF' }}>
-          Erstelle jetzt einen hier
+        <Link 
+          href="/register" 
+          color="primary" 
+          fontWeight="500"
+          sx={{ textDecoration: 'none' }}
+        >
+          Jetzt registrieren
         </Link>
       </Typography>
     </Box>

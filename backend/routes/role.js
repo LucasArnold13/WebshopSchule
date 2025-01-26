@@ -1,8 +1,13 @@
 const router = require("express").Router();
 const { Role } = require('../models');
+const { backendSession } = require("../sessions/session");
+const isAuthenticated = require("../middlewares/authentification");
+
+
+
 
 // returns all roles
-router.get('/', async (req, res) => {
+router.get('/', backendSession, isAuthenticated, async (req, res) => {
   try {
     const roles = await Role.findAll({
     });

@@ -7,7 +7,7 @@ const { backendSession } = require("../sessions/session");
 
 
 // returns all categories
-router.get('/',backendSession, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const categories = await Category.findAll();
     return res.status(200).json(categories);
@@ -17,7 +17,7 @@ router.get('/',backendSession, async (req, res) => {
   }
 });
 
-// returns a specific category
+// returns a specific category with all Products
 router.get('/:id',backendSession, isAuthenticated, async (req, res) => {
   try {
     const categoryID = req.params.id;
@@ -28,34 +28,6 @@ router.get('/:id',backendSession, isAuthenticated, async (req, res) => {
 
     const category = await Category.findOne({
       where: { id: categoryID },
-      include: [
-        {
-          model: Product,
-          as: 'products',
-        },
-      ],
-    });
-
-    if (!category) {
-      return res.status(404).json({
-        message: `Kategorie konnte nicht gefunden werden`,
-      });
-    }
-
-    return res.status(200).json(category);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Interner Serverfehler.' });
-  }
-});
-
-
-router.get('/name/:categoryName', async (req, res) => {
-  try {
-    const categoryName = req.params.categoryName;
-
-    const category = await Category.findOne({
-      where: { name: categoryName },
       include: [
         {
           model: Product,
@@ -125,5 +97,41 @@ router.put('/:id',backendSession, isAuthenticated, categoryValidation(), validat
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
+
+
+
+// returns a specific category based on the name with all active products
+router.get('/name/:categoryName', async (req, res) => {
+  try {
+    const categoryName = req.params.categoryName;
+
+    const category = await Category.findOne({
+      where: { name: categoryName },
+      include: [
+        {
+          model: Product,
+          as: 'products',
+          where: {
+            is_active: true,
+          },
+          required: false,
+        },
+      ],
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        message: `Kategorie konnte nicht gefunden werden`,
+      });
+    }
+
+    return res.status(200).json(category);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+
 
 module.exports = router;

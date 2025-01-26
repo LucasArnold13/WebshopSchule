@@ -1,4 +1,4 @@
-import { TextField, Typography, Checkbox, FormControl, Button, InputLabel, Divider, Box, Select, MenuItem, CircularProgress } from "@mui/material";
+import { TextField, Typography, Checkbox, FormControl, FormControlLabel, Button, InputLabel, Divider, Box, Select, MenuItem, CircularProgress } from "@mui/material";
 import Textarea from '@mui/joy/Textarea';
 
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { fetchCategories, fetchCategory } from "../../../api/categories";
 import { useSnackbar } from "../../../Context/SnackbarContext";
 import { updateProduct } from "../../../api/products";
 import BackendHeader from "../../../Components/Backend/ItemHeader";
+import LoadingCircle from "../../../Components/Feedback/LoadingCricle";
 
 function Product() {
   const [imagePreview, setImagePreview] = useState(null);
@@ -70,7 +71,7 @@ function Product() {
 
   if (loading) {
     return (
-      <CircularProgress />
+      <LoadingCircle />
     )
   }
 
@@ -127,30 +128,64 @@ function Product() {
             />
           </Box>
 
-          <Box sx={{ flex: 3, display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField value={product?.name} label="Name" onChange={(e) => setProduct({ ...product, name: e.target.value })} />
-            <TextField value={product?.sku} label="SKU" onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
-            <TextField value={product?.price} label="Preis" onChange={(e) => setProduct({ ...product, price: e.target.value })} />
-            <TextField value={product?.quantity} label="Anzahl" onChange={(e) => setProduct({ ...product, quantity: e.target.value })} />
-            <FormControl
-              sx={{ marginTop: "1rem" }}
-            >
-              <InputLabel id="category-label">Kategorie</InputLabel>
-              <Select
-                label="Kategorie"
-                value={product?.category_id || ""}
-                sx={{ width: "20%", marginTop: "1rem" }}
-                onChange={(e) =>
-                  setProduct((prev) => ({ ...prev, role_id: e.target.value }))
+          <Box sx={{ flex: 3, display: "flex", gap: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              <TextField
+                sx={{ width: 300 }}
+                value={product?.name}
+                label="Name"
+                onChange={(e) => setProduct({ ...product, name: e.target.value })} />
+              <TextField
+                sx={{ width: 300 }}
+                value={product?.sku}
+                label="SKU"
+                onChange={(e) => setProduct({ ...product, sku: e.target.value })} />
+              <TextField
+                sx={{ width: 300 }}
+                value={product?.price}
+                label="Preis"
+                onChange={(e) => setProduct({ ...product, price: e.target.value })} />
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              <TextField
+                sx={{ width: 300 }}
+                value={product?.quantity}
+                label="Anzahl"
+                onChange={(e) => setProduct({ ...product, quantity: e.target.value })} />
+
+              <FormControl>
+                <InputLabel id="category-label">Kategorie</InputLabel>
+                <Select
+                  label="Kategorie"
+                  value={product?.category_id || ""}
+                  onChange={(e) =>
+                    setProduct((prev) => ({ ...prev, category_id: e.target.value }))
+                  }
+                >
+                  {categories?.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={product?.is_active}
+                    onChange={(e) =>
+                      setProduct({
+                        ...product,
+                        is_active: e.target.checked,
+                      })
+                    }
+                  />
                 }
-              >
-                {categories?.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                label="Ist aktiv"
+              />
+
+            </Box>
+
           </Box>
         </Box>
         <Textarea

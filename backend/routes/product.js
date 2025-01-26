@@ -6,161 +6,162 @@ const { Product } = require('../models');
 const {
     Op,
     Sequelize
-  } = require("sequelize");
+} = require("sequelize");
 
 // returns all products
 router.get('/', async (req, res) => {
     try {
-      const products = await Product.findAll({
-      });
-  
-      return res.json(products);
+        const products = await Product.findAll({
+        });
+
+        return res.json(products);
     } catch (error) {
-      console.error('Fehler beim Abrufen der Bestellungen:', error);
-      res.status(500).json({ message: 'Interner Serverfehler.' });
+        console.error('Fehler beim Abrufen der Bestellungen:', error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
     }
-  });
+});
 
 // returns a specific product
 router.get('/:id', async (req, res) => {
-try {
-    const productId = req.params.id;
-    const product = await Product.findOne({
-    where: { id: productId }
-    });
+    try {
+        const productId = req.params.id;
+        const product = await Product.findOne({
+            where: { id: productId }
+        });
 
-    return res.json(product);
-} catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
-    res.status(500).json({ message: 'Interner Serverfehler.' });
-}
+        return res.json(product);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Bestellungen:', error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
+    }
 });
 
 router.get('/name/:productName', async (req, res) => {
     try {
         const productName = req.params.productName;
         const product = await Product.findOne({
-        where: { name: productName }
+            where: { name: productName }
         });
-    
+
         return res.json(product);
     } catch (error) {
         console.error('Fehler beim Abrufen der Bestellungen:', error);
         res.status(500).json({ message: 'Interner Serverfehler.' });
     }
-    });
+});
 
 // creates a new product
-router.post('/',productValidation(), validate,  async (req, res) => {
-try {
-    const product = req.body;
-    if(product.image){
-        const fileName = await storeImage(product.image)
-        delete product.image;
-        product.image_url = `http://localhost:3000/images/${fileName}`;
-    }
-    else {
+router.post('/', productValidation(), validate, async (req, res) => {
+    try {
+        const product = req.body;
+
         product.image_url = `http://localhost:3000/images/default.jpg`;
+
+
+
+        const newProduct = await Product.create(product);
+
+        if (newProduct) {
+            if (product.image) {
+                const fileName = await storeImage(product.image, newProduct.id);
+                const image_url = `http://localhost:3000/images/${fileName}`;
+                Product.update({ image_url: image_url },
+                    { where: { id: newProduct.id } }
+                );
+            }
+
+
+            return res.status(201).json({ message: 'Produkt wurde erfolgreich angelegt', product: newProduct });
+        }
+        else {
+            return res.status(400).json({ message: 'Fehler bei Erstellung des Produktes' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
     }
-
-   
-
-    product.is_active = true;
-
-    const newProduct = await Product.create(product);
-
-    if (newProduct) {
-    return res.status(201).json({ message: 'Produkt wurde erfolgreich angelegt', product: newProduct });
-    }
-    else {
-    return res.status(400).json({ message: 'Fehler bei Erstellung des Produktes' });
-    }
-} catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Interner Serverfehler.' });
-}
 });
-  
+
 // search for a product
 router.get('/search/query', async (req, res) => {
-const searchQuery = req.query.q;
+    const searchQuery = req.query.q;
 
-if (!searchQuery) {
-    return res.status(400).json({ message: 'Suchbegriff erforderlich' });
-}
-
-try {
-    const whereClause = [];
-
-    if (!isNaN(searchQuery)) {
-    console.log(searchQuery);
-
-    whereClause.push(
-        { id: searchQuery }, // Exakte Übereinstimmung für ID
-        Sequelize.where(
-        Sequelize.cast(Sequelize.col("sku"), "TEXT"), // SKU in Text umwandeln
-        { [Op.like]: `%${searchQuery}%` } // Teilstring-Suche
-        )
-    );
-    } else {
-    // Suche nach Name (case-insensitive)
-    whereClause.push(
-        { name: { [Op.iLike]: `%${searchQuery}%` } } // Name durchsuchen
-    );
+    if (!searchQuery) {
+        return res.status(400).json({ message: 'Suchbegriff erforderlich' });
     }
 
+    try {
+        const whereClause = [];
 
-    // Kombinierte Abfrage für alle Bedingungen
-    const products = await Product.findAll({
-    where: {
-        [Op.or]: whereClause,
-    },
-    });
+        if (!isNaN(searchQuery)) {
+            console.log(searchQuery);
 
-    if (products.length === 0) {
-    return res.status(404).json([]);
+            whereClause.push(
+                { id: searchQuery }, // Exakte Übereinstimmung für ID
+                Sequelize.where(
+                    Sequelize.cast(Sequelize.col("sku"), "TEXT"), // SKU in Text umwandeln
+                    { [Op.like]: `%${searchQuery}%` } // Teilstring-Suche
+                )
+            );
+        } else {
+            // Suche nach Name (case-insensitive)
+            whereClause.push(
+                { name: { [Op.iLike]: `%${searchQuery}%` } } // Name durchsuchen
+            );
+        }
+
+
+        // Kombinierte Abfrage für alle Bedingungen
+        const products = await Product.findAll({
+            where: {
+                [Op.or]: whereClause,
+            },
+        });
+
+        if (products.length === 0) {
+            return res.status(404).json([]);
+        }
+        console.log(products);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Bestellungen:', error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
     }
-    console.log(products);
-    res.status(200).json(products);
-} catch (error) {
-    console.error('Fehler beim Abrufen der Bestellungen:', error);
-    res.status(500).json({ message: 'Interner Serverfehler.' });
-}
 });
 
 // updates a product
-router.put('/:id',productValidation(), validate, async (req, res) => {
-try {
+router.put('/:id', productValidation(), validate, async (req, res) => {
+    try {
 
-    const product = req.body;
-    const productId = req.params.id;
+        const product = req.body;
+        const productId = req.params.id;
 
-    if (isNaN(productId)) {
-    return res.status(400).json({ message: 'Ungültige Produkt-ID.' });
+        if (isNaN(productId)) {
+            return res.status(400).json({ message: 'Ungültige Produkt-ID.' });
+        }
+
+        if (product.image) {
+            const fileName = await storeImage(product.image, productId);
+            delete product.image;
+            product.image_url = `http://localhost:3000/images/${fileName}`;
+        }
+
+        const updatetProduct = await Product.update(product,
+            { where: { id: productId } }
+        );
+
+        if (updatetProduct == 0) {
+            return res.status(404).json({ message: 'Produkt mit der ID wurde nicht gefunden ' });
+        }
+        else {
+            return res.status(200).json({ message: 'Produkt wurde erfolgreich aktualisiert.' });
+        }
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Interner Serverfehler.' });
     }
-
-    if (product.image) {
-    const fileName = await storeImage(product.image)
-    delete product.image;
-    product.image_url = `http://localhost:3000/images/${fileName}`;
-    }
-
-    const updatetProduct = await Product.update(product,
-    { where: { id: productId } }
-    );
-
-    if (updatetProduct == 0) {
-    return res.status(404).json({ message: 'Produkt mit der ID wurde nicht gefunden ' });
-    }
-    else {
-    return res.status(200).json({ message: 'Produkt wurde erfolgreich aktualisiert.' });
-    }
-
-
-} catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Interner Serverfehler.' });
-}
 });
 
 module.exports = router;

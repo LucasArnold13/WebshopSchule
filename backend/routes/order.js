@@ -10,7 +10,8 @@ const {
     Address, 
 } = require('../models');
 
-  
+const { backendSession, frontendSession } = require("../sessions/session");
+const { where } = require("sequelize");
 
 // returns all orders
 router.get('/', async (req, res) => {
@@ -39,11 +40,40 @@ router.get('/', async (req, res) => {
     }
   });
 
+// returns all orders from a specific customer
+router.get('/customer',frontendSession, async (req, res) => {
+  try {
+
+    const customerId = req.session.customer.id;
+
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: Orderitems,
+          as: 'orderitems',
+        },
+        {
+          model: Status,
+          as: 'status',
+        }
+      ],
+      where: {
+        customer_id: customerId
+      }
+    });
+    
+    return res.status(200).json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 // returns a specific order
 router.get('/:id', async (req, res) => {
     try {
       const orderId = req.params.id;
-      const customerOrders = await Order.findOne({
+      const customerOrder = await Order.findOne({
         where: { id: orderId },
         include: [
           {
@@ -67,13 +97,21 @@ router.get('/:id', async (req, res) => {
           },
         ],
       });
+
+      if (!customerOrder) {
+        return res.status(404).json({
+          message: `Kategorie konnte nicht gefunden werden`,
+        });
+      }
   
-      return res.json(customerOrders);
+      return res.status(200).json(customerOrder);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Interner Serverfehler.' });
     }
   });
+
+
 
 // returns a specific order for edit
 router.get('/:id/edit', async (req, res) => {

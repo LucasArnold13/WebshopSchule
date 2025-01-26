@@ -29,7 +29,6 @@ function BackendLogin() {
     console.log(response);
 
     if (response.status === 200) {
-      dispatch(login(response.data));
       navigate('/backend');
     }
     else {

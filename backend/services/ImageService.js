@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 
-async function storeImage(image) {
+async function storeImage(image, id) {
     const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Buffer.from(base64Data, "base64");
 
@@ -11,7 +11,7 @@ async function storeImage(image) {
     const extension = mimeType === "jpeg" ? "jpg" : mimeType;
 
     // Erstelle einen eindeutigen Dateinamen
-    const fileName = `${Date.now()}.${extension}`;
+    const fileName = `product_${id}.${extension}`;
     const filePath = path.join(__dirname, "..", "images", fileName);
     fs.writeFileSync(filePath, buffer);
 

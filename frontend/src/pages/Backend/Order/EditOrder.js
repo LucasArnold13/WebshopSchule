@@ -152,32 +152,37 @@ function EditOrder() {
             <SearchProductModal
                 open={openModal}
                 setOpen={setOpenModal}
-                order={order} // Order direkt übergeben
-                setOrder={setOrder} // Setter direkt übergeben
+                order={order} 
+                setOrder={setOrder} 
             />
 
 
 
 
-            <Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography
-                        variant="h4">
-                        Bestellung {order.id}
-                    </Typography>
-                    <StatusBox status={order?.status} />
-                    <Typography variant='body2' sx={{ color: "gray", }}>
-                        Erstellt am: {getFormattedDatetime(order?.createdAt)}
-                    </Typography>
+            <Box sx={{ paddingBottom: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
-                    <Typography variant='body2' sx={{ color: "blue", }}>
-                        Aktualisiert am: {getFormattedDatetime(order?.updatedAt)}
-                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                        <Typography variant="h4" sx={{}}>Bestellung {order?.id}</Typography>
+                        <StatusBox status={order?.status} />
+                        <Typography variant='body2' sx={{ color: "gray", }}>
+                            Erstellt am: {getFormattedDatetime(order?.createdAt)}
+                        </Typography>
+
+                        <Typography variant='body2' sx={{ color: "gray", }}>
+                            Aktualisiert am: {getFormattedDatetime(order?.updatedAt)}
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ marginRight: "2rem", marginBottom: "0.5rem", gap: 3, display: "flex" }}>
+                        <Button variant="contained" onClick={() => handleSave()} color="success">speichern</Button>
+                    </Box>
                 </Box>
+
                 <Divider />
             </Box>
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, marginTop: 2, gap: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
                 <Box sx={{ display: 'flex', gap: 7 }}>
 
                     <Box>
@@ -208,13 +213,16 @@ function EditOrder() {
                         </Box>
                     </Box>
 
+
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
                     <FormControl
                         sx={{ width: "200px" }}
-                        variant="outlined" // oder "standard"/"filled"
+                        variant="outlined"
                     >
                         <InputLabel id="role-label">Status</InputLabel>
                         <Select
-                            labelId="status-label"         // Verknüpft Select mit dem Label
+                            labelId="status-label"
                             id="status-select"
                             label="Status"
                             value={order.status_id}
@@ -230,7 +238,7 @@ function EditOrder() {
                                                 width: 10,
                                                 height: 10,
                                                 borderRadius: '50%',
-                                                backgroundColor: getStatusColor(status.id), // Farbe abhängig vom Status
+                                                backgroundColor: getStatusColor(status.id),
                                                 marginRight: 8,
                                             }}
                                         ></span>
@@ -243,10 +251,7 @@ function EditOrder() {
                     </FormControl>
                 </Box>
 
-                <Box sx={{ alignItems: 'center', marginBottom: 2 }}>
-                    <Button variant="contained" onClick={() => handleSave()} color="success">speichern</Button>
 
-                </Box>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, gap: 3 }}>
                 <Box

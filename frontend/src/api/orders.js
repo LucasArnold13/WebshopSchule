@@ -39,3 +39,10 @@ export const createOrder = async (order) => {
         showSnackbar : true
     });
 };
+
+export const fetchOrderFromCustomer = async () => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/orders/customer`,
+        method: 'GET',
+    });
+};

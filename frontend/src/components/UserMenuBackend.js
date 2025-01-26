@@ -49,14 +49,8 @@ const UserMenuBackend = ({ user }) => {
             height: "30px", // Feste Höhe für den Avatar
           }}
         >
-          <img
-            src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250"
-            alt="Avatar"
-            style={{
-              width: "100%", // Passt sich an das Eltern-Box-Layout an
-              height: "100%",
-              borderRadius: "50%",
-            }}
+          <Avatar 
+            sx={{ width: 29, height: 29 }}
           />
           {/* Grüner Punkt */}
           <Box

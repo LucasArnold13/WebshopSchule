@@ -10,219 +10,249 @@ const {
 } = require("sequelize");
 const { backendSession, frontendSession } = require("../sessions/session");
 
+module.exports = router;
+
 // returns all customers
-router.get('/',backendSession, async (req, res) => {
-    try {
-      const customers = await Customer.findAll({
-        attributes: { exclude: ['password'] }, // für die Sicherheit
-      });
-  
-      return res.status(200).json(customers);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Interner Serverfehler.' });
-    }
-  });
+router.get('/', backendSession, async (req, res) => {
+  try {
+    const customers = await Customer.findAll({
+      attributes: { exclude: ['password'] }, // für die Sicherheit
+    });
+
+    return res.status(200).json(customers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
 
 // returns a specific customer  
 router.get('/:id', backendSession, isAuthenticated, async (req, res) => {
-    try {
-      const customerId = req.params.id;
-      const customer = await Customer.findOne({
-        where: { id: customerId },
-        attributes: { exclude: ['password'] }, // für die Sicherheit
-        include: [
-          {
-            model: Order,
-            as: 'orders',
-            include: [
-              {
-                model: Status,
-                as: 'status',
-              },
-            ],
-          },
-          {
-            model: Address,
-            as: 'addresses',
-          },
-        ],
-      });
-  
-      if (!customer) {
-        return res.status(404).json({ message: 'Kunde nicht gefunden.' });
-      }
-  
-      return res.status(200).json(customer);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Interner Serverfehler.' });
+  try {
+    const customerId = req.params.id;
+    const customer = await Customer.findOne({
+      where: { id: customerId },
+      attributes: { exclude: ['password'] }, // für die Sicherheit
+      include: [
+        {
+          model: Order,
+          as: 'orders',
+          include: [
+            {
+              model: Status,
+              as: 'status',
+            },
+          ],
+        },
+        {
+          model: Address,
+          as: 'addresses',
+        },
+      ],
+    });
+
+    if (!customer) {
+      return res.status(404).json({ message: 'Kunde nicht gefunden.' });
     }
-  });
- 
+
+    return res.status(200).json(customer);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 // updates a customer  
-router.put('/:id',backendSession, isAuthenticated, customerValidation(),validate, async (req, res) => {
-    try {
-      const customerId = req.params.id;
-      const customer = req.body;
-  
-      const updatedCustomer = await Customer.update(customer, {
-        where: { id: customerId },
-      });
-  
-      if (updatedCustomer == 0) {
-        return res.status(400).json({ message: 'Kunde konnte nicht aktualisiert werden.' });
-      }
-  
-      if (customer.addresses && Array.isArray(customer.addresses)) {
-        for (const address of customer.addresses) {
-          if (address.id) {
-            await Address.update(address, {
-              where: { id: address.id, customer_id: customerId },
-            });
-          } else {
-            await Address.create({ ...address, customer_id: customerId });
-          }
+router.put('/:id', backendSession, isAuthenticated, customerValidation(), validate, async (req, res) => {
+  try {
+    const customerId = req.params.id;
+    const customer = req.body;
+
+    const updatedCustomer = await Customer.update(customer, {
+      where: { id: customerId },
+    });
+
+    if (updatedCustomer == 0) {
+      return res.status(400).json({ message: 'Kunde konnte nicht aktualisiert werden.' });
+    }
+
+    if (customer.addresses && Array.isArray(customer.addresses)) {
+      for (const address of customer.addresses) {
+        if (address.id) {
+          await Address.update(address, {
+            where: { id: address.id, customer_id: customerId },
+          });
+        } else {
+          await Address.create({ ...address, customer_id: customerId });
         }
       }
-  
-      return res.status(200).json({ message: 'Kunde und Adressen wurden erfolgreich aktualisiert.' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Interner Serverfehler.' });
     }
-  });
+
+    return res.status(200).json({ message: 'Kunde und Adressen wurden erfolgreich aktualisiert.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+//updates the password of a customer 
+router.post('/:id/password', backendSession, isAuthenticated, async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: 'Password muss gesetzt sein' });
+    }
+    const customer = await Customer.findOne({ where: { id } });
+    if (!customer) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+
+    const [updated] = await Customer.update(
+      { password: hashedPassword },
+      { where: { id } }
+    );
+
+    if (updated) {
+      return res.status(200).json({ message: 'Passwort wurde erfolgreich aktualisiert' });
+    } else {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Serverfehler" });
+  }
+});
 
 // creates a customer  
-router.post('/',backendSession, isAuthenticated, customerValidation(),validate, async (req, res) => {
-    try {
-      const customer = req.body;
+router.post('/', backendSession, isAuthenticated, customerValidation(), validate, async (req, res) => {
+  try {
+    const customer = req.body;
 
-      customer.password = await bcrypt.hash("test", 10);
-  
-      const newCustomer = await Customer.create(customer);
-      if (newCustomer) {
-        return res.status(200).json({ message: 'Kunde wurde erfolgreich angelegt', customer : newCustomer });
-      }
-      else {
-        console.log(newUser);
-        return res.status(400).json({ message: 'Fehler bei Erstellung des Kunden' });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Interner Serverfehler.' });
+    customer.password = await bcrypt.hash("test", 10);
+
+    const newCustomer = await Customer.create(customer);
+    if (newCustomer) {
+      return res.status(200).json({ message: 'Kunde wurde erfolgreich angelegt', customer: newCustomer });
     }
-  });
+    else {
+      console.log(newUser);
+      return res.status(400).json({ message: 'Fehler bei Erstellung des Kunden' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
 
 // serach for a customer
 router.get('/search/query', async (req, res) => {
-    const searchQuery = req.query.q;
-  
-    if (!searchQuery) {
-      return res.status(400).json({ message: 'Suchbegriff erforderlich' });
-    }
-  
-    try {
-      const whereClause = [];
-  
-      if (!isNaN(searchQuery)) {
-  
-        whereClause.push(
-          { id: searchQuery }, // Exakte Übereinstimmung für ID
-        );
-      } else {
-        // Suche nach Name (case-insensitive)
-        whereClause.push({
-          [Op.or]: [
-            { firstname: { [Op.iLike]: `%${searchQuery}%` } },  // Vorname durchsuchen
-            { lastname: { [Op.iLike]: `%${searchQuery}%` } },   // Nachname durchsuchen
-            { email: { [Op.iLike]: `%${searchQuery}%` } }       // E-Mail durchsuchen
-          ]
-        });
-      }
-  
-  
-      // Kombinierte Abfrage für alle Bedingungen
-      const customers = await Customer.findAll({
-        where: {
-          [Op.or]: whereClause,
-        },
+  const searchQuery = req.query.q;
+
+  if (!searchQuery) {
+    return res.status(400).json({ message: 'Suchbegriff erforderlich' });
+  }
+
+  try {
+    const whereClause = [];
+
+    if (!isNaN(searchQuery)) {
+
+      whereClause.push(
+        { id: searchQuery }, // Exakte Übereinstimmung für ID
+      );
+    } else {
+      // Suche nach Name (case-insensitive)
+      whereClause.push({
+        [Op.or]: [
+          { firstname: { [Op.iLike]: `%${searchQuery}%` } },  // Vorname durchsuchen
+          { lastname: { [Op.iLike]: `%${searchQuery}%` } },   // Nachname durchsuchen
+          { email: { [Op.iLike]: `%${searchQuery}%` } }       // E-Mail durchsuchen
+        ]
       });
-  
-      if (customers.length === 0) {
-        return res.status(404).json([]);
-      }
-      console.log(customers);
-      res.status(200).json(customers);
-    } catch (error) {
-      console.error('Fehler beim Abrufen der Kunden:', error);
-      res.status(500).json({ message: 'Interner Serverfehler.' });
     }
-  });
 
-module.exports = router;
 
-router.post('/login',frontendSession, async (req, res) => {
+    // Kombinierte Abfrage für alle Bedingungen
+    const customers = await Customer.findAll({
+      where: {
+        [Op.or]: whereClause,
+      },
+    });
+
+    if (customers.length === 0) {
+      return res.status(404).json([]);
+    }
+    console.log(customers);
+    res.status(200).json(customers);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Kunden:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+// login for a customer
+router.post('/login', frontendSession, async (req, res) => {
   const { email, password } = req.body;
   const existingCustomer = await Customer.findOne({ where: { email } });
   console.log(existingCustomer);
   if (!existingCustomer) {
     console.log("Ungültige Anmeldedaten");
-      return res.status(401).json({ message: "Ungültige Anmeldedaten" });
+    return res.status(401).json({ message: "Ungültige Anmeldedaten" });
   }
 
   const isPasswordValid = await bcrypt.compare(password, existingCustomer.password);
 
   if (isPasswordValid) {
-      req.session.customer = {
-          id: existingCustomer.id,
-          email: existingCustomer.email,
-          firstname: existingCustomer.firstname,
-          lastname: existingCustomer.lastname,
-      };
+    req.session.customer = {
+      id: existingCustomer.id,
+      email: existingCustomer.email,
+      firstname: existingCustomer.firstname,
+      lastname: existingCustomer.lastname,
+    };
 
 
 
-      return res.status(200).json({ message: "Login erfolgreich", customer: req.session.customer });
+    return res.status(200).json({ message: "Login erfolgreich", customer: req.session.customer });
   }
   else {
-      return res.status(401).json({ message: "Ungültige Anmeldedaten" });
+    return res.status(401).json({ message: "Ungültige Anmeldedaten" });
   }
 });
 
- 
-router.get('/auth/refresh', frontendSession,  (req, res) => {
+// authentication for a customer
+router.get('/auth/refresh', frontendSession, (req, res) => {
   if (req.session.customer) {
-      console.log(req.session.customer + " richtig");
-      res.status(200).json({ customer: req.session.customer });
+    console.log(req.session.customer + " richtig");
+    res.status(200).json({ customer: req.session.customer });
   } else {
-      console.log( + " falsch");
-      res.status(401).json({ message: "Nicht authentifiziert" });
+    console.log(+ " falsch");
+    res.status(401).json({ message: "Nicht authentifiziert" });
   }
 });
 
-router.delete('/logout',frontendSession, (req, res) => {
+// logout for a customer
+router.delete('/logout', frontendSession, (req, res) => {
   req.session.destroy((err) => {
-      if (err) {
-          console.error('Fehler beim Zerstören der Session:', err);
-          return res.status(500).json({ message: 'Logout fehlgeschlagen' });
-      }
+    if (err) {
+      console.error('Fehler beim Zerstören der Session:', err);
+      return res.status(500).json({ message: 'Logout fehlgeschlagen' });
+    }
 
-      res.clearCookie('FSID');
-      return res.status(200).json({ message: 'Logout erfolgreich' });
+    res.clearCookie('FSID');
+    return res.status(200).json({ message: 'Logout erfolgreich' });
   });
 
 });
 
-/*
-
-
-
-
-  
-
-
-
+// register for a customer
 router.post('/register',frontendSession,  async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
 
@@ -266,10 +296,7 @@ router.post('/register',frontendSession,  async (req, res) => {
     }
 });
 
-
-
-
-
+// returns all orders from a customer
 router.get('/customer/:id/orders', async (req, res) => {
     try {
         const customerId = req.params.id;
@@ -291,5 +318,4 @@ router.get('/customer/:id/orders', async (req, res) => {
 });
 
 
-module.exports = router;
-*/
+

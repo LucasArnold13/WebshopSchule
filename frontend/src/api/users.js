@@ -29,6 +29,15 @@ export const updateUser = async (user) => {
     });
     }
 
+    export const updateUserPassword = async (password, id) => {
+        return await apiCall({
+            url: `${API_BASE_URL}api/users/${id}/password`,
+            method: 'POST',
+            body: {password}, 
+            showSnackbar : true
+        });
+        }
+
 export const createUser = async (user) => {
     return await apiCall({
         url: `${API_BASE_URL}api/users`,
@@ -52,6 +61,7 @@ export const logoutUser = async () => {
         method: 'DELETE',
     });
     }
+
 export const authUser = async () => {
     return await apiCall({
         url: `${API_BASE_URL}api/users/auth/refresh`,

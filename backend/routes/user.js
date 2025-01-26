@@ -11,12 +11,13 @@ const {
   Sequelize
 } = require("sequelize");
 
-const { frontendSession, backendSession } = require("../sessions/session");
+const { backendSession } = require("../sessions/session");
+const isAuthenticated = require("../middlewares/authentification");
 
 
 
 // returns all users
-router.get('/', async (req, res) => {
+router.get('/', backendSession, isAuthenticated, async (req, res) => {
   try {
     const users = await User.findAll({
       attributes: { exclude: ['password'] }, // für die Sicherheit
@@ -35,7 +36,7 @@ router.get('/', async (req, res) => {
 });
 
 // returns an specific user
-router.get('/:id', async (req, res) => {
+router.get('/:id', backendSession, isAuthenticated, async (req, res) => {
   try {
     const userID = req.params.id;
 
@@ -62,7 +63,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // updates a user
-router.put('/:id', userValidation(), validate, async (req, res) => {
+router.put('/:id', backendSession, isAuthenticated, userValidation(), validate, async (req, res) => {
   try {
 
     const user = req.body;
@@ -91,7 +92,7 @@ router.put('/:id', userValidation(), validate, async (req, res) => {
 });
 
 // creates a user
-router.post('/', userValidation(), validate, async (req, res) => {
+router.post('/', backendSession, isAuthenticated, userValidation(), validate, async (req, res) => {
   try {
     const user = req.body;
     const saltRounds = 10;
@@ -112,15 +113,55 @@ router.post('/', userValidation(), validate, async (req, res) => {
   }
 });
 
+router.post('/:id/password', backendSession, isAuthenticated, async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    console.log(id);
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: 'Password muss gesetzt sein' });
+    }
+    const user = await User.findOne({ where: { id } });
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+
+    const [updated] = await User.update(
+      { password: hashedPassword },
+      { where: { id } }
+    );
+
+    // Überprüfe, ob der Benutzer aktualisiert wurde
+    if (updated) {
+      return res.status(200).json({ message: 'Passwort wurde erfolgreich aktualisiert' });
+    } else {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Serverfehler" });
+  }
+});
+
 
 router.post('/login', backendSession, async (req, res) => {
-  console.log("login");
   const { name, password } = req.body;
   const existingUser = await User.findOne({ where: { name }, include: [{ model: Role, as: 'role' }] });
 
   if (!existingUser) {
     return res.status(401).json({ message: "Ungültige Anmeldedaten" });
   }
+  else if (!existingUser.is_active) {
+    return res.status(401).json({ message: "Benutzer ist nicht mehr aktiv" });
+  }
+
 
   const isPasswordValid = await bcrypt.compare(password, existingUser.password);
 
@@ -128,7 +169,7 @@ router.post('/login', backendSession, async (req, res) => {
     req.session.user = {
       id: existingUser.id,
       name: existingUser.name,
-      role : existingUser.role
+      role: existingUser.role
     };
 
     return res.status(200).json({ message: "Login erfolgreich", user: req.session.user });
@@ -147,15 +188,15 @@ router.get('/auth/refresh', backendSession, (req, res) => {
   }
 });
 
-router.delete('/logout',backendSession, (req, res) => {
+router.delete('/logout', backendSession, (req, res) => {
   req.session.destroy((err) => {
-      if (err) {
-          console.error('Fehler beim Zerstören der Session:', err);
-          return res.status(500).json({ message: 'Logout fehlgeschlagen' });
-      }
+    if (err) {
+      console.error('Fehler beim Zerstören der Session:', err);
+      return res.status(500).json({ message: 'Logout fehlgeschlagen' });
+    }
 
-      res.clearCookie('BSID');
-      return res.status(200).json({ message: 'Logout erfolgreich' });
+    res.clearCookie('BSID');
+    return res.status(200).json({ message: 'Logout erfolgreich' });
   });
 
 });
