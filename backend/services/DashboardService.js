@@ -1,5 +1,5 @@
 const { Op, col, fn, Sequelize } = require('sequelize');
-const { Order } = require('../models');
+const { Order, Orderitems, Product, Category } = require('../models');
 const bcrypt = require("bcrypt");
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -174,8 +174,37 @@ async function getOrderChartData() {
     return {orderCounts : orderCounts , timeRangeString : timeRangeString};
 }
 
-async function name(params) {
+async function getQuantityByCategory() {
+    dayjs.extend(isoWeek);
+    dayjs.extend(utc);
+    dayjs.extend(timezone);
+
+    const startOfLastMonth = dayjs().subtract(1, 'month').startOf('isoWeek').tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss');  // Montag
+    const endOfLastMonth = dayjs().subtract(1, 'month').endOf('isoWeek').tz('Europe/Berlin').endOf('day').format('YYYY-MM-DD HH:mm:ss');  // Sonntag
+
+    const topCategories = await OrderItem.findAll({
+        attributes: [
+          [sequelize.fn('SUM', sequelize.col('quantity')), 'total_quantity_sold']
+        ],
+        include: [
+          {
+            model: Product,
+            attributes: [], // Keine zusätzlichen Attribute von Product benötigt
+            include: [
+              {
+                model: Category,
+                attributes: ['name'] // Kategoriename wird benötigt
+              }
+            ]
+          }
+        ],
+        group: ['Product.Category.name'], 
+        order: [[sequelize.literal('total_quantity_sold'), 'DESC']],
+        limit: 5 
+      });
+
+      return { data : topCategories}
 
 }
 
-module.exports = { getAllOrdersData, getTodaysRevenue, getNewCustomersFromThisMonth, getOrderChartData, name };
+module.exports = { getAllOrdersData ,getOrderChartData, getTodaysRevenue, getNewCustomersFromThisMonth };

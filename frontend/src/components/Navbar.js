@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Box, IconButton, Typography, Badge, Button, List, ListItem, ListItemText } from '@mui/material';
+import { AppBar, Toolbar, Box, IconButton, Typography, Badge, Button, List, ListItem, ListItemText, TextField } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -15,6 +15,7 @@ function Navbar() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false); // Zustand für das Öffnen/Schließen des Drawers
+  const [showSearch, setShowSearch] = useState(false); // Zustand für das Anzeigen des Suchfelds
   const { state, dispatch } = useCart(); // Verwende den globalen State
   const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -25,6 +26,10 @@ function Navbar() {
       return; // Ignoriere Tab- und Shift-Tasten
     }
     setIsOpen(open); // Zustand aktualisieren
+  };
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch); // Zustand für das Suchfeld umschalten
   };
 
   const navLinkStyle = ({ isActive }) => ({
@@ -41,10 +46,6 @@ function Navbar() {
       console.error('Fehler beim Abrufen der Daten:', error);
     }
   };
-
-
-
-
 
   useEffect(() => {
     Promise.all([fetchAndSetCategories()]).finally(() => {
@@ -105,9 +106,17 @@ function Navbar() {
 
           {/* Rechte Seite der Navbar */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton>
+            <IconButton onClick={toggleSearch}>
               <SearchOutlinedIcon />
             </IconButton>
+            {showSearch && (
+              <TextField
+                variant="outlined"
+                placeholder="Suchen..."
+                size="small"
+                sx={{ backgroundColor: 'white', borderRadius: '4px' }}
+              />
+            )}
             <UserMenu />
             <IconButton onClick={toggleDrawer(true)}>
               <Badge

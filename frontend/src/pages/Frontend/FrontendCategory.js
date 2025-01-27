@@ -24,6 +24,7 @@ function FrontendCategory() {
   const fetchAndSetCategory = async () => {
     try {
       const response = await fetchCategoryWithName(categoryName);
+      console.log(response);
       setCategory(response.data);
     } catch (error) {
       console.error("Fehler beim Abrufen der Daten:", error);
