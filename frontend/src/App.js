@@ -8,8 +8,7 @@ import FrontendLogin from "./Pages/Frontend/FrontendLogin";
 import Layout from "./Layouts/Layout"
 import Register from './Pages/Frontend/Register';
 import Customerlayout from './Layouts/Customerlayout';
-import Profile from './Pages/Frontend/Customer/profile';
-import Address from './Pages/Frontend/Customer/address';
+import Profile from './Pages/Frontend/Customer/Profile';
 import Orders from './Pages/Frontend/Customer/orders';
 import BackendLayout from './Layouts/Backendlayout';
 import BackendBackground from './Background/BackendBackground';
@@ -36,6 +35,8 @@ import AddOrder from './Pages/Backend/Order/AddOrder';
 import EditOrder from './Pages/Backend/Order/EditOrder';
 import FrontendProduct from './Pages/Frontend/FrontendProduct';
 import FrontendCategory from './Pages/Frontend/FrontendCategory';
+import Checkout from './Pages/Frontend/Checkout';
+
 
 
 function App() {
@@ -50,15 +51,15 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route path="login" element={<FrontendLogin />} />
               <Route path="register" element={<Register />} />
+              <Route path="checkout" element={<Checkout />} />
               <Route path="product/:productName" element={<FrontendProduct />} />
               <Route path=":categoryName" element={<FrontendCategory />} />
 
               <Route element={<ProtectedFrontendRoutes />} >
                 <Route path='customer/' element={<Customerlayout />}>
-                  <Route path="order/:id" element={<Order />} />
+                  <Route path="orders/:id" element={<Order />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="orders" element={<Orders />} />
-                  <Route path="addresses" element={<Address />} />
                 </Route>
               </Route>
 

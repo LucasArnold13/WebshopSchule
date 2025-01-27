@@ -118,12 +118,6 @@ export default function UserMenu() {
                Bestellungen
               </Typography>
             </MenuItem>
-            <MenuItem onClick={() => navigate('/customer/addresses')}>
-            <LocationOnIcon sx={MenuItemStyle}/>
-            <Typography color="white" sx={{ marginLeft: 1, textalign: 'center' }}>
-               Adressen
-              </Typography>
-            </MenuItem>
             <MenuItem onClick={() => handleLogout()}>
               <Logout sx={MenuItemStyle}/>
               <Typography color="white" sx={{ marginLeft: 1, textAlign: 'center' }}>

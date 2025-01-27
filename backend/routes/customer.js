@@ -29,6 +29,7 @@ router.get('/', backendSession, async (req, res) => {
 // returns a specific customer  
 router.get('/:id', backendSession, isAuthenticated, async (req, res) => {
   try {
+    console.log("test backendsession");
     const customerId = req.params.id;
     const customer = await Customer.findOne({
       where: { id: customerId },
@@ -58,6 +59,39 @@ router.get('/:id', backendSession, isAuthenticated, async (req, res) => {
     return res.status(200).json(customer);
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
+// returns a specific customer  
+router.get('/frontend/me', frontendSession, isAuthenticated, async (req, res) => {
+  try {
+    console.log("test");
+    const customerId = req.session.customer.id;
+    console.log(customerId);
+
+    const customer = await Customer.findByPk(customerId, {
+      attributes: {
+        exclude: ['password'],
+      },
+      include: [
+        {
+          model: Address,
+          as: 'addresses',
+        }
+      ]
+    });
+
+    if (!customer) {
+      return res.status(404).json({
+        message: 'Kein Kundenkonto gefunden'
+      });
+    }
+
+
+    res.status(200).json(customer);
+
+  } catch (error) {
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
@@ -230,7 +264,6 @@ router.post('/login', frontendSession, async (req, res) => {
 // authentication for a customer
 router.get('/auth/refresh', frontendSession, (req, res) => {
   if (req.session.customer) {
-    console.log(req.session.customer + " richtig");
     res.status(200).json({ customer: req.session.customer });
   } else {
     console.log(+ " falsch");
@@ -253,68 +286,68 @@ router.delete('/logout', frontendSession, (req, res) => {
 });
 
 // register for a customer
-router.post('/register',frontendSession,  async (req, res) => {
-    const { firstname, lastname, email, password } = req.body;
+router.post('/register', frontendSession, async (req, res) => {
+  const { firstname, lastname, email, password } = req.body;
 
-    if (!firstname || !lastname || !email || !password) {
-        return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
-    }
+  if (!firstname || !lastname || !email || !password) {
+    return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
+  }
 
-    const existingCostumer = await Customer.findOne({ where: { email } });
+  const existingCostumer = await Customer.findOne({ where: { email } });
 
-    if (existingCostumer) {
-        return res.status(400).json({ message: 'E-Mail wird bereits verwendet!' });
-    }
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
+  if (existingCostumer) {
+    return res.status(400).json({ message: 'E-Mail wird bereits verwendet!' });
+  }
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newCustomer = new Customer({
-            firstname,
-            lastname,
-            email,
-            password: hashedPassword,
-        });
+    const newCustomer = new Customer({
+      firstname,
+      lastname,
+      email,
+      password: hashedPassword,
+    });
 
-        await newCustomer.save();
-
-
-        req.session.user = {
-            id: newCustomer.id,
-            email: newCustomer.email,
-            firstname: newCustomer.firstname,
-            lastname: newCustomer.lastname,
-        };
+    await newCustomer.save();
 
 
-        res.status(201).json({
-            message: 'Benutzer erfolgreich registriert!',
-            user: req.session.user,
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Ein Fehler ist aufgetreten!' });
-    }
+    req.session.user = {
+      id: newCustomer.id,
+      email: newCustomer.email,
+      firstname: newCustomer.firstname,
+      lastname: newCustomer.lastname,
+    };
+
+
+    res.status(201).json({
+      message: 'Benutzer erfolgreich registriert!',
+      user: req.session.user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Ein Fehler ist aufgetreten!' });
+  }
 });
 
 // returns all orders from a customer
 router.get('/customer/:id/orders', async (req, res) => {
-    try {
-        const customerId = req.params.id;
-        const customerOrders = await Order.findAll({
-            where: { customer_id: customerId },
-            include: [
-                {
-                    model: Orderitems,
-                    as: 'orderitems',
-                },
-            ],
-        });
+  try {
+    const customerId = req.params.id;
+    const customerOrders = await Order.findAll({
+      where: { customer_id: customerId },
+      include: [
+        {
+          model: Orderitems,
+          as: 'orderitems',
+        },
+      ],
+    });
 
-        return res.json(customerOrders);
-    } catch (error) {
-        console.error('Fehler beim Abrufen der Bestellungen:', error);
-        res.status(500).json({ message: 'Interner Serverfehler.' });
-    }
+    return res.json(customerOrders);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bestellungen:', error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
 });
 
 

@@ -9,10 +9,10 @@ function ProtectedFrontendRoutes() {
 
 
 
-
-
+  return <Outlet />;
+  console.log(customer.isAuthenticated);
   if (customer.isAuthenticated) {
-    return <Outlet />;
+
   }
   return <Navigate to="/login" state={{ from: location }} replace />;
 

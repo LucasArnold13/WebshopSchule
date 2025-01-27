@@ -1,8 +1,10 @@
 import { Box, Drawer, Typography, List, ListItem, ListItemText, Button, IconButton, Divider } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCart } from '../Context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 function CartDrawer({ open, onClose }) {
+    const navigate = useNavigate();
     const { state, dispatch } = useCart(); // Verwende den globalen State
 
     const handleRemoveItem = (productId) => {
@@ -10,8 +12,7 @@ function CartDrawer({ open, onClose }) {
     };
 
     const handleCheckout = () => {
-        console.log('Checkout gestartet');
-        // Hier könntest du den Checkout-Prozess starten
+        navigate("/checkout")
     };
 
     return (

@@ -27,19 +27,30 @@ export const apiCall = async ({
         const data = await response.json();
 
         if (ignoreHttpStatus) {
+            console.log(ignoreHttpStatus, "lol")
             return { status: response.status, data };
         }
   
         if (response.status === 401) // Unauthorized
         {
+
             window.dispatchEvent(
                 new CustomEvent("snackbar", {
                     detail: { message: data.message, severity: "error" },
                 })
             );
-            if (window.location.pathname !== "/backend/login") {
-                window.location.href = "/backend/login";
-            }
+            if (window.location.pathname.includes("backend")) {
+                // Wir sind im Backend, also zum Backend-Login
+                if (window.location.pathname !== "/backend/login") {
+                  window.location.href = "/backend/login";
+                }
+              } else {
+                // Wir sind nicht im Backend, also zum normalen Login
+                if (window.location.pathname !== "/login") {
+                  window.location.href = "/login";
+                }
+              }
+              
 
             return {status : response.status};
         }

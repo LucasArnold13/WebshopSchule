@@ -15,6 +15,13 @@ export const fetchCustomer = async (id) => {
     });
 };
 
+export const fetchCustomerFrontend = async () => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/customers/frontend/me`,
+        method: 'GET',
+    });
+};
+
 export const updateCustomer = async (customer) => {
     return await apiCall({
         url: `${API_BASE_URL}api/customers/${customer.id}`,

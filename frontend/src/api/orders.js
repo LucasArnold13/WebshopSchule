@@ -14,6 +14,14 @@ export const fetchOrder = async (id) => {
     });
 };
 
+export const fetchOrderFrontend = async (id) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/orders/${id}/frontend`,
+        method: 'GET',
+        ignoreHttpStatus : true
+    });
+};
+
 export const fetchOrderForEdit = async (id) => {
     return await apiCall({
         url: `${API_BASE_URL}api/orders/${id}/edit`,

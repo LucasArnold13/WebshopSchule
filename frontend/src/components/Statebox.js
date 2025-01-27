@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import { getStatusColor } from "../utils/getStatusColor";
 
 function Statebox({state})
 {
@@ -9,7 +10,7 @@ function Statebox({state})
     };
 
     return (
-        <Box sx={{backgroundColor : colors[state.id], borderRadius : "5px", justifyContent : "center", display : "flex"}}>
+        <Box sx={{backgroundColor : getStatusColor(state.id), borderRadius : "5px", justifyContent : "center", display : "flex"}}>
             <Typography> {state.name}</Typography>
         </Box>
     );

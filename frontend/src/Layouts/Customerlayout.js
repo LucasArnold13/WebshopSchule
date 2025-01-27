@@ -5,72 +5,68 @@ import { useDispatch, useSelector } from "react-redux";
 
 function Customerlayout() {
     const customer = useSelector((state) => state.customer);
+    const navLinks = [
+        { to: "/customer/profile", label: "Profil" },
+        { to: "/customer/orders", label: "Bestellungen" },
+    ];
 
- 
     const navLinkStyle = ({ isActive }) => ({
         textDecoration: "none",
         color: isActive ? "white" : "rgba(255, 255, 255, 0.7)",
         padding: "10px 15px",
         borderRadius: "8px",
+        justifyContent: "center",
+        display : "flex",
         backgroundColor: isActive ? "rgba(255, 255, 255, 0.3)" : "transparent",
-        display: "block",
     });
     useEffect(() => {
 
     });
 
-        return (
+    return (
+        <Box sx={{
+            display: 'flex',
+            backgroundColor: "transparent"
+        }}>
             <Box sx={{
+                flex: 1,
+                background: "transparent",
+                height: "100vh",
                 display: 'flex',
-                backgroundColor: "transparent"
+                borderRight: 1,
+                borderColor: 'divider',
+                justifyContent: "flex-start",
+                flexDirection: 'column',
+                overflow: 'hidden',
+                alignItems: 'center',
+
             }}>
-                <Box sx={{
-                    flex: 1,
-                    background: "transparent",
-                    height: "100vh",
-                    display: 'flex',
-                    justifyContent : "flex-start",
-                    flexDirection: 'column',
-                    overflow: 'hidden',
-                    alignItems: 'center',
-                }}>
-                    <Box>
-                        <Typography variant="h4" sx={{ marginBottom: '20px' }}>
-                           {customer.firstname} {customer.lastname}
-                        </Typography>
+                <Box sx={{  }}>
+                    <Typography variant="h4" sx={{ marginBottom: '20px' }}>
+                        {customer.firstname} {customer.lastname}
+                    </Typography>
 
 
-                        <Box sx={{ padding: "10px" }}>
-                            <NavLink
-                                to="/customer/profile"
-                                style={navLinkStyle}
-                            >
-                                Profil
-                            </NavLink>
-                            <NavLink
-                                to="/customer/orders"
-                                style={navLinkStyle}
-                            >
-                                Bestellungen
-                            </NavLink>
-                            <NavLink
-                                to="/customer/addresses"
-                                style={navLinkStyle}
-                            >
-                                Adressen
-                            </NavLink>
-                        </Box>
-
+                    <Box sx={{ padding: "10px" }}>
+                    {navLinks.map((link) => (
+                    <Box key={link.to} sx={{ '&:hover': { backgroundColor: "rgba(255, 255, 255, 0.3)",  borderRadius: "8px", } }}>
+                        <NavLink to={link.to} style={({ isActive }) => navLinkStyle({ isActive })}>
+                            {link.label}
+                        </NavLink>
                     </Box>
-                </Box>
+                ))}
+                    </Box>
 
-                <Box sx={{
-                    flex: 4,
-                }}>
-                    <Outlet />
                 </Box>
             </Box>
-        );
+
+            <Box sx={{
+                flex: 4,
+            }}>
+                <Outlet />
+            </Box>
+        </Box>
+    );
 };
 
 export default Customerlayout;

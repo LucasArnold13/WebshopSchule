@@ -219,6 +219,13 @@ function Customer() {
             <BackendHeader item={customer} name={"Kunde"}>
                 <Button
                     variant="contained"
+                    color="secondary"
+                    onClick={() => navigate('/backend/orders/new?customerId=' + customer.id)}>
+                    Bestellung anlegen
+                </Button>
+
+                <Button
+                    variant="contained"
                     onClick={() => setOpenPasswordModal(true)}>
                     Passwort ändern
                 </Button>
