@@ -1,4 +1,4 @@
-const { Op, col, fn, Sequelize } = require('sequelize');
+const { Op, col, fn, Sequelize, where } = require('sequelize');
 const { Order, Orderitems, Product, Category } = require('../models');
 const bcrypt = require("bcrypt");
 const dayjs = require('dayjs');
@@ -6,6 +6,7 @@ const utc = require('dayjs/plugin/utc');
 var timezone = require("dayjs/plugin/timezone");
 const isoWeek = require('dayjs/plugin/isoWeek');
 const TIMEZONE = 'Europe/Berlin';
+const { sequelize } = require('../models');
 
 async function getAllOrdersData() {
     try {
@@ -52,7 +53,7 @@ async function getAllOrdersData() {
         const formattedEndDate = dayjs(endOfCurrentMonth).format('DD.MM.YYYY');
         const timeRangeString = `${formattedStartDate} - ${formattedEndDate}`;
 
-        return { data: currentMonthOrders,percentageChange : percentageChange,timeRangeString :  timeRangeString, title : "Bestellungen in diesem Monat" };
+        return { data: currentMonthOrders, percentageChange: percentageChange, timeRangeString: timeRangeString, title: "Bestellungen in diesem Monat" };
     } catch (error) {
         console.error('Fehler beim Abrufen der Bestelldaten:', error);
         throw new Error('Fehler beim Abrufen der Bestelldaten.');
@@ -86,7 +87,7 @@ async function getTodaysRevenue() {
 
     const roundedTotalRevenue = totalRevenueToday !== null ? totalRevenueToday.toFixed(2) : '0.00';
 
-    return { data: roundedTotalRevenue, timeRangeString: dayjs().format('DD.MM.YYYY'), percentageChange: percentageChange, title : "heutige Einnahmen" }
+    return { data: roundedTotalRevenue, timeRangeString: dayjs().format('DD.MM.YYYY'), percentageChange: percentageChange, title: "heutige Einnahmen" }
 
 }
 
@@ -123,21 +124,21 @@ async function getNewCustomersFromThisMonth() {
     });
 
     const percentageChange = lastMonthNewCustomers === 0
-    ? currentMonthNewCustomers > 0
-        ? 100 // Keine Neukunden im letzten Monat, aber im aktuellen
-        : 0  // Keine Neukunden in beiden Monaten
-    : ((currentMonthNewCustomers - lastMonthNewCustomers) / lastMonthNewCustomers) * 100;
+        ? currentMonthNewCustomers > 0
+            ? 100 // Keine Neukunden im letzten Monat, aber im aktuellen
+            : 0  // Keine Neukunden in beiden Monaten
+        : ((currentMonthNewCustomers - lastMonthNewCustomers) / lastMonthNewCustomers) * 100;
 
     // Zeitrahmen als String formatieren
     const formattedStartDate = dayjs(startOfCurrentMonth).format('DD.MM.YYYY');
     const formattedEndDate = dayjs(endOfCurrentMonth).format('DD.MM.YYYY');
     const timeRangeString = `${formattedStartDate} - ${formattedEndDate}`;
 
-    return { 
+    return {
         data: currentMonthNewCustomers,
-        percentageChange : percentageChange, 
-        timeRangeString : timeRangeString,
-        title : "Neukunden im Monat"
+        percentageChange: percentageChange,
+        timeRangeString: timeRangeString,
+        title: "Neukunden im Monat"
     }
 
 }
@@ -171,7 +172,7 @@ async function getOrderChartData() {
     const timeRangeString = `${formattedStartDate} - ${formattedEndDate}`;
 
 
-    return {orderCounts : orderCounts , timeRangeString : timeRangeString};
+    return { orderCounts: orderCounts, timeRangeString: timeRangeString };
 }
 
 async function getQuantityByCategory() {
@@ -182,29 +183,28 @@ async function getQuantityByCategory() {
     const startOfLastMonth = dayjs().subtract(1, 'month').startOf('isoWeek').tz('Europe/Berlin').format('YYYY-MM-DD HH:mm:ss');  // Montag
     const endOfLastMonth = dayjs().subtract(1, 'month').endOf('isoWeek').tz('Europe/Berlin').endOf('day').format('YYYY-MM-DD HH:mm:ss');  // Sonntag
 
-    const topCategories = await OrderItem.findAll({
-        attributes: [
-          [sequelize.fn('SUM', sequelize.col('quantity')), 'total_quantity_sold']
-        ],
-        include: [
-          {
-            model: Product,
-            attributes: [], // Keine zusätzlichen Attribute von Product benötigt
-            include: [
-              {
-                model: Category,
-                attributes: ['name'] // Kategoriename wird benötigt
-              }
-            ]
-          }
-        ],
-        group: ['Product.Category.name'], 
-        order: [[sequelize.literal('total_quantity_sold'), 'DESC']],
-        limit: 5 
-      });
 
-      return { data : topCategories}
+    const activeProducts = await Product.count({
+        where: {
+            is_active: {
+                [Op.eq]: true,
+            },
+        },
+    });
+
+    const inactiveProducts = await Product.count({
+        where: {
+            is_active: {
+                [Op.eq]: false,
+            },
+        },
+    });
+    
+
+
+
+return { data: {activeProducts, inactiveProducts} }
 
 }
 
-module.exports = { getAllOrdersData ,getOrderChartData, getTodaysRevenue, getNewCustomersFromThisMonth };
+module.exports = { getAllOrdersData, getOrderChartData, getTodaysRevenue, getNewCustomersFromThisMonth, getQuantityByCategory };

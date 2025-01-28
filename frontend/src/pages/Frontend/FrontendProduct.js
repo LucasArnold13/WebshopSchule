@@ -1,8 +1,8 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchProductWithName } from "../../api/products";
 import { useEffect, useState } from "react";
-
-// Material UI Komponenten
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Box,
   Typography,
@@ -13,16 +13,20 @@ import {
   AccordionSummary,
   AccordionDetails,
   Skeleton,
-  Divider
+  Divider,
+  Grid2
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Grid from "@mui/material/Grid";
+import { useCart } from "../../Context/CartContext";
+import { getCartFromLocalStorage } from "../../utils/localStorageCart";
+
+
 
 function FrontendProduct() {
+  const navigate = useNavigate();
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(true);
-
   const { productName } = useParams();
+  const { dispatch } = useCart();
 
   const fetchAndSetProduct = async () => {
     try {
@@ -37,121 +41,194 @@ function FrontendProduct() {
     Promise.all([fetchAndSetProduct()]).finally(() => {
       setLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productName]);
+    const savedCart = getCartFromLocalStorage();
+    dispatch({ type: "LOAD_CART", payload: savedCart });
+
+  }, [productName, dispatch]);
+
+
+  // Funktion zum Hinzufügen des Produkts in den Warenkorb
+  const addToCart = () => {
+    try {
+      dispatch({ type: "ADD_TO_CART", payload: product });
+    } catch (error) {
+      console.error("Fehler beim Hinzufügen zum Warenkorb:", error);
+    }
+  };
+
 
   if (loading) {
-    // Skeleton-Loader für Bild, Titel, Preis, etc.
     return (
-      <Box sx={{ padding: 2 }}>
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
-            <Skeleton variant="rectangular" width="100%" height={400} />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Skeleton variant="text" width="60%" height={60} />
-            <Skeleton variant="text" width="40%" height={40} />
-            <Skeleton variant="text" width="80%" height={120} />
-            <Skeleton variant="rectangular" width="100%" height={50} />
-          </Grid>
-        </Grid>
+      <Box sx={{ padding: 4, maxWidth: 1280, margin: '0 auto' }}>
+        <Grid2 container spacing={6}>
+          <Grid2 item xs={12} md={6}>
+            <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 4 }} />
+          </Grid2>
+          <Grid2 item xs={12} md={6}>
+            <Skeleton variant="text" width="80%" height={80} />
+            <Skeleton variant="text" width="40%" height={60} />
+            <Skeleton variant="text" width="100%" height={120} />
+            <Skeleton variant="rectangular" width="100%" height={60} sx={{ mt: 4 }} />
+          </Grid2>
+        </Grid2>
       </Box>
     );
   }
 
-  // Hier gehen wir davon aus, dass dein API-Response einen key "stock" mit dem Lagerbestand liefert
-  const stockAvailable = product.stock || 0; // Fallback auf 0, falls nicht definiert
+  const stockAvailable = product.stock || 0;
 
   return (
-    <Box sx={{ padding: 2 }}>
-      <Grid container spacing={4}>
-        {/* Linke Spalte: Produktbild */}
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              boxShadow: "none",
-              border: "1px solid #e0e0e0",
-              borderRadius: 2,
-            }}
-          >
+    <Box sx={{ padding: 4, maxWidth: 1280, margin: '0 auto' }}>
+      {/* Zurück-Button */}
+      <Button
+        startIcon={<ArrowBackIcon />}
+        onClick={() => navigate(-1)}
+        sx={{
+          mb: 4,
+          textTransform: 'none',
+          fontWeight: 500,
+          color: 'text.secondary',
+          '&:hover': {
+            backgroundColor: 'action.hover',
+            boxShadow: 1
+          }
+        }}
+      >
+        Zurück zur Übersicht
+      </Button>
+
+      <Grid2 container spacing={6}>
+        {/* Bildbereich */}
+        <Grid2 item xs={12} md={6}>
+          <Card sx={{
+            boxShadow: 3,
+            borderRadius: 4,
+            overflow: 'hidden',
+            transition: 'transform 0.3s',
+            '&:hover': { transform: 'scale(1.02)' }
+          }}>
             <CardMedia
               component="img"
-              image={product.image_url}
+              image={product.image_url || '/placeholder-product.jpg'}
               alt={product.name}
               sx={{
-                maxHeight: 500,
-                objectFit: "contain",
+                height: 500,
+                objectFit: 'cover',
+                backgroundColor: '#f5f5f5'
               }}
             />
           </Card>
-        </Grid>
+        </Grid2>
 
-        {/* Rechte Spalte: Produktdetails */}
-        <Grid item xs={12} md={6}>
-          <Box>
-            <Typography variant="h4" gutterBottom>
+        {/* Produktinfo */}
+        <Grid2 item xs={12} md={6}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Typography variant="h3" sx={{
+              fontWeight: 700,
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical'
+            }}>
               {product.name}
             </Typography>
 
-            <Typography variant="h5" color="primary" gutterBottom>
-              {product.price} €
+            <Typography variant="h4" sx={{
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}>
+              {new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'EUR'
+              }).format(product.price)}
             </Typography>
 
-            <Divider sx={{ marginBottom: 2 }} />
+            <Divider sx={{ my: 2 }} />
 
-            <Typography variant="body1" color="text.secondary" paragraph>
-              {product.description || "Keine Beschreibung verfügbar."}
-            </Typography>
+            <Box sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+              gap: 10,
+              mt: 2,
+            }}>
+              <Box>
+                <Typography variant="overline" color="text.secondary">
+                  Artikelnummer
+                </Typography>
+                <Typography variant="body1">{product.sku}</Typography>
+              </Box>
 
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ marginBottom: 2 }}
-            >
-              Artikelnummer: {product.sku}
-            </Typography>
-
-            {/* Lagerbestand */}
-            <Typography variant="body2" sx={{ marginBottom: 2 }}>
-              {stockAvailable > 0
-                ? `Noch ${stockAvailable} Stück auf Lager`
-                : "Aktuell nicht auf Lager"}
-            </Typography>
+              <Box>
+                <Typography variant="overline" color="text.secondary">
+                  Verfügbarkeit
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 500 }}
+                >
+                  {product.quantity}
+                </Typography>
+              </Box>
+            </Box>
 
             <Button
               variant="contained"
-              color="primary"
               size="large"
-              sx={{ textTransform: "none", fontWeight: "bold", width: "100%" }}
-              onClick={() => console.log("Zum Warenkorb hinzugefügt")}
-              disabled={stockAvailable <= 0}
+              sx={{
+                mt: 4,
+                py: 2,
+                fontSize: '1.1rem',
+                borderRadius: 2,
+                boxShadow: 3,
+                '&:hover': { boxShadow: 5 }
+              }}
+              onClick={(e) => {
+                e.stopPropagation(); // Verhindert, dass onClick für die Card ausgelöst wird
+                addToCart();
+              }}
             >
-              In den Warenkorb
+              in den Warenkorb
             </Button>
           </Box>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
 
-      {/* Zusätzliche Informationen */}
-      <Box sx={{ marginTop: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          Weitere Informationen
-        </Typography>
-        <Accordion defaultExpanded>
+      <Box sx={{ mt: 8 }}>
+        <Accordion
+          sx={{
+            border: 1,
+            borderColor: 'divider',
+            boxShadow: 'none',
+            '&:before': { display: 'none' }
+          }}
+        >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1">Produktdetails</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography variant="body2" color="text.secondary">
-              Hier kannst du weitere Informationen, Spezifikationen
-              oder technische Daten zum Produkt unterbringen.
-              Du kannst auch mehrere Accordions verwenden, z.B.
-              für „Lieferumfang“, „Garantiebestimmungen“ und mehr.
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Beschreibung
             </Typography>
+          </AccordionSummary>
+
+          <AccordionDetails>
+            <Box sx={{
+              display: 'grid',
+              gap: 3,
+              p: 2
+            }}>
+              {product.description || (
+                <Typography color="text.secondary">
+                  Keine Produktbeschreibung verfügbar
+                </Typography>
+              )}
+            </Box>
           </AccordionDetails>
         </Accordion>
-        {/* Weitere Accordions bei Bedarf hinzufügen */}
       </Box>
+
+
     </Box>
   );
 }

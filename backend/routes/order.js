@@ -60,7 +60,8 @@ router.get('/customer', frontendSession, async (req, res) => {
       ],
       where: {
         customer_id: customerId
-      }
+      },
+      order: [['order_date', 'DESC']]
     });
 
     return res.status(200).json(orders);

@@ -62,8 +62,8 @@ function Navbar() {
       <AppBar
         position="fixed"
         elevation={0}
-        sx={{ backgroundColor: 'transparent', backdropFilter: 'blur(8px)' }}
-      >
+        sx={{  background: 'linear-gradient(to right, #8e44ad, #3498db)',}}
+      > 
         <Toolbar
           sx={{
             display: 'flex',

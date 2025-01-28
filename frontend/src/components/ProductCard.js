@@ -33,6 +33,10 @@ const ProductCard = ({ product }) => {
   return (
     <Card
       sx={{
+        height: "375px",     // Feste Höhe für alle Karten
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between", // Verteilt Inhalt gleichmäßig
         cursor: "pointer",
         position: "relative",
         overflow: "hidden",
@@ -47,11 +51,13 @@ const ProductCard = ({ product }) => {
     >
       <CardMedia
         component="img"
-        height="200"
         image={product.image_url}
         alt={product.name}
         sx={{
-          objectFit: "cover",
+          height: "200px",
+          width: "100%",       // Erzwingt volle Breite
+          objectFit: "cover",  // Schneidet Bilder einheitlich zu
+          aspectRatio: "1/1",
         }}
       />
 
@@ -61,7 +67,7 @@ const ProductCard = ({ product }) => {
           paddingBottom: "56px", // Platz für den "In den Warenkorb"-Button
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, }}>
           {product.name}
         </Typography>
         <Typography variant="subtitle1" color="primary">

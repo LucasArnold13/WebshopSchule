@@ -6,9 +6,8 @@ const CartContext = createContext();
 
 // Initialer State
 const initialState = {
-  cart: [],
+  cart: getCartFromLocalStorage(), // Stelle sicher, dass diese Funktion ein Array zurückgibt (auch bei leerem localStorage)
 };
-
 // Reducer-Funktion
 const cartReducer = (state, action) => {
   switch (action.type) {
