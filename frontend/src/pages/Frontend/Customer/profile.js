@@ -32,7 +32,7 @@ function Profile() {
                 <Typography
                     variant="h5"
                     sx={{
-                        fontWeight: 600,
+                        fontWeight: 600,                     
                         color: theme.palette.text.primary,
                         [theme.breakpoints.up('md')]: { fontSize: '2rem' }
                     }}
@@ -46,6 +46,8 @@ function Profile() {
                 <TextField label="Nachname" value={customer?.lastname} />
                 <TextField label="Email" value={customer?.email} />
             </Box>
+
+            
             
         </Container>
     );

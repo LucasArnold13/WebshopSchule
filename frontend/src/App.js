@@ -36,6 +36,8 @@ import EditOrder from './Pages/Backend/Order/EditOrder';
 import FrontendProduct from './Pages/Frontend/FrontendProduct';
 import FrontendCategory from './Pages/Frontend/FrontendCategory';
 import Checkout from './Pages/Frontend/Checkout';
+import Home from './Pages/Frontend/Home';
+
 
 
 
@@ -54,6 +56,7 @@ function App() {
               <Route path="checkout" element={<Checkout />} />
               <Route path="product/:productName" element={<FrontendProduct />} />
               <Route path=":categoryName" element={<FrontendCategory />} />
+              <Route path="/" element={<Home />} />
 
               <Route element={<ProtectedFrontendRoutes />} >
                 <Route path='customer/' element={<Customerlayout />}>
