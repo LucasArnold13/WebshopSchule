@@ -5,13 +5,14 @@ import { useNavigate } from 'react-router-dom';
 
 function CartDrawer({ open, onClose }) {
     const navigate = useNavigate();
-    const { state, dispatch } = useCart(); // Verwende den globalen State
+    const { state, dispatch } = useCart();
 
     const handleRemoveItem = (productId) => {
         dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
     };
 
     const handleCheckout = () => {
+        onClose({ type: "click" });  
         navigate("/checkout")
     };
 
@@ -66,14 +67,14 @@ function CartDrawer({ open, onClose }) {
                                     {/* Eckiges Produktbild anzeigen */}
                                     <Box
                                         component="img"
-                                        src={item.image_url} // Bild-URL
-                                        alt={item.name} // Alternativtext
+                                        src={item.image_url} 
+                                        alt={item.name} 
                                         sx={{
-                                            width: 56, // Breite des Bildes
-                                            height: 56, // Höhe des Bildes
-                                            borderRadius: 0, // Eckige Ecken
-                                            marginRight: 2, // Abstand zum Text
-                                            objectFit: 'cover', // Bild anpassen
+                                            width: 56,
+                                            height: 56, 
+                                            borderRadius: 2, 
+                                            marginRight: 2, 
+                                            objectFit: 'cover', 
                                         }}
                                     />
                                     <ListItemText
@@ -95,7 +96,7 @@ function CartDrawer({ open, onClose }) {
                     </List>
                 )}
 
-                {/* Checkout-Button anzeigen, wenn der Warenkorb nicht leer ist */}
+                {/* Checkout-Button anzeigen, wenn Warenkorb nicht leer */}
                 {state.cart.length > 0 && (
                     <Box sx={{ mt: 2 }}>
                         <Button

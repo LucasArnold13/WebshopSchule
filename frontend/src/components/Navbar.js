@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Box, IconButton, Typography, Badge, Button, List, ListItem, ListItemText } from '@mui/material';
+import { AppBar, Toolbar, Box, IconButton, Typography, Badge, Button, List, ListItem, ListItemText, TextField } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -9,22 +9,29 @@ import UserMenu from './UserMenu';
 import CartDrawer from './CartDrawer';
 import { fetchCategories } from '../api/categories';
 import { useCart } from '../Context/CartContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { set } from 'lodash';
 
 function Navbar() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false); // Zustand für das Öffnen/Schließen des Drawers
+  const [showSearch, setShowSearch] = useState(false); // Zustand für das Anzeigen des Suchfelds
   const { state, dispatch } = useCart(); // Verwende den globalen State
   const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
       return; // Ignoriere Tab- und Shift-Tasten
     }
     setIsOpen(open); // Zustand aktualisieren
+  };
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch); // Zustand für das Suchfeld umschalten
   };
 
   const navLinkStyle = ({ isActive }) => ({
@@ -42,10 +49,12 @@ function Navbar() {
     }
   };
 
-
-
-
-
+  const handleClickShoppingBag = async () => {
+    if (location.pathname === "/checkout") {
+      return;
+  }
+    setIsOpen(true);
+  }
   useEffect(() => {
     Promise.all([fetchAndSetCategories()]).finally(() => {
       setLoading(false);
@@ -61,7 +70,7 @@ function Navbar() {
       <AppBar
         position="fixed"
         elevation={0}
-        sx={{ backgroundColor: 'transparent', backdropFilter: 'blur(8px)' }}
+        sx={{ background: 'linear-gradient(to right, #8e44ad, #3498db)', }}
       >
         <Toolbar
           sx={{
@@ -105,11 +114,19 @@ function Navbar() {
 
           {/* Rechte Seite der Navbar */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton>
+            <IconButton onClick={toggleSearch}>
               <SearchOutlinedIcon />
             </IconButton>
+            {showSearch && (
+              <TextField
+                variant="outlined"
+                placeholder="Suchen..."
+                size="small"
+                sx={{ backgroundColor: 'white', borderRadius: '4px' }}
+              />
+            )}
             <UserMenu />
-            <IconButton onClick={toggleDrawer(true)}>
+            <IconButton onClick={handleClickShoppingBag}>
               <Badge
                 badgeContent={itemCount}
                 color="primary"

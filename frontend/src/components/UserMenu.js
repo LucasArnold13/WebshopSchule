@@ -25,7 +25,7 @@ export default function UserMenu() {
   const customer = useSelector((state) => state.customer);
 
 
-  const MenuItemStyle = () => ({ color: '#FFFFFF', fontSize: 30 });
+  const MenuItemStyle = () => ({ fontSize: 30 });
 
   React.useEffect(() => {
   });
@@ -37,7 +37,7 @@ export default function UserMenu() {
   const handleLogout = () => {
     logoutCustomer();
     dispatch(customerLogout());
-    //navigate('/');
+    navigate('/');
   }
 
   const handleClick = (event) => {
@@ -50,7 +50,7 @@ export default function UserMenu() {
 
 
   return (
-    <React.Fragment>
+    <>
       <Box sx={{ display: 'flex', alignItems: 'center', textalign: 'center' }}>
         <IconButton
           onClick={handleClick}
@@ -72,7 +72,6 @@ export default function UserMenu() {
           paper: {
             elevation: 0,
             sx: {
-              background: '#333',
               overflow: 'visible',
               filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
               mt: 0,
@@ -84,7 +83,6 @@ export default function UserMenu() {
               },
               '&::before': {
                 content: '""',
-                bgcolor: '#333',
                 display: 'block',
                 position: 'absolute',
                 top: 0,
@@ -103,24 +101,24 @@ export default function UserMenu() {
         {(customer.isAuthenticated) ?  (
           <div>
             <MenuItem>
-              <Typography color="white">Willkommen zurück {customer.firstname}!</Typography>
+              <Typography >Willkommen zurück {customer.firstname}!</Typography>
             </MenuItem>
             <Divider />
             <MenuItem onClick={() => navigate('/customer/profile')}>
             <AccountBoxOutlinedIcon sx={MenuItemStyle}/>
-              <Typography color="white" sx={{ marginLeft: 1, textalign: 'center' }}>
+              <Typography  sx={{ marginLeft: 1, textalign: 'center' }}>
                Profil
               </Typography>
             </MenuItem>
             <MenuItem onClick={() => navigate('/customer/orders')}>
             <ShoppingBagIcon sx={MenuItemStyle}/>
-            <Typography color="white" sx={{ marginLeft: 1, textalign: 'center' }}>
+            <Typography  sx={{ marginLeft: 1, textalign: 'center' }}>
                Bestellungen
               </Typography>
             </MenuItem>
             <MenuItem onClick={() => handleLogout()}>
               <Logout sx={MenuItemStyle}/>
-              <Typography color="white" sx={{ marginLeft: 1, textAlign: 'center' }}>
+              <Typography sx={{ marginLeft: 1, textAlign: 'center' }}>
                Logout
               </Typography>
             </MenuItem>
@@ -135,7 +133,7 @@ export default function UserMenu() {
                 width: '100%',
               }}
             >
-              <Typography color="white" sx={{ marginBottom: 2, textalign: 'center' }}>
+              <Typography sx={{ marginBottom: 2, textalign: 'center' }}>
                 Du bist noch nicht angemeldet
               </Typography>
               <Button
@@ -154,6 +152,6 @@ export default function UserMenu() {
           </MenuItem>
         )}
       </Menu>
-      </React.Fragment>
+      </>
   );
 }

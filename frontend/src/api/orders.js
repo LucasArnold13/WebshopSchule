@@ -48,6 +48,15 @@ export const createOrder = async (order) => {
     });
 };
 
+export const createOrderFrontend = async (order) => {
+    return await apiCall({
+        url: `${API_BASE_URL}api/orders/frontend`,
+        method: 'POST',
+        body : order,
+        showSnackbar : true
+    });
+};
+
 export const fetchOrderFromCustomer = async () => {
     return await apiCall({
         url: `${API_BASE_URL}api/orders/customer`,

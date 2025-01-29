@@ -12,6 +12,7 @@ const statusRoutes = require('./routes/status');
 const orderRoutes = require('./routes/order');
 const roleRoutes = require('./routes/role');
 const dashboardRoutes = require('./routes/dashboard');
+const addressRoutes = require('./routes/address')
 
 app.use(cors({
   origin: ["http://localhost:3001", "http://192.168.156.97:3001", "http://192.168.154.237:3001"],
@@ -32,6 +33,7 @@ app.use("/api/status", statusRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/address", addressRoutes);
 
 
 

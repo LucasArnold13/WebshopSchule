@@ -30,13 +30,13 @@ function Orders() {
     }
   };
 
- 
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4, overflowY : "auto"}}>
+    <Container maxWidth="lg" sx={{ py: 4, overflowY: "auto" }}>
       <Box sx={{ mb: 4 }}>
-        <Typography 
-          variant="h5" 
-          sx={{ 
+        <Typography
+          variant="h5"
+          sx={{
             fontWeight: 600,
             color: theme.palette.text.primary,
             [theme.breakpoints.up('md')]: { fontSize: '2rem' }
@@ -51,11 +51,11 @@ function Orders() {
         <Grid2 container spacing={3}>
           {[...Array(3)].map((_, index) => (
             <Grid2 item xs={12} key={index}>
-              <Skeleton 
-                variant="rounded" 
-                width="100%" 
-                height={120} 
-                sx={{ borderRadius: 2 }} 
+              <Skeleton
+                variant="rounded"
+                width="100%"
+                height={120}
+                sx={{ borderRadius: 2 }}
               />
             </Grid2>
           ))}
@@ -63,19 +63,16 @@ function Orders() {
       ) : (
         <Grid2 container spacing={3}>
           {orders.map((order) => (
-
-
-                <Ordercard order={order} key={order.id}/>
-
+            <Ordercard order={order} key={order.id} />
           ))}
         </Grid2>
       )}
 
       {!loading && orders.length === 0 && (
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           minHeight: 200,
           backgroundColor: theme.palette.background.paper,
           borderRadius: 2,

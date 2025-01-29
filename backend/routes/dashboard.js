@@ -3,7 +3,8 @@ const {
   getAllOrdersData,
   getTodaysRevenue,
   getNewCustomersFromThisMonth,
-  getOrderChartData
+  getOrderChartData,
+  getQuantityByCategory
 } = require("../services/DashboardService");
 
 const isAuthenticated = require("../middlewares/authentification");
@@ -18,6 +19,7 @@ router.get('/', backendSession, isAuthenticated, async (req, res) => {
       todaysRevenue: await getTodaysRevenue(),
       newCustomers: await getNewCustomersFromThisMonth(),
       orderChartData: await getOrderChartData(),
+      getQuantityByCategory : await getQuantityByCategory()
 
     }
 

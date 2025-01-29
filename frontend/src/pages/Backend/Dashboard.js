@@ -68,20 +68,23 @@ function Dashboard() {
                 </Card>
 
                 <Card sx={{ flex: 1 }}>
-                    <CardHeader title="meistverkaufte Produkte anhand der Kategorie" subheader={data?.orderChartData?.timeRangeString} />
+                    <CardHeader title="Produkte"  />
                     <CardContent sx={{ display : "flex"}}>
                         <PieChart
                             series={[
                                 {
                                     data: [
-                                        { id: 0, value: 10, label: 'series A' },
-                                        { id: 1, value: 15, label: 'series B' },
-                                        { id: 2, value: 20, label: 'series C' },
+                                        { id: 0, value: data?.getQuantityByCategory.data.activeProducts, label: 'aktive Produkte' },
+                                        { id: 1, value:  data?.getQuantityByCategory.data.inactiveProducts, label: 'inaktive Produkte' },
+                                        
                                     ],
+                                    highlightScope: { fade: 'global', highlight: 'item' },
+                                    faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
                                 },
                             ]}
                             width={400}
-                            height={290}
+                            height={300}
+                         
                         />
                     </CardContent>
 

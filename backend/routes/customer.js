@@ -170,7 +170,8 @@ router.post('/', backendSession, isAuthenticated, customerValidation(), validate
   try {
     const customer = req.body;
 
-    customer.password = await bcrypt.hash("test", 10);
+    const hashedPassword = await bcrypt.hash(customer.password, 10);
+    customer.password = hashedPassword;
 
     const newCustomer = await Customer.create(customer);
     if (newCustomer) {
