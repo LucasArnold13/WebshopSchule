@@ -12,6 +12,7 @@ function CartDrawer({ open, onClose }) {
     };
 
     const handleCheckout = () => {
+        onClose({ type: "click" });  
         navigate("/checkout")
     };
 

@@ -9,7 +9,8 @@ import UserMenu from './UserMenu';
 import CartDrawer from './CartDrawer';
 import { fetchCategories } from '../api/categories';
 import { useCart } from '../Context/CartContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { set } from 'lodash';
 
 function Navbar() {
   const [categories, setCategories] = useState([]);
@@ -20,6 +21,7 @@ function Navbar() {
   const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === "keydown" && (event.key === "Tab" || event.key === "Shift")) {
@@ -47,6 +49,12 @@ function Navbar() {
     }
   };
 
+  const handleClickShoppingBag = async () => {
+    if (location.pathname === "/checkout") {
+      return;
+  }
+    setIsOpen(true);
+  }
   useEffect(() => {
     Promise.all([fetchAndSetCategories()]).finally(() => {
       setLoading(false);
@@ -62,8 +70,8 @@ function Navbar() {
       <AppBar
         position="fixed"
         elevation={0}
-        sx={{  background: 'linear-gradient(to right, #8e44ad, #3498db)',}}
-      > 
+        sx={{ background: 'linear-gradient(to right, #8e44ad, #3498db)', }}
+      >
         <Toolbar
           sx={{
             display: 'flex',
@@ -118,7 +126,7 @@ function Navbar() {
               />
             )}
             <UserMenu />
-            <IconButton onClick={toggleDrawer(true)}>
+            <IconButton onClick={handleClickShoppingBag}>
               <Badge
                 badgeContent={itemCount}
                 color="primary"

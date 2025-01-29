@@ -1,5 +1,3 @@
-
-
 export const apiCall = async ({
     url,
     method,
@@ -27,7 +25,6 @@ export const apiCall = async ({
         const data = await response.json();
 
         if (ignoreHttpStatus) {
-            console.log(ignoreHttpStatus, "lol")
             return { status: response.status, data };
         }
   
@@ -60,8 +57,14 @@ export const apiCall = async ({
         }
         else if (response.status === 404) // not found
         {
-            if (window.location.pathname !== "/backend") {
+            if (window.location.pathname.includes("backend")) {
                 window.location.href = "/backend/404";
+              } else {
+                window.location.href = "/404";
+              }
+
+            if (window.location.pathname !== "/backend") {
+
             }
         }
         else if (response.status === 500) // internal server error

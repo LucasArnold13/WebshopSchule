@@ -5,7 +5,7 @@ import { login } from "../store/slices/userSlice";
 import { authUser } from "../api/users";
 
 function ProtectedBackendRoutes() {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const dispatch = useDispatch();

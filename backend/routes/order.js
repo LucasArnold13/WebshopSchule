@@ -201,7 +201,7 @@ router.get('/:id/edit', async (req, res) => {
   }
 });
 
-// creates a new order
+// creates a new order in backend
 router.post('/', orderValidation(), validate, async (req, res) => {
   try {
     const order = req.body;
@@ -226,6 +226,65 @@ router.post('/', orderValidation(), validate, async (req, res) => {
     res.status(500).json({ message: 'Interner Serverfehler.' });
   }
 });
+
+// creates a new order from frontend
+router.post('/frontend', frontendSession, isAuthenticated, async (req, res) => {
+  try {
+    const order = req.body;
+    order.customer_id = req.session.customer.id;
+    order.status_id = 1;
+    
+    let totalPrice = 0; // Gesamtpreis initialisieren
+
+    // **Berechne Gesamtpreis und überprüfe Produkte**
+    for (const item of order.orderitems) {
+      const product = await Product.findByPk(item.id);
+      
+      if (!product) {
+        return res.status(404).json({ message: `Produkt mit ID ${item.id} nicht gefunden.` });
+      }
+
+      if (product.quantity < item.quantity) {
+        return res.status(400).json({ message: `Nicht genügend Bestand für Produkt ID ${item.id}` });
+      }
+
+      const itemTotalPrice = product.price * item.quantity; // Preis * Anzahl
+      totalPrice += itemTotalPrice; // Auf Gesamtpreis addieren
+    }
+
+    // **Setze den endgültigen Preis**
+    order.total_price_float = totalPrice;
+
+    // **Bestellung erstellen**
+    const newOrder = await Order.create(order);
+
+    // **Bestellpositionen erstellen & Lagerbestand aktualisieren**
+    for (const item of order.orderitems) {
+      const orderitem = {};
+      console.log(item);
+      const product = await Product.findByPk(item.id);
+      
+      await product.update({ quantity: product.quantity - item.quantity });
+
+      orderitem.order_id = newOrder.id;
+      orderitem.quantity = item.quantity;
+      orderitem.product_id = item.id;
+      orderitem.price = product.price; 
+      
+      await Orderitems.create(orderitem);
+    }
+
+    if (newOrder) {
+      return res.status(201).json({ message: 'Deine Bestellung wurde erfolgreich aufgegeben', order_id: newOrder.id });
+    } else {
+      return res.status(400).json({ message: 'Fehler bei Erstellung der Bestellung' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Interner Serverfehler.' });
+  }
+});
+
 
 // updates an order
 router.put('/:id', orderValidation(), validate, async (req, res) => {

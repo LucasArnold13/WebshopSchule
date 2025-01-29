@@ -37,7 +37,7 @@ export default function UserMenu() {
   const handleLogout = () => {
     logoutCustomer();
     dispatch(customerLogout());
-    //navigate('/');
+    navigate('/');
   }
 
   const handleClick = (event) => {

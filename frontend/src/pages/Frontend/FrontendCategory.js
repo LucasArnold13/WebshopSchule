@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import ProductCard from "../../Components/ProductCard";
+import SearchOffIcon from "@mui/icons-material/SearchOff";
 
 function FrontendCategory() {
   const { categoryName } = useParams();
@@ -60,12 +61,13 @@ function FrontendCategory() {
   // Falls keine Produkte vorhanden
   if (!category.products || category.products.length === 0) {
     return (
-      <Container sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
+      <Container sx={{ mt: 4, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "50vh" }}>
+        <SearchOffIcon sx={{ fontSize: 60, color: "gray", mb: 2 }} />
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
           Keine Produkte gefunden
         </Typography>
-        <Typography variant="body1">
-          Die angeforderte Kategorie konnte nicht gefunden werden oder enthält keine Produkte.
+        <Typography variant="body1" color="textSecondary">
+          Die angeforderte Kategorie enthält keine Produkte.
         </Typography>
       </Container>
     );
