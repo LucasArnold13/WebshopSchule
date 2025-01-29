@@ -55,6 +55,7 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="product/:productName" element={<FrontendProduct />} />
             <Route path=":categoryName" element={<FrontendCategory />} />
+            <Route index element={<Home />} />
 
             <Route element={<ProtectedFrontendRoutes />} >
               <Route path='customer/' element={<Customerlayout />}>
@@ -65,18 +66,8 @@ function App() {
               <Route path="checkout" element={<Checkout />} />
               <Route path="product/:productName" element={<FrontendProduct />} />
               <Route path=":categoryName" element={<FrontendCategory />} />
-              <Route path="/" element={<Home />} />
+              
 
-              <Route element={<ProtectedFrontendRoutes />} >
-                <Route path='customer/' element={<Customerlayout />}>
-                  <Route path="orders/:id" element={<Order />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="orders" element={<Orders />} />
-                </Route>
-              </Route>
-
-              <Route path="user" />
-              <Route path="*" element={<NotFoundFrontend />} />
             </Route>
 
             <Route path="*" element={<NotFoundFrontend />} />

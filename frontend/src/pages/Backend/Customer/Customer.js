@@ -89,6 +89,8 @@ function Customer() {
         await updateCustomer(customer);
     };
 
+    
+
     const DeleteAddress = () => {
 
     };
